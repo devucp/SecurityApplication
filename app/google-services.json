@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "534786616869",
+    "firebase_url": "https://securityapplication-b990e.firebaseio.com",
+    "project_id": "securityapplication-b990e",
+    "storage_bucket": "securityapplication-b990e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534786616869:android:5a8c0e7e37d212d0",
+        "android_client_info": {
+          "package_name": "com.example.securityapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534786616869-k8kplmfdh0gfrbjlc30sts4fnmr66bo9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoktY7jMw46GPkXoAjO5xlNtjbxspEQ1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534786616869-k8kplmfdh0gfrbjlc30sts4fnmr66bo9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

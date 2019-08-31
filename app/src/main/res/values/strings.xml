@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SecurityApplication</string>
+    <string name="not_logged">NOT LOGGED IN</string>
+    <string name="logged">LOGGED IN</string>
+    <string name="sign_out_text">SIGN OUT</string>
+    <string name="sign_in_text">SIGN IN</string>
 </resources>

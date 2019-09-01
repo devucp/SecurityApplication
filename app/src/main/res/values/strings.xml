@@ -5,9 +5,5 @@
     <string name="sign_out_text">SIGN OUT</string>
     <string name="sign_in_text">SIGN IN</string>
     <string name="server_client_id">534786616869–6j43f17evv8a6tv9vh2dbbo4k0grd513.apps.googleusercontent.com</string>
-    <!-- Sign-in status messages -->
-    <string name="signed_in_fmt">Signed in as: %s</string>
-    <string name="signed_in">Signed in</string>
-    <string name="signing_in">Signing in…</string>
-    <string name="signed_out">Signed out</string>
+
 </resources>

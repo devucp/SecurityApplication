@@ -1,7 +1,6 @@
 package com.example.securityapplication;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -92,23 +91,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(!validateForm()){
             return;
         }
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(
-                        this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    updateUI(user);
-                                }
-                                else{
-                                    updateUI(null);
+        else {
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(
+                            this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        updateUI(user);
+                                    } else {
+                                        updateUI(null);
+                                    }
                                 }
                             }
-                        }
-                );
-
+                    );
+        }
     }
 
     private void signOut(){
@@ -129,12 +127,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mEmail.setVisibility(View.GONE);
             mPassword.setVisibility(View.GONE);
         }
-    }
-
-    /** Called when the user taps the Send button */
-    public void GoogleSignIn(View view) {
-        Intent intent = new Intent(this, GoogleSignInActivity.class);
-        startActivity(intent);
     }
 
 }

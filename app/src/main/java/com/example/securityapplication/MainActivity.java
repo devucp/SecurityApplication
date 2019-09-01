@@ -1,6 +1,7 @@
 package com.example.securityapplication;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -129,4 +130,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mPassword.setVisibility(View.GONE);
         }
     }
+
+    /** Called when the user taps the Send button */
+    public void GoogleSignIn(View view) {
+        Intent intent = new Intent(this, GoogleSignInActivity.class);
+        startActivity(intent);
+    }
+
 }

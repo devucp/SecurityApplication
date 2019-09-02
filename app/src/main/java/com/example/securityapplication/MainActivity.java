@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else
                 signOut();
         }
-
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth=FirebaseAuth.getInstance();
 
         findViewById(R.id.signInButton).setOnClickListener(this);
+        findViewById(R.id.googleSignInButton).setOnClickListener(this);
 
     }
 
@@ -129,12 +129,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mPassword.setVisibility(View.GONE);
         }
     }
-
-    /** Called when the user taps the Send button */
-    public void googleSignIn(View view) {
-        Intent intent;
-        intent = new Intent(this, GoogleSignInActivity.class);
-        startActivity(intent);
-    }
-
 }

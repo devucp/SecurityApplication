@@ -6,11 +6,11 @@
     <string name="sign_in_text">SIGN IN</string>
     <string name="server_client_id">534786616869-k8kplmfdh0gfrbjlc30sts4fnmr66bo9.apps.googleusercontent.com</string>
     <!--Google Sign-in-->
-    <string name="title_text">Google Sign-In</string>
+    <!--<string name="title_text">Google Sign-In</string>-->
     <!--Google Sign-in status messages-->
-    <string name="signed_in_fmt">Signed in as: %s</string>
-    <string name="signed_out">Signed out</string>
+    <!--<string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="signed_out">Signed out</string>-->
     <!-- Google Button labels -->
-    <string name="sign_out">Sign Out</string>
-    <string name="disconnect">Disconnect</string>
+    <!--<string name="sign_out">Sign Out</string>
+    <string name="disconnect">Disconnect</string>-->
 </resources>

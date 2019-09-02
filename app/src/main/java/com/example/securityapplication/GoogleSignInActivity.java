@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -16,6 +18,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,64 +34,54 @@ public class GoogleSignInActivity extends AppCompatActivity implements
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
     private TextView mStatusTextView;
+    private EditText mEmail;
+    private EditText mPassword;
+    private Button mSignInButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_google_sign_in);
-
-        //set status TextView using setter function
-        setmStatusTextView((TextView) findViewById(R.id.status));
-
-        // [START initialize_auth]
-        // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
-        // [END initialize_auth]
-
-        // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.disconnect_button).setOnClickListener(this);
+        setContentView(R.layout.activity_main);
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        findViewById(R.id.signInButton).setOnClickListener(this);
+        mEmail=findViewById(R.id.editEmail);
+        mPassword=findViewById(R.id.editPassword);
+        mStatusTextView= findViewById(R.id.status);
+        mSignInButton=findViewById(R.id.signInButton);
+        mAuth=FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        // [START customize_button]
-        // Set the dimensions of the sign-in button.
-        SignInButton signInButton = findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setColorScheme(SignInButton.COLOR_LIGHT);
-        // [END customize_button]
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        // [START on_start_sign_in]
-
         // Check if user is signed in (non-null) and update UI accordingly using firebase server.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
-        // [END on_start_sign_in]
+
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+    private void updateUI(FirebaseUser user){
+        if(user != null){
+            //mStatusTextView.setText(getString(R.string.signed_in_fmt, user.getDisplayName()));
+            mStatusTextView.setText(R.string.logged);
+            mSignInButton.setText(R.string.sign_out_text);
+            mEmail.setVisibility(View.GONE);
+            mPassword.setVisibility(View.GONE);
+        }
+        else {
+            mStatusTextView.setText(R.string.not_logged);
+            mSignInButton.setText(R.string.sign_in_text);
+            mEmail.setVisibility(View.VISIBLE);
+            mPassword.setVisibility(View.VISIBLE);
         }
     }
 
@@ -128,16 +121,16 @@ public class GoogleSignInActivity extends AppCompatActivity implements
         }
     }
 
-    private void updateUI(FirebaseUser user){
-        if(user != null){
-            getmStatusTextView().setText(getString(R.string.signed_in_fmt, user.getDisplayName()));
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
-        }
-        else {
-            getmStatusTextView().setText(R.string.signed_out);
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
         }
     }
 
@@ -171,7 +164,7 @@ public class GoogleSignInActivity extends AppCompatActivity implements
 
 
         // Firebase sign out
-        mAuth.signOut();
+        //mAuth.signOut();
 
         mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
@@ -189,25 +182,19 @@ public class GoogleSignInActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_in_button:
+            case R.id.googleSignInButton:
                 signIn();
                 break;
 
-            case R.id.sign_out_button:
-                signOut();
+            case R.id.signInButton:
+                if(GoogleSignIn.getLastSignedInAccount(this) != null || mAuth.getCurrentUser()!=null)
+                    signOut();
                 break;
 
-            case R.id.disconnect_button:
+            /*case R.id.disconnect_button:
                 revokeAccess();
-                break;
+                break;*/
         }
 
-    }
-
-    public void setmStatusTextView(TextView mStatusTextView) {
-        this.mStatusTextView = mStatusTextView;
-    }
-    public TextView getmStatusTextView() {
-        return this.mStatusTextView;
     }
 }

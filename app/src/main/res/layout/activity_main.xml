@@ -86,9 +86,10 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/shapelogin"
+        android:onClick="onClick"
         android:padding="15dp"
         android:shadowColor="@android:color/transparent"
-        android:text="Log In" />
+        android:text="@string/sign_in_text" />
 
     <Button
         android:layout_width="match_parent"
@@ -122,6 +123,7 @@
             android:textColor="#fff" />
 
         <Button
+            android:id="@+id/googleSignInButton"
             android:layout_width="165dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -131,6 +133,7 @@
             android:background="@drawable/rounded_corners"
             android:bottomLeftRadius="10dp"
             android:bottomRightRadius="10dp"
+            android:onClick="onClick"
             android:padding="15dp"
             android:radius="250dp"
             android:text="Google +"

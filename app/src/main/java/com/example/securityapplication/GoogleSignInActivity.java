@@ -41,11 +41,13 @@ public class GoogleSignInActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_google_sign_in);
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+
         findViewById(R.id.signInButton).setOnClickListener(this);
+
         mEmail=findViewById(R.id.editEmail);
         mPassword=findViewById(R.id.editPassword);
         mStatusTextView= findViewById(R.id.status);
@@ -57,6 +59,12 @@ public class GoogleSignInActivity extends AppCompatActivity implements
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        if(mAuth.getCurrentUser()==null)
+            signIn();
+        else {
+            signOut();
+            //finish();
+        }
     }
 
     @Override

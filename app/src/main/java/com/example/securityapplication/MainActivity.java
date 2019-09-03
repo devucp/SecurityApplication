@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -34,12 +36,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         int i = v.getId();
-
         if(i== R.id.signInButton){
             if(mAuth.getCurrentUser()==null)
                 signIn(mEmail.getText().toString(),mPassword.getText().toString());
-            else
+            else {
                 signOut();
+                if(GoogleSignIn.getLastSignedInAccount(this) != null) {
+                    Intent intent = new Intent(this, GoogleSignInActivity.class);
+                    startActivity(intent);
+                }
+            }
+        }
+        else if (i==R.id.googleSignInButton){
+            Intent intent = new Intent(this, GoogleSignInActivity.class);
+            startActivity(intent);
         }
     }
     @Override

@@ -91,23 +91,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(!validateForm()){
             return;
         }
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(
-                        this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    updateUI(user);
-                                }
-                                else{
-                                    updateUI(null);
+        else {
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(
+                            this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        FirebaseUser user = mAuth.getCurrentUser();
+                                        updateUI(user);
+                                    } else {
+                                        updateUI(null);
+                                    }
                                 }
                             }
-                        }
-                );
-
+                    );
+        }
     }
 
     private void signOut(){

@@ -34,7 +34,7 @@ import java.util.concurrent.Executor;
 //import androidx.annotation.NonNull;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, FaceBookLoginIn.OnFaceBookLoginListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener/*, FaceBookLoginIn.OnFaceBookLoginListener*/{
 
     private FirebaseAuth mAuth;
     private TextView mStatus;
@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d("FB", "facebook:onSuccess:" + loginResult);
-                faceBookLoginIn.setOnFaceBookLoginListener((FaceBookLoginIn.OnFaceBookLoginListener)faceBookLoginIn);
                 faceBookLoginIn.handleFacebookAccessToken(loginResult.getAccessToken());
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 if(faceBookLoginIn.isLoggedIn())

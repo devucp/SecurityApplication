@@ -23,14 +23,14 @@ import java.io.Serializable;
 
 import static com.facebook.AccessTokenManager.TAG;
 
+//Singleton class
 public class FaceBookLoginIn implements Serializable{
 
-    //private LoginResult loginResult;
     private FirebaseAuth mAuth;
-    private Activity activity;
+    private MainActivity activity;
     private FirebaseUser user;
 
-    private OnFaceBookLoginListener callback;
+    //private OnFaceBookLoginListener callback;
     private static volatile FaceBookLoginIn faceBookInstance;
 
     //private constructor
@@ -41,11 +41,10 @@ public class FaceBookLoginIn implements Serializable{
         }
     }
 
-    public void init(Activity activity, FirebaseAuth mAuth){
+    public void init(MainActivity activity, FirebaseAuth mAuth){
 
                     this.activity = activity;
                     this.mAuth = mAuth;
-                    //this.loginResult = loginResult;
     }
 
     public static FaceBookLoginIn getInstance() {
@@ -90,7 +89,7 @@ public class FaceBookLoginIn implements Serializable{
 
     private void setUser(FirebaseUser user){
         this.user = user;
-        callback.updateUI(user);
+        activity.updateUI(user);
     }
 
     public boolean isLoggedIn(){
@@ -99,13 +98,5 @@ public class FaceBookLoginIn implements Serializable{
             return true;
         else
             return false;
-    }
-
-
-    public void setOnFaceBookLoginListener(OnFaceBookLoginListener callback){
-        this.callback = callback;
-    }
-    public interface OnFaceBookLoginListener{
-        void updateUI(FirebaseUser user);
     }
 }

@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
-
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -15,12 +14,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
+
         <activity android:name=".SignUp_1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"
             </intent-filter>
         </activity>
         <activity android:name=".FaceBookSignInActivity" />
+
         <activity android:name=".GoogleSignInActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -29,14 +30,19 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar">
+            android:theme="@style/AppNoTitleTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
+
+
+        <!--<activity
+
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
@@ -51,11 +57,13 @@
 
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
+
         </activity>
+
+        </activity>-->
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
     </application>
-
 </manifest>

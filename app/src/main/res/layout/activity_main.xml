@@ -105,9 +105,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:orientation="horizontal">
-    <Button
+    <!--<Button
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -118,9 +118,22 @@
         android:text="Facebook"
         android:background="@drawable/facebook_rounded_corners"
         android:textAllCaps="false"
-        android:textColor="#fff" />
+        android:textColor="#fff" />-->
 
-        <Button
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/facebook_login_button"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:padding="15dp"
+            app:com_facebook_login_text="Facebook" />
+
+        <com.google.android.gms.common.SignInButton
             android:id="@+id/googleSignInButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -128,17 +141,11 @@
             android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/rounded_corners"
             android:bottomLeftRadius="10dp"
             android:bottomRightRadius="10dp"
             android:onClick="onClick"
-            android:padding="15dp"
-            android:radius="250dp"
-            android:text="Google +"
-            android:textAllCaps="false"
-            android:textColor="#fff"
-            android:topLeftRadius="10dp"
-            android:topRightRadius="10dp" />
+            android:padding="15dp" />
+
     </LinearLayout>
 
     <TextView

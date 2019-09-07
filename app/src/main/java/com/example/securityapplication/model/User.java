@@ -1,4 +1,4 @@
-package com.example.securityapplication;
+package com.example.securityapplication.model;
 
 public class User {
     private int id;

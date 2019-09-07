@@ -1,6 +1,8 @@
 package com.example.securityapplication;
 
+import android.database.Cursor;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -10,12 +12,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SignUp_1 extends AppCompatActivity {
+public class SignUp1Activity extends AppCompatActivity {
 
     Database_Helper myDb;
     Validation val = new Validation();
     private TextView text_view;
-    private TextInputLayout textinputName,textinputGenderVal,textinputDOB,textinputEmail,textinputPass,textinputCnfPass;
+    private TextInputLayout textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass;
     private RadioGroup gender_grp;
     private RadioButton Radio_Gender;
     private Button Btn_Submit;
@@ -23,7 +25,7 @@ public class SignUp_1 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up_1);
+        setContentView(R.layout.activity_signup1);
         myDb = new Database_Helper(this);
 
         text_view = (TextView)findViewById(R.id.text_gender);
@@ -37,6 +39,14 @@ public class SignUp_1 extends AppCompatActivity {
 
     }
 
+
+    private void ShowMessage(String title,String Message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(Message);
+    }
+
     public void Validater(View view) {
         if (val.validateName(textinputName) & val.validateGender(gender_grp,text_view) & val.validateDob(textinputDOB) & val.validateEmail(textinputEmail) &
                 val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass)){
@@ -48,7 +58,6 @@ public class SignUp_1 extends AppCompatActivity {
     }
 
     private void AddData() {
-
         int selected_id = gender_grp.getCheckedRadioButtonId();
         Radio_Gender = (RadioButton) findViewById(selected_id);
         String gender = Radio_Gender.getText().toString().trim();
@@ -56,8 +65,7 @@ public class SignUp_1 extends AppCompatActivity {
                 gender,
                 textinputDOB.getEditText().getText().toString().trim(),
                 textinputEmail.getEditText().getText().toString().trim(),
-                textinputPass.getEditText().getText().toString().trim(),
-                textinputCnfPass.getEditText().getText().toString().trim());
+                textinputPass.getEditText().getText().toString().trim());
         if (isInserted) {
             textinputName.getEditText().setText(null);
             gender_grp.clearCheck();
@@ -67,7 +75,14 @@ public class SignUp_1 extends AppCompatActivity {
             textinputCnfPass.getEditText().setText(null);
         }
         else {
-            Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();
+            String UserEmail = textinputEmail.getEditText().getText().toString().trim();
+            boolean res = myDb.CheckUserEmail(UserEmail);
+            if (res){
+                Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(this,"User Entry Unsuccessful",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

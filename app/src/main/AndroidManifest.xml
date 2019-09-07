@@ -15,9 +15,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
-        <activity android:name=".SignUp_1">
+        <activity android:name=".SignUp1Activity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity android:name=".FaceBookSignInActivity" />

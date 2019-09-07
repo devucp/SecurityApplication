@@ -118,11 +118,12 @@ public class Validation {
             return false;
         }
         else{
+            inputdob.setError(null);
+            inputdob.setError("Invalid Date");
             return false;
         }
 
     }
-
 
     boolean validateName(TextInputLayout textInputName) {
         String nameinput = textInputName.getEditText().getText().toString().trim();

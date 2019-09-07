@@ -1,74 +1,67 @@
 package com.example.securityapplication;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.io.Serializable;
 
-import static com.facebook.AccessTokenManager.TAG;
-
-//Singleton class
-public class FaceBookLoginIn implements Serializable{
+public class GoogleFirebaseSignIn implements Serializable {
 
     private FirebaseAuth mAuth;
     private MainActivity activity;
     private FirebaseUser user;
+    private static final String TAG = "GoogleSignIn";
+    //private static final int RC_SIGN_IN = 9001;
 
-    private static volatile FaceBookLoginIn faceBookInstance;
+    private static volatile GoogleFirebaseSignIn googleFirebaseInstance;
 
     //private constructor
-    private FaceBookLoginIn(){
+    private GoogleFirebaseSignIn(){
         //Prevent form the reflection api.
-        if (faceBookInstance != null){
+        if (googleFirebaseInstance != null){
             throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
         }
     }
 
     public void init(MainActivity activity, FirebaseAuth mAuth){
 
-                    this.activity = activity;
-                    this.mAuth = mAuth;
+        this.activity = activity;
+        this.mAuth = mAuth;
+
     }
 
-    public static FaceBookLoginIn getInstance() {
+    public static GoogleFirebaseSignIn getInstance() {
         //Double check locking pattern
-        if (faceBookInstance == null) { //Check for the first time..if there is no instance available... create new one
+        if (googleFirebaseInstance == null) { //Check for the first time..if there is no instance available... create new one
             synchronized (FaceBookLoginIn.class) { //Check for the second time to make ThreadSafe
                 //if there is no instance available... create new one
-                if (faceBookInstance == null)
-                    faceBookInstance = new FaceBookLoginIn();
+                if (googleFirebaseInstance == null)
+                    googleFirebaseInstance = new GoogleFirebaseSignIn();
             }
         }
-        return faceBookInstance;
+        return googleFirebaseInstance;
     }
 
     //Make singleton from serialize and deserialize operation.
-    protected FaceBookLoginIn readResolve() {
+    protected GoogleFirebaseSignIn readResolve() {
         return getInstance();
     }
 
-
-    public void handleFacebookAccessToken(AccessToken token) {
-        Log.d(TAG, "handleFacebookAccessToken:" + token);
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -81,10 +74,23 @@ public class FaceBookLoginIn implements Serializable{
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            //Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                             setUser(null);
                         }
                     }
                 });
+    }
+
+    public void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            firebaseAuthWithGoogle(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            setUser(null);
+        }
     }
 
     private void setUser(FirebaseUser user){

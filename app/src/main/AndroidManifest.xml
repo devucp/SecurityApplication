@@ -14,21 +14,12 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
-        <activity android:name=".SignUp1Activity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".FaceBookSignInActivity" />
-        <activity android:name=".GoogleSignInActivity">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-       
+        <activity android:name=".SignUp1Activity" />
+
+
         <activity android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoTitleBar">
+            android:label="@string/app_name">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -17,6 +17,11 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+/*
+        *NOTE: Earlier TextInputLayout was used as parameter for all validation function
+        *They have been changed to TextInputEditText
+        * and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
+*/
 public class SignUp1Activity extends AppCompatActivity {
 //
    Database_Helper myDb;
@@ -27,7 +32,7 @@ public class SignUp1Activity extends AppCompatActivity {
     private RadioButton Radio_Gender;
     //
 DatePickerDialog datePickerDialog;
-private TextInputLayout textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass;
+private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
     private TextInputEditText date;
 
 
@@ -39,15 +44,17 @@ private TextInputLayout textinputName,textinputDOB,textinputEmail,textinputPass,
        java.util.Calendar calendar=Calendar.getInstance();
       final int year=calendar.get(Calendar.YEAR);
 
-        text_view = (TextView)findViewById(R.id.text_gender);
+      //removed most the view castings as they're unnecessary
+
+        text_view = findViewById(R.id.text_gender);
         textinputName = findViewById(R.id.textlayout_Name);
-        textinputDOB =(TextInputLayout) findViewById(R.id.textlayout_Dob);
-        date=(TextInputEditText)findViewById(R.id.date);
+        textinputDOB = findViewById(R.id.textlayout_Dob);
+        date=findViewById(R.id.textlayout_Dob);
         textinputEmail = findViewById(R.id.textlayout_Email);
-        textinputPass = (TextInputLayout) findViewById(R.id.textlayout_Pass);
-        textinputCnfPass = (TextInputLayout)findViewById(R.id.textlayout_CnfPass);
-        gender_grp = (RadioGroup) findViewById(R.id.radiogrp);
-        Btn_Submit = (Button)findViewById(R.id.btn_sub);
+        textinputPass =  findViewById(R.id.textlayout_Pass);
+        textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
+        gender_grp = findViewById(R.id.radiogrp);
+        Btn_Submit = findViewById(R.id.btn_sub);
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,22 +102,22 @@ private TextInputLayout textinputName,textinputDOB,textinputEmail,textinputPass,
     private void AddData() {
         int selected_id = gender_grp.getCheckedRadioButtonId();
         Radio_Gender = (RadioButton) findViewById(selected_id);
-        String gender = Radio_Gender.getText().toString().trim();
-        Boolean isInserted = myDb.insert_data(textinputName.getEditText().getText().toString().trim(),
+        String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
+        Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
-                textinputDOB.getEditText().getText().toString().trim(),
-                textinputEmail.getEditText().getText().toString().trim(),
-                textinputPass.getEditText().getText().toString().trim());
+                textinputDOB.getText().toString().trim(),
+                textinputEmail.getText().toString().trim(),
+                textinputPass.getText().toString().trim());
         if (isInserted) {
-            textinputName.getEditText().setText(null);
+            textinputName.setText(null);
             gender_grp.clearCheck();
-            textinputDOB.getEditText().setText(null);
-            textinputEmail.getEditText().setText(null);
-            textinputPass.getEditText().setText(null);
-            textinputCnfPass.getEditText().setText(null);
+            textinputDOB.setText(null);
+            textinputEmail.setText(null);
+            textinputPass.setText(null);
+            textinputCnfPass.setText(null);
         }
         else {
-            String UserEmail = textinputEmail.getEditText().getText().toString().trim();
+            String UserEmail = textinputEmail.getText().toString().trim();
             boolean res = myDb.CheckUserEmail(UserEmail);
             if (res){
                 Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();

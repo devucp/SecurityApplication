@@ -73,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
+        else if (i==R.id.signUpButton){
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+            startActivity(signUpIntent);
+        }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {

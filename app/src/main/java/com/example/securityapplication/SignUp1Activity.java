@@ -2,28 +2,32 @@ package com.example.securityapplication;
 
 import android.app.DatePickerDialog;
 import android.database.Cursor;
-import android.icu.util.Calendar;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 public class SignUp1Activity extends AppCompatActivity {
 
-   // Database_Helper myDb;
-    //Validation val = new Validation();
-    private TextView text_view;
+//    Database_Helper myDb;
+//    Validation val = new Validation();
+//    private TextView text_view;
     private TextInputLayout textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass;
-    private RadioGroup gender_grp;
-    private RadioButton Radio_Gender;
-   // private DatePickerDialog.OnDateSetListener setListener;
-    private Button Btn_Submit;
+    private TextInputEditText date;
+//    private RadioGroup gender_grp;
+//    private RadioButton Radio_Gender;
+DatePickerDialog datePickerDialog;
+//    private Button Btn_Submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +36,39 @@ public class SignUp1Activity extends AppCompatActivity {
        // myDb = new Database_Helper(this);
        // java.util.Calendar calendar=Calendar.getInstance();
       //final int year=calendar.get(Calendar.YEAR);
+//
+//        text_view = (TextView)findViewById(R.id.text_gender);
+//        textinputName = findViewById(R.id.textlayout_Name);
+        textinputDOB =(TextInputLayout) findViewById(R.id.textlayout_Dob);
+        date=(TextInputEditText)findViewById(R.id.date);
+//        textinputEmail = findViewById(R.id.textlayout_Email);
+//        textinputPass = findViewById(R.id.textlayout_Pass);
+//        textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
+//        gender_grp = (RadioGroup) findViewById(R.id.radiogrp);
+//        Btn_Submit = (Button)findViewById(R.id.btn_sub);
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar c= java.util.Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(SignUp1Activity.this,
+                        new DatePickerDialog.OnDateSetListener() {
 
-        text_view = (TextView)findViewById(R.id.text_gender);
-        textinputName = findViewById(R.id.textlayout_Name);
-        textinputDOB = findViewById(R.id.textlayout_Dob);
-        textinputEmail = findViewById(R.id.textlayout_Email);
-        textinputPass = findViewById(R.id.textlayout_Pass);
-        textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
-        gender_grp = (RadioGroup) findViewById(R.id.radiogrp);
-        Btn_Submit = (Button)findViewById(R.id.btn_sub);
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                date.setText(dayOfMonth + "/"
+                                        + (monthOfYear + 1) + "/" + year);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
 
     }
 

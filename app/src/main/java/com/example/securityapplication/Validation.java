@@ -1,6 +1,7 @@
 package com.example.securityapplication;
 
-import android.support.design.widget.TextInputLayout;
+//import android.support.design.widget.TextInputLayout;
+import android.support.design.widget.TextInputEditText;
 import android.util.Patterns;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -8,6 +9,11 @@ import android.widget.TextView;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+*NOTE: Earlier TextInputLayout was used as parameter for all validation function
+*They have been changed to TextInputEditText
+* and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
+ */
 public class Validation {
 
 
@@ -32,8 +38,8 @@ public class Validation {
         name_pattern = Pattern.compile(NAME_PATTERN,Pattern.CASE_INSENSITIVE);
     }
 
-    boolean validateEmail(TextInputLayout textInputEmail) {
-        String emailInput = textInputEmail.getEditText().getText().toString().trim();
+    boolean validateEmail(TextInputEditText textInputEmail) {
+        String emailInput = textInputEmail.getText().toString().trim();
 
         if (emailInput.isEmpty()) {
             textInputEmail.setError("Field can't be empty");
@@ -60,9 +66,9 @@ public class Validation {
             return true;
         }
     }
-    boolean validateDob(TextInputLayout inputdob) {
+    boolean validateDob(TextInputEditText inputdob) {
 
-        String dobinput = inputdob.getEditText().getText().toString().trim();
+        String dobinput = inputdob.getText().toString().trim();
 
         matcher = date_pattern.matcher(dobinput);
 
@@ -125,8 +131,8 @@ public class Validation {
 
     }
 
-    boolean validateName(TextInputLayout textInputName) {
-        String nameinput = textInputName.getEditText().getText().toString().trim();
+    boolean validateName(TextInputEditText textInputName) {
+        String nameinput = textInputName.getText().toString().trim();
         matcher = name_pattern.matcher(nameinput);
         if (nameinput.isEmpty()) {
             textInputName.setError("Field can't be empty");
@@ -144,8 +150,8 @@ public class Validation {
         }
     }
 
-    boolean validatePassword(TextInputLayout textInputPassword) {
-        String passwordinput = textInputPassword.getEditText().getText().toString().trim();
+    boolean validatePassword(TextInputEditText textInputPassword) {
+        String passwordinput = textInputPassword.getText().toString().trim();
 
         if (passwordinput.isEmpty()) {
             textInputPassword.setError("Field can't be empty");
@@ -158,9 +164,9 @@ public class Validation {
             return true;
         }
     }
-    boolean validateCnfPassword(TextInputLayout textInputPassword,TextInputLayout textInputCnfPassword){
-        String passinput = textInputPassword.getEditText().getText().toString().trim();
-        String cnfpassinput = textInputCnfPassword.getEditText().getText().toString().trim();
+    boolean validateCnfPassword(TextInputEditText textInputPassword,TextInputEditText textInputCnfPassword){
+        String passinput = textInputPassword.getText().toString().trim();
+        String cnfpassinput = textInputCnfPassword.getText().toString().trim();
 
         if (cnfpassinput.isEmpty()) {
             textInputCnfPassword.setError("Field can't be empty");

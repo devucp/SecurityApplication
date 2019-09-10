@@ -1,41 +1,83 @@
 package com.example.securityapplication;
 
+import android.app.DatePickerDialog;
 import android.database.Cursor;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SignUp1Activity extends AppCompatActivity {
+import java.util.Calendar;
 
-    Database_Helper myDb;
+/*
+        *NOTE: Earlier TextInputLayout was used as parameter for all validation function
+        *They have been changed to TextInputEditText
+        * and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
+*/
+public class SignUp1Activity extends AppCompatActivity {
+//
+   Database_Helper myDb;
     Validation val = new Validation();
     private TextView text_view;
-    private TextInputLayout textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass;
+    private Button Btn_Submit;
     private RadioGroup gender_grp;
     private RadioButton Radio_Gender;
-    private Button Btn_Submit;
+    //
+DatePickerDialog datePickerDialog;
+private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
+    private TextInputEditText date;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
-        myDb = new Database_Helper(this);
+       myDb = new Database_Helper(this);
+       java.util.Calendar calendar=Calendar.getInstance();
+      final int year=calendar.get(Calendar.YEAR);
 
-        text_view = (TextView)findViewById(R.id.text_gender);
+      //removed most the view castings as they're unnecessary
+
+        text_view = findViewById(R.id.text_gender);
         textinputName = findViewById(R.id.textlayout_Name);
         textinputDOB = findViewById(R.id.textlayout_Dob);
+        date=findViewById(R.id.textlayout_Dob);
         textinputEmail = findViewById(R.id.textlayout_Email);
-        textinputPass = findViewById(R.id.textlayout_Pass);
+        textinputPass =  findViewById(R.id.textlayout_Pass);
         textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
-        gender_grp = (RadioGroup) findViewById(R.id.radiogrp);
-        Btn_Submit = (Button)findViewById(R.id.btn_sub);
+        gender_grp = findViewById(R.id.radiogrp);
+        Btn_Submit = findViewById(R.id.btn_sub);
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar c= java.util.Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(SignUp1Activity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                date.setText(dayOfMonth + "/"
+                                        + (monthOfYear + 1) + "/" + year);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
 
     }
 
@@ -60,29 +102,29 @@ public class SignUp1Activity extends AppCompatActivity {
     private void AddData() {
         int selected_id = gender_grp.getCheckedRadioButtonId();
         Radio_Gender = (RadioButton) findViewById(selected_id);
-        String gender = Radio_Gender.getText().toString().trim();
-        Boolean isInserted = myDb.insert_data(textinputName.getEditText().getText().toString().trim(),
+        String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
+        Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
-                textinputDOB.getEditText().getText().toString().trim(),
-                textinputEmail.getEditText().getText().toString().trim(),
-                textinputPass.getEditText().getText().toString().trim());
+                textinputDOB.getText().toString().trim(),
+                textinputEmail.getText().toString().trim(),
+                textinputPass.getText().toString().trim());
         if (isInserted) {
-            textinputName.getEditText().setText(null);
+            textinputName.setText(null);
             gender_grp.clearCheck();
-            textinputDOB.getEditText().setText(null);
-            textinputEmail.getEditText().setText(null);
-            textinputPass.getEditText().setText(null);
-            textinputCnfPass.getEditText().setText(null);
+            textinputDOB.setText(null);
+            textinputEmail.setText(null);
+            textinputPass.setText(null);
+            textinputCnfPass.setText(null);
         }
         else {
-            String UserEmail = textinputEmail.getEditText().getText().toString().trim();
+            String UserEmail = textinputEmail.getText().toString().trim();
             boolean res = myDb.CheckUserEmail(UserEmail);
             if (res){
                 Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();
             }
             else{
                 Toast.makeText(this,"User Entry Unsuccessful",Toast.LENGTH_SHORT).show();
-            }
+           }
         }
-    }
+   }
 }

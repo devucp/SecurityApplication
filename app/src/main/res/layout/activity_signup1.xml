@@ -91,6 +91,7 @@
                 android:id="@+id/text_gender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:text="Gender : "
                 android:textColor="#FFFFFF"
                 android:textSize="18sp" />
@@ -232,7 +233,6 @@
                     android:paddingEnd="5dp"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
-                    android:textColor="#FFFFFF"
                     android:textColorHint="#FFFFFF"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>

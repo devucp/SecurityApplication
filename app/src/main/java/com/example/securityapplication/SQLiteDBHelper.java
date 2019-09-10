@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.securityapplication.model.User;
 
+import static android.icu.text.MessagePattern.ArgType.SELECT;
+
 
 public class SQLiteDBHelper extends SQLiteOpenHelper {
 
@@ -119,9 +121,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         if(cursorCount > 0){
-            return true;
+            return false;
         }
-        return false;
+        return true;
 
     }
 

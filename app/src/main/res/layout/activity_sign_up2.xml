@@ -6,59 +6,64 @@
     android:layout_height="match_parent"
     tools:context=".SignUp2">
 
-    <LinearLayout
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/mobile"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="31dp"
-        tools:layout_editor_absoluteY="72dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/input_mobile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter phone no."
+            android:inputType="phone"
+            android:maxLength="10" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/mobile"
+            android:id="@+id/aadhar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="Enter Mobile No.">
+            android:layout_height="match_parent">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/input_mobile"
+                android:id="@+id/input_aadhar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLength="10"  />
+                android:hint="Enter aadhar no"
+                android:inputType="number"
+                android:maxLength="12" />
 
-        <android.support.design.widget.TextInputLayout
-                android:id="@+id/aadhar"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/location"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Enter Aadhar No.">
+                android:orientation="vertical">
 
-            <android.support.design.widget.TextInputEditText
-                    android:id="@+id/input_aadhar"
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/input_location"
                     android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Enter location" />
+
+                <TextView
+                    android:id="@+id/error_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="53dp"
+                    android:inputType="none"
+                    android:text="YOU ARE ONE STEP AWAY FROM BEING A SAVIOUR" />
+
+                <Button
+                    android:id="@+id/btn_submit"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                android:maxLength="12"  />
+                    android:text="SUBMIT" />
 
-        <android.support.design.widget.TextInputLayout
-                    android:id="@+id/location"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Enter Location">
-
-            <android.support.design.widget.TextInputEditText
-                        android:id="@+id/input_location"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-        <Button
-                        android:id="@+id/btn_submit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Submit"
-                        />
-                </android.support.design.widget.TextInputLayout>
             </android.support.design.widget.TextInputLayout>
 
         </android.support.design.widget.TextInputLayout>
 
-    </LinearLayout>
-
+    </android.support.design.widget.TextInputLayout>
 </android.support.constraint.ConstraintLayout>

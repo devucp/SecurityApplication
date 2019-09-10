@@ -5,7 +5,10 @@
     <string name="sign_out_text">SIGN OUT</string>
     <string name="sign_in_text">SIGN IN</string>
     <string name="server_client_id">534786616869-k8kplmfdh0gfrbjlc30sts4fnmr66bo9.apps.googleusercontent.com</string>
-    <string name="message">PLEASE ENTER VALID INFORMATION</string>
+    <string name="message">THIS FIELD CANNOT BE EMPTY</string>
+    <string name="no_phone">PLEASE ENTER MOBILE NO.</string>
+    <string name="no_aadhar">PLEASE ENTER AADHAR NO.</string>
+    <string name="no_location">PLEASE ENTER LOCATION</string>
     <string name="facebook_app_id">795149104216520</string>
     <string name="fb_login_protocol_scheme">fb795149104216520</string>
     <string name="PLACES_API_KEY">AIzaSyAt8cTuR3xlg0xsywjKX-gMnyHncu0-lG8</string>

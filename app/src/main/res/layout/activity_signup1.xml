@@ -50,7 +50,7 @@
                 android:textStyle="bold" />
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/textlayout_Name"
+                android:id="@+id/textlayout_Name_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
@@ -60,18 +60,19 @@
                 app:hintEnabled="false">
 
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/textlayout_Name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
 
+                    android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:ems="10"
                     android:hint="Full Name"
                     android:inputType="textPersonName"
                     android:maxLength="40"
-                    android:paddingBottom="9dp"
-                    android:paddingEnd="5dp"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
+                    android:paddingEnd="5dp"
+                    android:paddingBottom="9dp"
                     android:textColor="#ffffff"
                     android:textColorHighlight="#F8FA0707"
                     android:textColorHint="#ffffff"
@@ -127,7 +128,7 @@
         </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/textlayout_Dob"
+                android:id="@+id/textlayout_Dob_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -137,7 +138,7 @@
                 app:hintEnabled="false">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/date"
+                    android:id="@+id/textlayout_Dob"
 
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -158,7 +159,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/textlayout_Email"
+                android:id="@+id/textlayout_Email_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -168,7 +169,7 @@
                 app:hintEnabled="false">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/emai"
+                    android:id="@+id/textlayout_Email"
                     android:layout_width="match_parent"
 
                     android:layout_height="wrap_content"
@@ -189,7 +190,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/textlayout_Pass"
+                android:id="@+id/textlayout_Pass_outer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
@@ -199,7 +200,7 @@
                 app:passwordToggleTint="@color/colorAccent">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/pass"
+                    android:id="@+id/textlayout_Pass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
@@ -215,7 +216,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/textlayout_CnfPass"
+                android:id="@+id/textlayout_CnfPass_outer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
@@ -224,7 +225,7 @@
                 app:passwordToggleTint="@color/colorAccent">
 
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/cpass"
+                    android:id="@+id/textlayout_CnfPass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
@@ -250,6 +251,7 @@
                 android:text="@string/submit"
                 android:textColor="#000000"
                 android:textColorHint="#ffffff"
+                android:onClick="Validater"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

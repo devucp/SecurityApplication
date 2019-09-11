@@ -14,7 +14,7 @@ import static android.icu.text.MessagePattern.ArgType.SELECT;
 
 public class SQLiteDBHelper extends SQLiteOpenHelper {
 
-    private static final String DB_name = "info.db";
+    private static final String DB_name = "userinfo.db";
     private static final int DB_version = 1;
 
     private static final String TABLE_NAME = "user";
@@ -33,8 +33,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_NAME + " TEXT, "+
-                    COLUMN_EMAIL + " TEXT, " +
-                    COLUMN_GENDER + "TEXT, " +
+                    COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
+                    COLUMN_GENDER + " TEXT, " +
                     COLUMN_PASSWORD + " TEXT, " +
                     COLUMN_MOBILE + " TEXT, " +
                     COLUMN_AADHAR + " TEXT, " +
@@ -50,7 +50,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        Log.d("SQL Query","Create table query is:"+CREATE_TABLE_QUERY);
         sqLiteDatabase.execSQL(CREATE_TABLE_QUERY);
+        //sqLiteDatabase.execSQL("create table "+TABLE_NAME+" (id int , name varchar(20),location varchar(20),mobile char(10),aadhar char(12),imei varchar(10), gender Varchar(6), dob Varchar(8), email varchar(30) , password varchar(16))");
     }
 
     @Override
@@ -61,7 +63,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     /**Adding user*/
     public boolean addUser(User user){
-        SQLiteDatabase db = this.getWritableDatabase();
+        try{SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(COLUMN_NAME, user.getName());
@@ -82,6 +84,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         else{
             Log.d("Database","User object added successfully");
             return true;
+            }
+        }catch(Exception e){
+            Log.d("SQL","Exception occurred");
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -107,7 +114,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     /**Checking if user is present*/
     public boolean checkUser(String aadhar){
         String[] columns = {
-                COLUMN_ID
+                COLUMN_AADHAR   //NOTE:changed to column aadhar
         };
         SQLiteDatabase db = this.getReadableDatabase();
         String selection = COLUMN_AADHAR + " = ?";
@@ -136,9 +143,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public void deleteUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // delete user record by id
-        db.delete(TABLE_NAME, COLUMN_ID + " = ?",
-                new String[]{String.valueOf(user.getId())});
+        // NOTE: delete user record by Aadhar
+        db.delete(TABLE_NAME, COLUMN_AADHAR + " = ?",
+                new String[]{String.valueOf(user.getAadhar())});
         db.close();
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.securityapplication.model.User;
 
@@ -75,9 +76,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         long result = db.insert(TABLE_NAME,null, contentValues);
         db.close();
         if (result == -1){
+            Log.d("Database","User object NOT ADDED");
             return false;
         }
         else{
+            Log.d("Database","User object added successfully");
             return true;
         }
     }

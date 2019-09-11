@@ -11,6 +11,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -87,18 +88,7 @@ public class SignUp2 extends AppCompatActivity {
                     input_location.setError(getString(R.string.no_location));
                 }
 
-
-
-
-                if(!DBHelper.checkUser(input_aadhar.getText().toString().trim()) && !empty){
-                    user.setMobile(input_mobile.getText().toString().trim());
-                    user.setAadhar(input_aadhar.getText().toString().trim());
-                    user.setLocation(input_location.getText().toString().trim());
-                    DBHelper.addUser(user);
-                    Toast.makeText(getApplicationContext(),"YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                }
-
-
+                //Moved IMEI reading code to this place so IMEI can be stored for user object
                 String imei = null;
                 TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -107,8 +97,31 @@ public class SignUp2 extends AppCompatActivity {
                 if (res == PackageManager.PERMISSION_GRANTED){
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         imei = tm.getImei(1);
+                        Log.d("IMEI","IMEI Number of slot 1 is:"+imei);
+
+                    }
+                    else
+                    {
+                        Log.d("SignUp2","SDK Version not of required level");
                     }
                 }
+                else{
+                    Log.d("SIgnUP2","PERMISSION FOR READ STATE NOT GRANTED");
+                }
+
+
+                if(!DBHelper.checkUser(input_aadhar.getText().toString().trim()) && !empty){
+                    user.setMobile(input_mobile.getText().toString().trim());
+                    user.setAadhar(input_aadhar.getText().toString().trim());
+                    user.setLocation(input_location.getText().toString().trim());
+                    //setting IMEI
+                    user.setImei(imei);
+                    DBHelper.addUser(user);
+                    Toast.makeText(getApplicationContext(),"YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                }
+
+
+
 
             }
 

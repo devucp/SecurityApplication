@@ -46,7 +46,7 @@ public class SignUp2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up2);
+        setContentView(R.layout.activity_signup2);
 
         initViews();
         initListeners();
@@ -76,12 +76,10 @@ public class SignUp2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Call the method to validate the fields
-                boolean empty = inputValidation.is_Empty(input_mobile,mobile,getString(R.string.message)) &&
-                        inputValidation.is_Empty(input_aadhar,aadhar,getString(R.string.message)) &&
+                boolean empty = inputValidation.is_Empty(input_mobile,mobile,getString(R.string.message)) || //NOTE:Changed previously '&&' to '||'
+                        inputValidation.is_Empty(input_aadhar,aadhar,getString(R.string.message)) ||
                         inputValidation.is_Empty(input_location,location,getString(R.string.message));
-                if(empty){
-                    return;
-                }
+
                 if(inputValidation.is_Empty(input_mobile,mobile,getString(R.string.no_phone))){
                     input_mobile.setError(getString(R.string.no_phone));
                 }
@@ -90,6 +88,10 @@ public class SignUp2 extends AppCompatActivity {
                 }
                 if(inputValidation.is_Empty(input_location,location,getString(R.string.no_location))){
                     input_location.setError(getString(R.string.no_location));
+                }
+                //NOTE:MOVED empty if statement here to ensure error messages are displayed before exiting
+                if(empty){
+                    return;
                 }
 
                 //Moved IMEI reading code to this place so IMEI can be stored for user object

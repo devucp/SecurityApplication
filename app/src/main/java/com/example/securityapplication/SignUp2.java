@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -38,6 +39,9 @@ public class SignUp2 extends AppCompatActivity {
     private InputValidation inputValidation;
     private  SQLiteDBHelper DBHelper;
     private User user;
+
+    //adding requestCode variable for requestPermission
+    private int RC;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +110,9 @@ public class SignUp2 extends AppCompatActivity {
                     }
                 }
                 else{
-                    Log.d("SIgnUP2","PERMISSION FOR READ STATE NOT GRANTED");
+                    Log.d("SIgnUP2","PERMISSION FOR READ STATE NOT GRANTED, REQUESTING PERMSISSION...");
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{Manifest.permission.READ_PHONE_STATE},RC);
                 }
 
 
@@ -116,8 +122,16 @@ public class SignUp2 extends AppCompatActivity {
                     user.setLocation(input_location.getText().toString().trim());
                     //setting IMEI
                     user.setImei(imei);
-                    DBHelper.addUser(user);
-                    Toast.makeText(getApplicationContext(),"YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                    //added conditional checking and showing respective Toast message
+                    if(DBHelper.addUser(user))
+                        Toast.makeText(getApplicationContext(),"YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getApplicationContext(),"SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
+
+                }
+                else{
+                    Log.d("SIgnUP2","User exists ");
+                    Toast.makeText(getApplicationContext(),"AADHAR NO ALREADY EXISTS", Toast.LENGTH_LONG).show();
                 }
 
 

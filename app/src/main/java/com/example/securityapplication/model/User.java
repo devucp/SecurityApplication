@@ -14,6 +14,18 @@ public class User implements Parcelable {
     private String location;
     private String imei;
 
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    private String dob;
+
+    public User(){}
+
     protected User(Parcel in) {
         id = in.readInt();
         name = in.readString();
@@ -24,6 +36,7 @@ public class User implements Parcelable {
         aadhar = in.readString();
         location = in.readString();
         imei = in.readString();
+        dob = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -126,5 +139,6 @@ public class User implements Parcelable {
         dest.writeString(aadhar);
         dest.writeString(location);
         dest.writeString(imei);
+        dest.writeString(dob);
     }
 }

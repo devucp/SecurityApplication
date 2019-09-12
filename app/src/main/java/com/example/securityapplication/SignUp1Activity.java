@@ -1,6 +1,7 @@
 package com.example.securityapplication;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -14,6 +15,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.securityapplication.model.User;
 
 import java.util.Calendar;
 
@@ -30,6 +33,8 @@ public class SignUp1Activity extends AppCompatActivity {
     private Button Btn_Submit;
     private RadioGroup gender_grp;
     private RadioButton Radio_Gender;
+    //Added user object to send to next
+    private User user;
     //
 DatePickerDialog datePickerDialog;
 private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
@@ -79,6 +84,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
             }
         });
 
+        user=new User();
+
     }
 
 
@@ -103,6 +110,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         int selected_id = gender_grp.getCheckedRadioButtonId();
         Radio_Gender = (RadioButton) findViewById(selected_id);
         String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
+        //Sending the user object
+        myDb.setUser(user);
         Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
                 textinputDOB.getText().toString().trim(),
@@ -115,6 +124,12 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
             textinputEmail.setText(null);
             textinputPass.setText(null);
             textinputCnfPass.setText(null);
+            //updates the Usr object with filled fields
+            user=myDb.getUser();
+            //starting signup activity
+            Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
+            intent.putExtra("User",user);
+            startActivity(intent);
         }
         else {
             String UserEmail = textinputEmail.getText().toString().trim();

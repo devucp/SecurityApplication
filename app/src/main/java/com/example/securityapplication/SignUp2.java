@@ -149,6 +149,6 @@ public class SignUp2 extends AppCompatActivity {
     private void initObjects(){
         inputValidation = new InputValidation(activity);
         DBHelper = new SQLiteDBHelper(activity);
-        user = new User();
+        user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
     }
 }

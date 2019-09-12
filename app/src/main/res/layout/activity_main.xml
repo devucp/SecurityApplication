@@ -62,6 +62,7 @@
             android:buttonTint="@color/white"
             android:checked="true"/>
         <TextView
+            android:id="@+id/ForgetPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Forget Password"
@@ -72,6 +73,7 @@
             android:textColor="@color/white"
             android:drawableLeft="@drawable/ic_lock_open_black_24dp"
             android:drawablePadding="6dp"
+            android:onClick="onClick"
             android:padding="4dp"/>
 
 

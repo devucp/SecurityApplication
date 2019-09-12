@@ -11,8 +11,9 @@
 
     <ImageView
         android:layout_width="90dp"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/login" />
+        android:layout_height="83dp"
+        android:src="@mipmap/login"
+        app:srcCompat="@mipmap/ic_launcher_foreground" />
 
     <EditText
         android:id="@+id/editEmail"
@@ -61,6 +62,7 @@
             android:buttonTint="@color/white"
             android:checked="true"/>
         <TextView
+            android:id="@+id/ForgetPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Forget Password"
@@ -71,78 +73,88 @@
             android:textColor="@color/white"
             android:drawableLeft="@drawable/ic_lock_open_black_24dp"
             android:drawablePadding="6dp"
+            android:onClick="onClick"
             android:padding="4dp"/>
 
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/signInButton"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/shapelogin"
-        android:padding="15dp"
-        android:shadowColor="@android:color/transparent"
-        android:text="Log In" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:shadowColor="@android:color/transparent"
-        android:padding="15dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="0dp"
-        android:background="@drawable/shapesignup"
-        android:textColor="@color/white"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <Button
-            android:layout_width="165dp"
+            android:id="@+id/signInButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/facebook_rounded_corners"
+            android:background="@drawable/shapelogin"
+            android:onClick="onClick"
             android:padding="15dp"
-            android:text="Facebook"
-            android:textAllCaps="false"
-            android:textColor="#fff" />
+            android:shadowColor="@android:color/transparent"
+            android:text="@string/sign_in_text" />
 
         <Button
-            android:layout_width="165dp"
+            android:id="@+id/signUpButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/rounded_corners"
-            android:bottomLeftRadius="10dp"
-            android:bottomRightRadius="10dp"
+            android:text="Sign Up"
+            android:onClick="onClick"
+            android:shadowColor="@android:color/transparent"
             android:padding="15dp"
-            android:radius="250dp"
-            android:text="Google +"
-            android:textAllCaps="false"
-            android:textColor="#fff"
-            android:topLeftRadius="10dp"
-            android:topRightRadius="10dp" />
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="0dp"
+            android:background="@drawable/shapesignup"
+            android:textColor="@color/white"
+            android:layout_below="@+id/signInButton"/>
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/googleFbButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/signUpButton">
 
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/not_logged" />
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/facebook_login_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textSize="15sp"
+                app:com_facebook_login_text="Facebook"
+                />
+
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/googleSignInButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:onClick="onClick" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/not_logged"
+            android:paddingTop="10dp"
+            android:layout_below="@+id/googleFbButtons"/>
+
+    </RelativeLayout>
+
+
 </LinearLayout>

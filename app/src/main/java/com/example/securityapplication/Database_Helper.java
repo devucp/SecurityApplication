@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.example.securityapplication.model.User;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -18,6 +21,8 @@ public class Database_Helper extends SQLiteOpenHelper {
     private static final String Col_3 = "DOB";
     private static final String Col_4 = "Email";
     private static final String Col_5 = "Password";
+    //Added user object
+    private User user;
 
     public Database_Helper(Context context) {
         super(context, Database_Name, null, 1);
@@ -68,6 +73,13 @@ public class Database_Helper extends SQLiteOpenHelper {
             contentValues.put(Col_3, dob);
             contentValues.put(Col_4, Email);
             contentValues.put(Col_5, EncPass);
+            //setting user values
+            user.setName(fname);
+            user.setGender(gender);
+            user.setDob(dob);
+            user.setEmail(Email);
+            user.setPassword(password);
+
             long result = db.insert(Table_Name, null, contentValues);
             if (result == -1) {
                 Log.d("SignUp Activity","Data not inserted");
@@ -92,5 +104,17 @@ public class Database_Helper extends SQLiteOpenHelper {
         } else {
             return false;
         }
+    }
+
+    //Sets the user object for this class
+    public void setUser(User user){
+        this.user=user;
+        Log.d("DH.java","User object set");
+    }
+    //Returns the User with filled fields
+    public User getUser(){
+        Log.d("DH.java","User object sent");
+        return user;
+
     }
 }

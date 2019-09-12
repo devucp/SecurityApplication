@@ -5,12 +5,27 @@
     <string name="sign_out_text">SIGN OUT</string>
     <string name="sign_in_text">SIGN IN</string>
     <string name="server_client_id">534786616869-k8kplmfdh0gfrbjlc30sts4fnmr66bo9.apps.googleusercontent.com</string>
-
+    <string name="message">THIS FIELD CANNOT BE EMPTY</string>
+    <string name="no_phone">PLEASE ENTER MOBILE NO.</string>
+    <string name="no_aadhar">PLEASE ENTER AADHAR NO.</string>
+    <string name="no_location">PLEASE ENTER LOCATION</string>
     <string name="facebook_app_id">795149104216520</string>
     <string name="fb_login_protocol_scheme">fb795149104216520</string>
+    <string name="PLACES_API_KEY">AIzaSyAt8cTuR3xlg0xsywjKX-gMnyHncu0-lG8</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="facebook_button">Facebook</string>
-
+    <string name="signup">SignUp</string>
+    <string name="full_name">Full Name</string>
+    <string name="gender">Gender</string>
+    <string name="dob">DOB</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="submit">Sign-up</string>
+    <string name="enter_your_registered_email">Enter your registered email...</string>
+    <string name="reset_password">RESET PASSWORD</string>
+    <string name="reset_password_desc">By clicking RESET PASSWORD an email will be sent to your registered email address to reset the password</string>
 </resources>

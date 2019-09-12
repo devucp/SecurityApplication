@@ -1,5 +1,7 @@
 package com.example.securityapplication.model;
 
+import java.util.Date;
+
 public class User {
     private int id;
     private String name;

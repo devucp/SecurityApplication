@@ -12,14 +12,19 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.example.securityapplication.model.User;
 
+import java.util.regex.Pattern;
 
 
 public class SignUp2 extends AppCompatActivity {
@@ -39,9 +44,11 @@ public class SignUp2 extends AppCompatActivity {
     private InputValidation inputValidation;
     private  SQLiteDBHelper DBHelper;
     private User user;
-
+    private String blockcharset = "~#^|$%&*!,.";
     //adding requestCode variable for requestPermission
     private int RC;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,15 +87,18 @@ public class SignUp2 extends AppCompatActivity {
                         inputValidation.is_Empty(input_aadhar,aadhar,getString(R.string.message)) ||
                         inputValidation.is_Empty(input_location,location,getString(R.string.message));
 
-                if(inputValidation.is_Empty(input_mobile,mobile,getString(R.string.no_phone))){
+                if(inputValidation.is_Empty(input_mobile,mobile,getString(R.string.no_phone))
+                    || inputValidation.is_Valid(input_mobile,10)){
                     input_mobile.setError(getString(R.string.no_phone));
                 }
-                if(inputValidation.is_Empty(input_aadhar,aadhar,getString(R.string.no_aadhar))){
+                if(inputValidation.is_Empty(input_aadhar,aadhar,getString(R.string.no_aadhar))
+                    || inputValidation.is_Valid(input_aadhar,12)){
                     input_aadhar.setError(getString(R.string.no_aadhar));
                 }
                 if(inputValidation.is_Empty(input_location,location,getString(R.string.no_location))){
                     input_location.setError(getString(R.string.no_location));
                 }
+
                 //NOTE:MOVED empty if statement here to ensure error messages are displayed before exiting
                 if(empty){
                     return;

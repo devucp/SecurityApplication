@@ -132,9 +132,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         db.close();
         Log.d("DATABASE","Cursor count for aadhar"+cursorCount);
         if(cursorCount == 0){
-            Log.d("DATABASE","Aadhar no exists:"+aadhar);
+
             return true;
         }
+        Log.d("DATABASE","Aadhar no  exists:"+aadhar);
         return false;
 
     }

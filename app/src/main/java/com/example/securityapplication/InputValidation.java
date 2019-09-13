@@ -45,8 +45,8 @@ public class InputValidation {
             return false;
         }
     }
-
-    public boolean valid_input(TextInputEditText textInputEditText, int minlength, String message){
+    //return true if input is equal to minLength
+    public boolean isMinLength(TextInputEditText textInputEditText, int minlength, String message){
         int value = textInputEditText.getText().toString().length();
         if(value != minlength) {
             //textInputEditText.setError(message);
@@ -58,14 +58,15 @@ public class InputValidation {
         }
     }
 
-
-    public boolean is_Valid(TextInputEditText textInputEditText){
+    //returns true if input is NUMERIC
+    public boolean is_numeric(TextInputEditText textInputEditText){
 
         String value =  textInputEditText.getText().toString().trim();
         String message = "INVALID";
         String regex = "^[0-9]+$";
         Matcher matcher = Pattern.compile( regex ).matcher(value);
         if ( matcher.find()){
+            textInputEditText.setError(null);
             return true;
         }
         else{

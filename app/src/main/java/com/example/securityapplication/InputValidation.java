@@ -39,7 +39,6 @@ public class InputValidation {
         if(i3)
             textInputEditText3.setError(message);
         if(i1 || i2 || i3){
-
             return true;
         }
         else {

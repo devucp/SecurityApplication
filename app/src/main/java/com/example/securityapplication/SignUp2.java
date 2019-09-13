@@ -83,7 +83,9 @@ public class SignUp2 extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //Call the method to validate the fields
-
+                boolean valid_mobile = false;
+                boolean valid_aadhar = false;
+                boolean valid_location = false;
                 boolean empty_mobile = inputValidation.is_Empty(input_mobile, "PLEASE ENTER MOBILE NO. ");
                 if (!empty_mobile) {
                     if (!inputValidation.valid_input(input_mobile, 10, getString(R.string.no_phone))) {
@@ -92,6 +94,7 @@ public class SignUp2 extends AppCompatActivity {
                         }
                     }
                 } else{
+                    valid_mobile = true;
                     input_mobile.setError(null);
                 }
 
@@ -103,23 +106,29 @@ public class SignUp2 extends AppCompatActivity {
                         }
                     }
                 } else {
+                    valid_aadhar = true;
                     input_aadhar.setError(null);
                 }
 
                 if (input_location.getText().toString().isEmpty()) {
                     input_location.setError(getString(R.string.no_location));
                 }
+                else{
+                    valid_location = true;
+                    input_location.setError(null);
+                }
                 /**NOTE:MOVED empty if statement here to ensure error messages are displayed before exiting
                  //if(empty){
                  //  return;
-                 }*/
-                //Moved IMEI reading code to this place so IMEI can be stored for user object
-                boolean empty = inputValidation.all_Empty(input_mobile, input_aadhar, input_location,
-                        getString(R.string.message));
-                if (!empty) {
-                    String imei = null;
-                    TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
+                 }*/
+
+                //Moved IMEI reading code to this place so IMEI can be stored for user object
+                boolean empty = inputValidation.all_Empty(input_mobile,input_aadhar,input_location,getString(R.string.message));
+                boolean valid = valid_mobile && valid_aadhar && valid_location;
+                if(!empty){
+                    String imei = null;
+                    TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
                     String permission = Manifest.permission.READ_PHONE_STATE;
                     int res = getApplicationContext().checkCallingOrSelfPermission(permission);
                     if (res == PackageManager.PERMISSION_GRANTED) {
@@ -137,12 +146,11 @@ public class SignUp2 extends AppCompatActivity {
                     }
 
 
-                    if (!DBHelper.checkUser(input_aadhar.getText().toString().trim())) {
+                    if (DBHelper.checkUser(input_aadhar.getText().toString().trim()) && !empty){
                         user.setMobile(input_mobile.getText().toString().trim());
                         user.setAadhar(input_aadhar.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
-                        //setting IMEI
-                        user.setImei(imei);
+                        user.setImei(imei);//setting IMEI
                         //added conditional checking and showing respective Toast message
                         if (DBHelper.addUser(user))
                             Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
@@ -150,13 +158,13 @@ public class SignUp2 extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
 
                     } else {
-                        Log.d("SIgnUP2", "User exists ");
+                        Log.d("SIgnUp2", "User exists ");
                         Toast.makeText(getApplicationContext(), "AADHAR NO ALREADY EXISTS", Toast.LENGTH_LONG).show();
                     }
-
+                }//
 
                 }
-            }//
+            //
             }
 
         );

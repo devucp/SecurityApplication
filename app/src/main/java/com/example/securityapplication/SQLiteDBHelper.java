@@ -31,7 +31,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
-                    COLUMN_ID + " INTEGER AUTOINCREMENT, " +
+                    COLUMN_ID + " INTEGER, " +
                     COLUMN_NAME + " TEXT, "+
                     COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
                     COLUMN_GENDER + " TEXT, " +
@@ -130,8 +130,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         int cursorCount = cursor.getCount();
         cursor.close();
         db.close();
-        Log.d("DATABASE","Curson count for aadhar"+cursorCount);
-        if(cursorCount > 0){
+        Log.d("DATABASE","Cursor count for aadhar"+cursorCount);
+        if(cursorCount == 0){
             Log.d("DATABASE","Aadhar no exists:"+aadhar);
             return true;
         }

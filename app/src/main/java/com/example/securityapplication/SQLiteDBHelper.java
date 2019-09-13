@@ -28,6 +28,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_AADHAR = "aadhar";
     public static final String COLUMN_LOCATION = "location";
     public static final String COLUMN_IMEI = "imei";
+    public static final String COLUMN_DOB = "dob";
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -39,6 +40,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_MOBILE + " TEXT, " +
                     COLUMN_AADHAR + " TEXT, " +
                     COLUMN_LOCATION + " TEXT, " +
+                    COLUMN_DOB + " TEXT, " +
                     COLUMN_IMEI + " TEXT " + ")";
 
 
@@ -74,7 +76,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_AADHAR, user.getAadhar());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
         contentValues.put(COLUMN_IMEI, user.getImei());
-
+        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
         long result = db.insert(TABLE_NAME,null, contentValues);
         db.close();
         if (result == -1){
@@ -105,6 +107,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_AADHAR, user.getAadhar());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
         contentValues.put(COLUMN_IMEI, user.getImei());
+        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
 
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
                 new String[]{String.valueOf(user.getId())});

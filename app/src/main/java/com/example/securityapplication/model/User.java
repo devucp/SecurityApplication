@@ -1,8 +1,12 @@
 package com.example.securityapplication.model;
 
+
 import java.util.Date;
 
-public class User {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class User implements Parcelable {
     private int id;
     private String name;
     private String email;
@@ -12,6 +16,43 @@ public class User {
     private String aadhar;
     private String location;
     private String imei;
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
+
+    private String dob;
+
+    public User(){}
+
+    protected User(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        email = in.readString();
+        password = in.readString();
+        gender = in.readString();
+        mobile = in.readString();
+        aadhar = in.readString();
+        location = in.readString();
+        imei = in.readString();
+        dob = in.readString();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -83,5 +124,24 @@ public class User {
 
     public void setImei(String imei) {
         this.imei = imei;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(gender);
+        dest.writeString(mobile);
+        dest.writeString(aadhar);
+        dest.writeString(location);
+        dest.writeString(imei);
+        dest.writeString(dob);
     }
 }

@@ -166,7 +166,9 @@ public class SignUp2 extends AppCompatActivity {
                         user.setImei(imei);//setting IMEI
                         //added conditional checking and showing respective Toast message
                         if (DBHelper.addUser(user))
-                            Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                        {   Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                            setResult(10,null);//to finish sing up 1 activity
+                            activity.finish();}
                         else
                             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
 

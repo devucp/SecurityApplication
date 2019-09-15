@@ -106,11 +106,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent signUpIntent = new Intent(this,SignUp1Activity.class);
             startActivity(signUpIntent);
         }
-        //Added Reset Passowrd Activity
-        else if (i==R.id.ForgetPassword) {
-            Intent forgetPasswordIntent = new Intent(this, ResetPasswordActivity.class);
-            startActivity(forgetPasswordIntent);
-        }
         else if (i==R.id.linkAccountButton){
             Intent linkAccountIntent = new Intent(this,LinkAccountActivity.class);
             startActivity(linkAccountIntent);

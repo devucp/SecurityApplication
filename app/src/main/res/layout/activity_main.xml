@@ -153,6 +153,19 @@
             android:text="@string/not_logged"
             android:paddingTop="10dp"
             android:layout_below="@+id/googleFbButtons"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/status"
+            android:id="@+id/linkAccountButton"
+            android:text="Link Account"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linkAccountButton"
+            android:id="@+id/verifyEmailButton"
+            android:text="Verify Email"/>
 
     </RelativeLayout>
 

@@ -50,6 +50,11 @@ public class SosPlayer extends Service {
         soskeyscount=0;
     }
     public void updateCount(int direction){
+        if(soskeyscount==5){
+            Intent svc=new Intent(this, BackgroundSosPlayerService.class);
+            startService(svc);
+            sosplay=true;
+        }
 
         if (direction!=0){
             if(soskeyscount%2==0 && direction<0){

@@ -1,8 +1,11 @@
 package com.example.securityapplication;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -18,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.securityapplication.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.util.Calendar;
 
@@ -87,6 +92,27 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 
         user=new User();
 
+        // check if user is signed in to google or facebook
+        if (GoogleSignIn.getLastSignedInAccount(this) != null){
+            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+            if (acct != null) {
+                String personName = acct.getDisplayName();
+                //String personGivenName = acct.getGivenName();
+                //String personFamilyName = acct.getFamilyName();
+                String personEmail = acct.getEmail();
+                //String personId = acct.getId();
+                //Uri personPhoto = acct.getPhotoUrl();
+
+                if (personName != null)
+                    textinputName.setText(personName);
+                if (personEmail != null) {
+                    textinputEmail.setText(personEmail);
+                    textinputEmail.setEnabled(false);
+                }
+            }
+
+        }
+
     }
 
 
@@ -151,5 +177,13 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         if(resultCode==10 && requestCode==1)
             finish();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("hasBackPressed",true);
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
     }
 }

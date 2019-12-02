@@ -33,6 +33,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -326,7 +327,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            googleFirebaseSignIn.handleSignInResult(task);
+
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+            startActivityForResult(signUpIntent,1);
+            /*try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                updateUI(null);
+            }
+            googleFirebaseSignIn.handleSignInResult(task);*/
+        }
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",false);
+                if (hasBackPressed){
+                    signOut();
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
         }
 
         // Pass the activity result back to the Facebook SDK
@@ -356,7 +379,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             DeviceUser deviceUser = deviceDataSnapshot.child(mImeiNumber).getValue(DeviceUser.class);
                             final String uid = deviceUser.getUID();
                             if (uid == null){
-                                // new user
+                                // new user -> ask to sign up
+                                Toast.makeText(MainActivity.this, "User not registered", Toast.LENGTH_SHORT).show();
                             }
                             else{
                                 //Log.d(TAG, "Inside dataSnapshot.hasChild(mImeiNumber) method");
@@ -368,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             if (userDataSnapshot.hasChild(uid)){
                                                 User user = userDataSnapshot.child(uid).getValue(User.class);
                                                 if (user.getPassword() == null){
-                                                    // user never logged in through email..Give error
+                                                    // user never logged in through email account..Give error
                                                     Toast.makeText(MainActivity.this, "You do not have email account", Toast.LENGTH_SHORT).show();
                                                 }
                                                 else if (user.getEmail().equals(email) && user.getPassword().equals(password)){
@@ -393,7 +417,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 }
                                             }
                                             else{
-                                                // remove uid from imei in devices
+                                                // remove uid from imei in devices node
                                             }
                                         }
                                         else {

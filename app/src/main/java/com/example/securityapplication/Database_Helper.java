@@ -97,7 +97,7 @@ public class Database_Helper extends SQLiteOpenHelper {
     }
 
     public boolean CheckUserEmail(String UserEmail){
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("Select Fname from "+Table_Name +" where Email = '"+UserEmail+"'" , null);
         if(res.getCount()>0) {
             return true;

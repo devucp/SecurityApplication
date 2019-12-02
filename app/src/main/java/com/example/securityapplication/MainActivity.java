@@ -194,6 +194,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         /**  END FACEBOOK LOGIN  **/
+
+        /** SosPlayer Service intent**/
+        startService(new Intent(this, SosPlayer.class));
     }
 
     public void onStart(){

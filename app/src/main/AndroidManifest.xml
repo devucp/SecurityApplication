@@ -57,6 +57,8 @@
 
         </activity>
         -->
+        <service android:name=".SosPlayer"></service>
+        <service android:name=".BackgroundSosPlayerService"></service>
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />

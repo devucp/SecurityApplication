@@ -89,13 +89,32 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 
     }
 
+   /* public void ViewData(){
+        Btn_ViewData.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Cursor res = myDb.GetData();
+                        StringBuffer buffer = new StringBuffer();
+                        if(res.getCount() == 0){
+                            ShowMessage("Error","No entries found");
+                            return;
+                        }
+                        else {
+                            while (res.moveToNext()) {
+                                buffer.append("Name " + res.getString(0));
+                                buffer.append("Gender " + res.getString(1));
+                                buffer.append("DOB " + res.getString(2));
+                                buffer.append("Email " + res.getString(3));
+                                buffer.append("Password " + res.getString(4));
+                            }
+                            ShowMessage("Data Inserted", buffer.toString());
+                        }
+                    }
+                }
+        );
+    }*/
 
-    private void ShowMessage(String title,String Message){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
-        builder.setTitle(title);
-        builder.setMessage(Message);
-    }
 
     public void Validater(View view) {
         if (val.validateName(textinputName) & val.validateGender(gender_grp,text_view) & val.validateDob(textinputDOB) & val.validateEmail(textinputEmail) &

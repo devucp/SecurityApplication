@@ -17,6 +17,8 @@ import android.text.Spanned;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +43,8 @@ public class SignUp2 extends AppCompatActivity {
     private TextView error_message;
     private Button btn_submit;
 
+//    private AutoCompleteTextView input_locality;
+
     private InputValidation inputValidation;
     private  SQLiteDBHelper DBHelper;
     private User user;
@@ -54,12 +58,15 @@ public class SignUp2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup2);
 
+
+//        input_locality = findViewById(R.id.input_locality);
+//        String[] Locality = getResources().getStringArray(R.array.Locality);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Locality);
+//        input_locality.setAdapter(adapter);
+        //mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
         initViews();
         initListeners();
         initObjects();
-
-        //mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
-
 
     }
 
@@ -75,6 +82,7 @@ public class SignUp2 extends AppCompatActivity {
 
         error_message = findViewById(R.id.error_message);
         btn_submit = findViewById(R.id.btn_submit);
+
 
     }
 

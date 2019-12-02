@@ -9,8 +9,6 @@ import android.util.Log;
 
 import com.example.securityapplication.model.User;
 
-import static android.icu.text.MessagePattern.ArgType.SELECT;
-
 
 public class SQLiteDBHelper extends SQLiteOpenHelper {
 
@@ -154,6 +152,14 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
 
+    public Cursor getAllData(String Mobile) {
 
+        Cursor cursor = getReadableDatabase().rawQuery("select * from "+TABLE_NAME+" where mobile = "+ Mobile, null);
+        if (cursor.getCount()!=0) {
+            Log.d("Database", "Details Fetched");
+        }
+        Log.d("Database","No records Found");
+        return cursor;
+    }
 
 }

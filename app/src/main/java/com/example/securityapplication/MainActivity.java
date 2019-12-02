@@ -106,11 +106,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent signUpIntent = new Intent(this,SignUp1Activity.class);
             startActivity(signUpIntent);
         }
-        //Added Reset Passowrd Activity
-        else if (i==R.id.ForgetPassword) {
-            Intent forgetPasswordIntent = new Intent(this, ResetPasswordActivity.class);
-            startActivity(forgetPasswordIntent);
-        }
         else if (i==R.id.linkAccountButton){
             Intent linkAccountIntent = new Intent(this,LinkAccountActivity.class);
             startActivity(linkAccountIntent);
@@ -229,8 +224,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initDataBase(){
         //Initialize Database
-        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("devices");
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
+        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
         Log.d(TAG,mDevicesDatabaseReference.toString());
     }
 
@@ -348,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
                     if (deviceDataSnapshot.exists()){
                         Log.d(TAG, "Devices node exists in json tree");
-                        //Log.d("MainActiity", dataSnapshot.toString());
+                        Log.d("MainActiity", deviceDataSnapshot.toString());
                         Log.d(TAG,"From mobile: "+mImeiNumber);
                         Log.d(TAG,"From firebase: "+deviceDataSnapshot.hasChild(mImeiNumber));
                         if (deviceDataSnapshot.hasChild(mImeiNumber)){
@@ -357,68 +352,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             // first get uid from imei
                             DeviceUser deviceUser = deviceDataSnapshot.child(mImeiNumber).getValue(DeviceUser.class);
                             final String uid = deviceUser.getUID();
-                            //Log.d(TAG, "Inside dataSnapshot.hasChild(mImeiNumber) method");
-                            Log.d(TAG, deviceUser.getUID());
-                            mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                                    if (userDataSnapshot.exists()){
-                                        if (userDataSnapshot.hasChild(uid)){
-                                            User user = userDataSnapshot.child(uid).getValue(User.class);
-                                            if (user.getEmail().equals(email) && user.getPassword().equals(password)){
-                                                // Login the User
-                                                mAuth.signInWithEmailAndPassword(email, password)
-                                                        .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
-                                                                    Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+                            if (uid == null){
+                                // new user
+                            }
+                            else{
+                                //Log.d(TAG, "Inside dataSnapshot.hasChild(mImeiNumber) method");
+                                Log.d(TAG, uid);
+                                mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                                        if (userDataSnapshot.exists()){
+                                            if (userDataSnapshot.hasChild(uid)){
+                                                User user = userDataSnapshot.child(uid).getValue(User.class);
+                                                if (user.getPassword() == null){
+                                                    // user never logged in through email..Give error
+                                                    Toast.makeText(MainActivity.this, "You do not have email account", Toast.LENGTH_SHORT).show();
+                                                }
+                                                else if (user.getEmail().equals(email) && user.getPassword().equals(password)){
+                                                    // Login the User
+                                                    mAuth.signInWithEmailAndPassword(email, password)
+                                                            .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
+                                                                        Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
-                                                                    FirebaseUser user = mAuth.getCurrentUser();
-                                                                    Log.d(TAG, mDevicesDatabaseReference.toString());
-                                                                    //mDatabaseReference.setValue(user.getUid());
-                                                                    updateUI(user);
-                                                                } else {
-                                                                    updateUI(null);
+                                                                        FirebaseUser user = mAuth.getCurrentUser();
+                                                                        Log.d(TAG, mDevicesDatabaseReference.toString());
+                                                                        //mDatabaseReference.setValue(user.getUid());
+                                                                        updateUI(user);
+                                                                    } else {
+                                                                        updateUI(null);
+                                                                    }
                                                                 }
-                                                            }
-                                                        });
+                                                            });
+                                                }
                                             }
-                                            else {
-                                                /*// check if email exists
-                                                if (email exists condition){
-                                                //--Yet to be decided--//
-                                                // Implies user is registered but uses new device to login and new device is also registered
-                                                // In that case, user needs to logout from old device, so prompt the user to logout from old device with buttons allow and deny.
-                                                // If user clicks allow button, then:
-                                                    // 1.log out user from old device;
-                                                    // 2.change value of isLoggedIn status of old device in Database to false
-                                                // Now user can login from new device.
-                                                // Now if user tries to login from new device then check
-                                               }
-                                                else {
-                                                    Log.d(TAG, "Invalid username or password");
-                                                    Toast.makeText(MainActivity.this, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
-                                                }*/
+                                            else{
+                                                // remove uid from imei in devices
                                             }
                                         }
-                                        else{
-                                            Log.d(TAG, "Unknown UID");
+                                        else {
+                                            Log.d(TAG, "Users node does not exists in json tree");
                                         }
                                     }
-                                    else {
-                                        Log.d(TAG, "Users node does not exists in json tree");
-                                    }
-                                }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    // Getting User failed, log a message
-                                    Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-                                    Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        // Getting User failed, log a message
+                                        Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
+                                        Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+
                         }
                         else {
                             Log.d(TAG, "Imei not registered");
@@ -442,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     else {
                         Log.d(TAG, "Devices node does not exists in json tree");
-                        mDevicesDatabaseReference.child(mImeiNumber).child("uid").setValue("CM2RyALv19Sk6iAQVPlHB538auv1");
+                        //mDevicesDatabaseReference.child(mImeiNumber).child("uid").setValue("CM2RyALv19Sk6iAQVPlHB538auv1");
                     }
                 }
 

@@ -16,6 +16,7 @@ public class SosPlayer extends Service {
     private  boolean sosplay;
     private int prev_direction;
     private boolean timerStarted;
+    private CountDownTimer timer;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -58,11 +59,13 @@ public class SosPlayer extends Service {
     public void startTimer(){
         timerStarted=true;
         Log.d("SOS Timer","Timer started");
-        new CountDownTimer(4*1000, 1000) {
+        Toast.makeText(getApplicationContext(), "SOS timer started", Toast.LENGTH_LONG).show();
+        timer=new CountDownTimer(10*1000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 Log.d("SOS Timer" ,"Time remaining:" +millisUntilFinished / 1000);
             }
+
 
             public void onFinish() {
                 Log.d("SOS Timer" ,"Timeoout reached" );
@@ -101,6 +104,12 @@ public class SosPlayer extends Service {
 
             else{
                 resetCount();
+
+                //cancel the timer counting and deinitialize it to restart counting from start
+                if(timer!=null){
+                    timer.cancel();
+                    timer=null;
+                }
             }
             prev_direction=direction;
             Log.d("New soskeycount","Count"+soskeyscount+" Direction"+direction+" Prev direction"+prev_direction);

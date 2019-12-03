@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -51,8 +53,10 @@ public class SignUp2 extends AppCompatActivity {
     //adding requestCode variable for requestPermission
     private int RC;
 
-    private DatabaseReference mDatabase;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
     private FirebaseAuth mAuth;
+    private GoogleFirebaseSignIn googleFirebaseSignIn;
 
     private String TAG = "SignUp2";
 
@@ -68,9 +72,15 @@ public class SignUp2 extends AppCompatActivity {
 
         //mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference();
         mAuth=FirebaseAuth.getInstance();
         device = new Device();
+
+        //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
+        googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
+        //initialize user defined class GoogleFirebaseSignIn with Firebase user instance and TAG using user defined init method
+        //googleFirebaseSignIn.init(this, mAuth, mFirebaseDatabase);
     }
 
     /**Initialize Views*/
@@ -174,12 +184,13 @@ public class SignUp2 extends AppCompatActivity {
                         //user.setAadhar(input_aadhar.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
+                        user.setIsPaid(false);
                         //added conditional checking and showing respective Toast message
                         if (DBHelper.addUser(user))
                         {
                             Log.d("User Email:",user.getEmail());
                             Log.d("User imei:",user.getImei());
-                            Log.d("DB Ref:",mDatabase.toString());
+                            Log.d("DB Ref:",mDatabaseReference.toString());
                             // create the User
                             mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                                     .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
@@ -193,14 +204,27 @@ public class SignUp2 extends AppCompatActivity {
                                                 device.setUID(firebaseUser.getUid());
 
                                                 //push user to firebase database 'Users' node
-                                                mDatabase.child("Users").child(firebaseUser.getUid()).setValue(user);
+                                                mDatabaseReference.child("Users").child(firebaseUser.getUid()).setValue(user);
                                                 //push device to firebase database 'Devices' node
-                                                mDatabase.child("Devices").child(user.getImei()).setValue(device);
+                                                mDatabaseReference.child("Devices").child(user.getImei()).setValue(device);
                                                 //push email and mobile no. on root node
-                                                mDatabase.child("Email").setValue(user.getEmail());
-                                                mDatabase.child("Mobile").setValue(user.getMobile());
+                                                mDatabaseReference.child("Email").push().setValue(user.getEmail());
+                                                mDatabaseReference.child("Mobile").push().setValue(user.getMobile());
 
-                                                Log.d("Pushed to db",mDatabase.getDatabase().toString());
+                                                Log.d("Pushed to db",mDatabaseReference.getDatabase().toString());
+
+                                                // check if user is signed in to google or facebook
+                                                if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
+                                                    GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
+                                                    if (acct != null) {
+                                                        //link google acc to email acc
+                                                        googleFirebaseSignIn.linkGoogleAccount(acct);
+                                                        Log.d(TAG,"Returned Back to SignUp2");
+                                                    }
+                                                }
+                                                else
+                                                    Log.d("isLoggedinGoogle","Not logged in");
+
                                                 //updateUI(user);
                                             } else {
                                                 // If sign in fails, display a message to the user.

@@ -17,6 +17,8 @@ public class User implements Parcelable {
     private String location;
     private String imei;
     private String dob;
+    private boolean ispaid;
+
 
     public String getDob() {
         return dob;
@@ -125,6 +127,11 @@ public class User implements Parcelable {
     public void setImei(String imei) {
         this.imei = imei;
     }
+
+    public boolean getIsPaid(){ return ispaid; }
+
+    public void setIsPaid(boolean isPaid){ this.ispaid = isPaid; }
+
 
     @Override
     public int describeContents() {

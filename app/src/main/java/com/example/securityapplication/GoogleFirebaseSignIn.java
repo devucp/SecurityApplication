@@ -51,11 +51,16 @@ public class GoogleFirebaseSignIn implements Serializable {
     public static GoogleFirebaseSignIn getInstance() {
         //Double check locking pattern
         if (googleFirebaseInstance == null) { //Check for the first time..if there is no instance available... create new one
-            synchronized (FaceBookLoginIn.class) { //Check for the second time to make ThreadSafe
+            synchronized (GoogleFirebaseSignIn.class) { //Check for the second time to make ThreadSafe
                 //if there is no instance available... create new one
-                if (googleFirebaseInstance == null)
+                if (googleFirebaseInstance == null) {
                     googleFirebaseInstance = new GoogleFirebaseSignIn();
+                    Log.d(TAG,"Created new googleFirebaseInstance");
+                }
             }
+        }
+        else {
+            Log.d(TAG,"googleFirebaseInstance Exists");
         }
         return googleFirebaseInstance;
     }
@@ -63,6 +68,36 @@ public class GoogleFirebaseSignIn implements Serializable {
     //Make singleton from serialize and deserialize operation.
     protected GoogleFirebaseSignIn readResolve() {
         return getInstance();
+    }
+
+    public void linkGoogleAccount(GoogleSignInAccount acct) {
+
+        // Link the anonymous user to the email credential
+        //showProgressDialog();
+        AuthCredential credential= GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        // [START link_credential]
+        mAuth.getCurrentUser().linkWithCredential(credential)
+                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "linkWithCredential:success");
+                            FirebaseUser user = task.getResult().getUser();
+                            //Toast.makeText(LinkAccountActivity.this, "Account Linked Successfully", Toast.LENGTH_SHORT).show();
+                            return;
+                        } else {
+                            String[] exceptionSplitted = task.getException().toString().split(":");
+                            Log.w(TAG, "linkWithCredential:failure", task.getException());
+                            //Toast.makeText(LinkAccountActivity.this, exceptionSplitted[exceptionSplitted.length-1], Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // [START_EXCLUDE]
+                        //hideProgressDialog();
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END link_credential]
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {

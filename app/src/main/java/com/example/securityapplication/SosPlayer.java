@@ -2,17 +2,20 @@ package com.example.securityapplication;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.media.VolumeProviderCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SosPlayer extends Service {
     private MediaSessionCompat mediaSession;
     private int soskeyscount;
     private  boolean sosplay;
     private int prev_direction;
+    private boolean timerStarted;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -22,6 +25,9 @@ public class SosPlayer extends Service {
         //initialising sosplaying variable
         sosplay=false;
         prev_direction=0;
+
+        timerStarted=false;
+
         mediaSession = new MediaSessionCompat(this, "SosPlayer");
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -46,10 +52,32 @@ public class SosPlayer extends Service {
 
         mediaSession.setPlaybackToRemote(myVolumeProvider);
         mediaSession.setActive(true);
+
+
     }
+    public void startTimer(){
+        timerStarted=true;
+        Log.d("SOS Timer","Timer started");
+        new CountDownTimer(4*1000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                Log.d("SOS Timer" ,"Time remaining:" +millisUntilFinished / 1000);
+            }
+
+            public void onFinish() {
+                Log.d("SOS Timer" ,"Timeoout reached" );
+                resetCount();
+                timerStarted=false;
+                Toast.makeText(getApplicationContext(), "SOS timer reset", Toast.LENGTH_LONG).show();
+
+            }
+        }.start();
+    }
+
     public void resetCount(){
         soskeyscount=0;
     }
+
     public void updateCount(int direction){
         if(soskeyscount==5){
             Intent svc=new Intent(this, BackgroundSosPlayerService.class);
@@ -61,11 +89,16 @@ public class SosPlayer extends Service {
             return;
         }
         if (direction!=0){
+            //start timer on first key press
+            if(soskeyscount==0 && !timerStarted){
+                startTimer();
+
+            }
 
             if(compareDirection(prev_direction,direction)){
                 soskeyscount++;
             }
-            
+
             else{
                 resetCount();
             }

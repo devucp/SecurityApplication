@@ -15,18 +15,19 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
         <activity android:name=".LinkAccountActivity"></activity>
-        <!--
-        <activity android:name=".SignUp2">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-        <activity android:name=".LinkAccountActivity"></activity>
+        <activity android:name=".SignUp2" />
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>-->
+
+        <!--<activity android:name=".LinkAccountActivity"></activity>-->
 
         <activity android:name=".ResetPasswordActivity"
             android:screenOrientation="portrait">
 
         </activity>
-        -->
+
         <activity android:name=".SignUp1Activity" />
         <activity
             android:name=".MainActivity"

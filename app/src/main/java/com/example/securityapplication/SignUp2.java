@@ -3,28 +3,30 @@ package com.example.securityapplication;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
-
-import java.util.regex.Pattern;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class SignUp2 extends AppCompatActivity {
@@ -44,9 +46,15 @@ public class SignUp2 extends AppCompatActivity {
     private InputValidation inputValidation;
     private  SQLiteDBHelper DBHelper;
     private User user;
+    private Device device;
     private String blockcharset = "~#^|$%&*!,.";
     //adding requestCode variable for requestPermission
     private int RC;
+
+    private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
+
+    private String TAG = "SignUp2";
 
 
     @Override
@@ -60,7 +68,9 @@ public class SignUp2 extends AppCompatActivity {
 
         //mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
-
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth=FirebaseAuth.getInstance();
+        device = new Device();
     }
 
     /**Initialize Views*/
@@ -142,7 +152,7 @@ public class SignUp2 extends AppCompatActivity {
                     int res = getApplicationContext().checkCallingOrSelfPermission(permission);
                     if (res == PackageManager.PERMISSION_GRANTED) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            imei = tm.getImei(1);
+                            imei = tm.getImei(0);
                             Log.d("IMEI", "IMEI Number of slot 1 is:" + imei);
 
                         } else {
@@ -161,14 +171,53 @@ public class SignUp2 extends AppCompatActivity {
                     if (DBHelper.checkUser(input_aadhar.getText().toString().trim()) ){
 
                         user.setMobile(input_mobile.getText().toString().trim());
-                        user.setAadhar(input_aadhar.getText().toString().trim());
+                        //user.setAadhar(input_aadhar.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
                         //added conditional checking and showing respective Toast message
                         if (DBHelper.addUser(user))
-                        {   Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                        {
+                            Log.d("User Email:",user.getEmail());
+                            Log.d("User imei:",user.getImei());
+                            Log.d("DB Ref:",mDatabase.toString());
+                            // create the User
+                            mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+                                    .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                            if (task.isSuccessful()) {
+                                                // Sign in success, update UI with the signed-in user's information
+                                                Log.d(TAG, "createUserWithEmail:success");
+                                                FirebaseUser firebaseUser = mAuth.getCurrentUser();
+
+                                                device.setUID(firebaseUser.getUid());
+
+                                                //push user to firebase database 'Users' node
+                                                mDatabase.child("Users").child(firebaseUser.getUid()).setValue(user);
+                                                //push device to firebase database 'Devices' node
+                                                mDatabase.child("Devices").child(user.getImei()).setValue(device);
+                                                //push email and mobile no. on root node
+                                                mDatabase.child("Email").setValue(user.getEmail());
+                                                mDatabase.child("Mobile").setValue(user.getMobile());
+
+                                                Log.d("Pushed to db",mDatabase.getDatabase().toString());
+                                                //updateUI(user);
+                                            } else {
+                                                // If sign in fails, display a message to the user.
+                                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                                Toast.makeText(SignUp2.this, "Authentication failed.",
+                                                        Toast.LENGTH_SHORT).show();
+                                                //updateUI(null);
+                                            }
+
+                                            // ...
+                                        }
+                                    });
+
+                            Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
                             setResult(10,null);//to finish sing up 1 activity
-                            activity.finish();}
+                            //activity.finish();
+                        }
                         else
                             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
 
@@ -185,9 +234,15 @@ public class SignUp2 extends AppCompatActivity {
         );
     }
 
+
     private void initObjects(){
         inputValidation = new InputValidation(activity);
         DBHelper = new SQLiteDBHelper(activity);
         user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
     }
 }
+
+
+
+
+

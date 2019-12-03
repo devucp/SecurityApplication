@@ -3,25 +3,25 @@ package com.example.securityapplication.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class DeviceUser implements Parcelable {
+public class Device implements Parcelable {
 
     private String uid;
 
-    public DeviceUser(){}
+    public Device(){}
 
-    protected DeviceUser(Parcel in) {
+    protected Device(Parcel in) {
         uid = in.readString();
     }
 
-    public static final Creator<DeviceUser> CREATOR = new Creator<DeviceUser>() {
+    public static final Creator<Device> CREATOR = new Creator<Device>() {
         @Override
-        public DeviceUser createFromParcel(Parcel in) {
-            return new DeviceUser(in);
+        public Device createFromParcel(Parcel in) {
+            return new Device(in);
         }
 
         @Override
-        public DeviceUser[] newArray(int size) {
-            return new DeviceUser[size];
+        public Device[] newArray(int size) {
+            return new Device[size];
         }
     };
 

@@ -12,6 +12,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -41,6 +42,7 @@ public class SignUp1Activity extends AppCompatActivity {
     private RadioButton Radio_Gender;
     //Added user object to send to next
     private User user;
+
     //
 DatePickerDialog datePickerDialog;
 private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
@@ -93,6 +95,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         user=new User();
 
         // check if user is signed in to google or facebook
+
         if (GoogleSignIn.getLastSignedInAccount(this) != null){
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
@@ -102,7 +105,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
                 String personEmail = acct.getEmail();
                 //String personId = acct.getId();
                 //Uri personPhoto = acct.getPhotoUrl();
-
+                Log.d("Usernanme",personName);
+                Log.d("Email",personEmail);
                 if (personName != null)
                     textinputName.setText(personName);
                 if (personEmail != null) {
@@ -110,9 +114,9 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
                     textinputEmail.setEnabled(false);
                 }
             }
-
         }
-
+        else
+            Log.d("isLoggedinGoogle","Not logged in");
     }
 
 
@@ -153,6 +157,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 //            textinputCnfPass.setText(null);
             //updates the Usr object with filled fields
             user=myDb.getUser();
+            Log.d("User",user.getEmail().toString());
             //starting signup activity
             Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
             intent.putExtra("User",user);

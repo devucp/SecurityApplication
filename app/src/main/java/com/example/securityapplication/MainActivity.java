@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import com.example.securityapplication.model.DeviceUser;
+import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -37,9 +37,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,9 +48,6 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
 
 //import androidx.annotation.NonNull;
 
@@ -124,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Grant DeviceUser read Permissions
+        //Grant Device read Permissions
         deviceId();
 
         //initialize Activity
@@ -328,8 +323,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
-            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-            startActivityForResult(signUpIntent,1);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+                startActivityForResult(signUpIntent,1);
+
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                updateUI(null);
+            }
+
             /*try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
             } catch (ApiException e) {
@@ -376,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             // implies user tries to log in from same device as registered
                             // now check if email and password matches with credentials stored in db
                             // first get uid from imei
-                            DeviceUser deviceUser = deviceDataSnapshot.child(mImeiNumber).getValue(DeviceUser.class);
+                            Device deviceUser = deviceDataSnapshot.child(mImeiNumber).getValue(Device.class);
                             final String uid = deviceUser.getUID();
                             if (uid == null){
                                 // new user -> ask to sign up
@@ -388,14 +393,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                                        Log.d("User Data Snapshot:",userDataSnapshot.toString());
                                         if (userDataSnapshot.exists()){
                                             if (userDataSnapshot.hasChild(uid)){
                                                 User user = userDataSnapshot.child(uid).getValue(User.class);
+                                                Log.d("password:",user.getPassword());
                                                 if (user.getPassword() == null){
                                                     // user never logged in through email account..Give error
                                                     Toast.makeText(MainActivity.this, "You do not have email account", Toast.LENGTH_SHORT).show();
                                                 }
                                                 else if (user.getEmail().equals(email) && user.getPassword().equals(password)){
+                                                    Log.d(TAG,"Log user in");
                                                     // Login the User
                                                     mAuth.signInWithEmailAndPassword(email, password)
                                                             .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
@@ -414,6 +422,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                                     }
                                                                 }
                                                             });
+                                                }
+                                                else {
+                                                    Toast.makeText(MainActivity.this,"Invalid Email or Password", Toast.LENGTH_SHORT).show();
                                                 }
                                             }
                                             else{

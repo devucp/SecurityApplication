@@ -73,7 +73,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_PASSWORD, user.getPassword());
         contentValues.put(COLUMN_GENDER, user.getGender());
         contentValues.put(COLUMN_MOBILE,user.getMobile());
-        contentValues.put(COLUMN_AADHAR, user.getAadhar());
+//        contentValues.put(COLUMN_AADHAR, user.getAadhar());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
         contentValues.put(COLUMN_IMEI, user.getImei());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
@@ -95,7 +95,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     /**Updating user*/
-    public void updateUser(User user){
+    /*public void updateUser(User user){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -112,7 +112,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
                 new String[]{String.valueOf(user.getId())});
         db.close();
-    }
+    }*/
 
     /**Checking if user is present*/
     public boolean checkUser(String aadhar){
@@ -144,14 +144,14 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     /**Delete User */
-    public void deleteUser(User user) {
+    /*public void deleteUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // NOTE: delete user record by Aadhar
         db.delete(TABLE_NAME, COLUMN_AADHAR + " = ?",
                 new String[]{String.valueOf(user.getAadhar())});
         db.close();
-    }
+    }*/
 
 
 

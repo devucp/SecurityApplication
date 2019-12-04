@@ -17,6 +17,7 @@ public class RestartJobService extends JobService{
 
         @Override
         public boolean onStartJob(JobParameters jobParameters) {
+            Log.d(TAG,"inside onStartJob");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(new Intent(this,SosPlayer.class));
             } else {

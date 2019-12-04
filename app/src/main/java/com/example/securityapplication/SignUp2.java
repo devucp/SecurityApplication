@@ -3,6 +3,7 @@ package com.example.securityapplication;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -17,6 +18,8 @@ import android.text.Spanned;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,15 +33,13 @@ import java.util.regex.Pattern;
 public class SignUp2 extends AppCompatActivity {
     private final AppCompatActivity activity = SignUp2.this;
 
-    private TextInputLayout mobile;
-    private TextInputLayout aadhar;
-    private TextInputLayout location;
-
 
     private TextInputEditText input_mobile;
-    private TextInputEditText input_aadhar;
-    private TextInputEditText input_location;
-    private TextView error_message;
+//    private TextInputEditText input_aadhar;
+    private AutoCompleteTextView input_location;
+//    private TextView error_message;
+
+
     private Button btn_submit;
 
     private InputValidation inputValidation;
@@ -58,8 +59,11 @@ public class SignUp2 extends AppCompatActivity {
         initListeners();
         initObjects();
 
-        //mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
-
+        Resources res = getResources();
+        String[] Locality = res.getStringArray(R.array.Locality);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Locality);
+        input_location.setAdapter(adapter);
+//        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
     }
 
@@ -68,14 +72,12 @@ public class SignUp2 extends AppCompatActivity {
        // mobile = findViewById(R.id.mobile);
        // aadhar = findViewById(R.id.aadhar);
        // location = findViewById(R.id.location);
-
         input_mobile = findViewById(R.id.input_mobile);
-        input_aadhar = findViewById(R.id.input_aadhar);
-        input_location = findViewById(R.id.input_location);
-
+//        input_aadhar = findViewById(R.id.input_aadhar);
+        input_location = findViewById(R.id.AutoCompleteTextView);
+//        input_actv = findViewById(R.id.AutoCompleteTextView);
        // error_message = findViewById(R.id.error_message);
         btn_submit = findViewById(R.id.btn_submit);
-
     }
 
     private void initListeners(){
@@ -84,7 +86,7 @@ public class SignUp2 extends AppCompatActivity {
             public void onClick(View view) {
                 //Call the method to validate the fields
                 boolean valid_mobile = false;
-                boolean valid_aadhar = false;
+//                boolean valid_aadhar = false;
                 boolean valid_location = false;
                 boolean empty_mobile = inputValidation.is_Empty(input_mobile, "PLEASE ENTER MOBILE NO. ");
                 if (!empty_mobile) {
@@ -99,7 +101,7 @@ public class SignUp2 extends AppCompatActivity {
                     }
                 }
 
-                boolean empty_aadhar = inputValidation.is_Empty(input_aadhar, getString(R.string.no_aadhar));
+            /*    boolean empty_aadhar = inputValidation.is_Empty(input_aadhar, getString(R.string.no_aadhar));
                 if (!empty_aadhar) {
                     if (!inputValidation.isMinLength(input_aadhar, 12, getString(R.string.no_aadhar)) ||
                             !inputValidation.is_numeric(input_aadhar)) {
@@ -111,7 +113,7 @@ public class SignUp2 extends AppCompatActivity {
                         valid_aadhar = true;
                         input_aadhar.setError(null);
                     }
-                }
+                }*/
 
                 if (input_location.getText().toString().isEmpty()) {
                     input_location.setError(getString(R.string.no_location));
@@ -127,10 +129,10 @@ public class SignUp2 extends AppCompatActivity {
                  }*/
 
                 //Moved IMEI reading code to this place so IMEI can be stored for user object
-                boolean empty = inputValidation.all_Empty(input_mobile,input_aadhar,input_location,getString(R.string.message));
+                boolean empty = inputValidation.all_Empty(input_mobile,input_location,getString(R.string.message));
 
-                Log.d("SIgnUP2"," Valid Aadhar:"+valid_aadhar+" Valid Mobile:"+valid_mobile+" Valid Location:"+valid_location);
-                boolean valid = valid_mobile && valid_aadhar && valid_location;
+                Log.d("SIgnUP2","Valid Mobile:"+valid_mobile+" Valid Location:"+valid_location);
+                boolean valid = valid_mobile && valid_location;
 
                 Log.d("SIgnUP2","Empty:"+empty+" Valid"+valid);
 
@@ -158,10 +160,10 @@ public class SignUp2 extends AppCompatActivity {
                     }
 
 
-                    if (DBHelper.checkUser(input_aadhar.getText().toString().trim()) ){
+                    if (DBHelper.checkUser(input_mobile.getText().toString().trim()) ){
 
                         user.setMobile(input_mobile.getText().toString().trim());
-                        user.setAadhar(input_aadhar.getText().toString().trim());
+//                        user.setAadhar(input_aadhar.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
                         //added conditional checking and showing respective Toast message
@@ -174,12 +176,10 @@ public class SignUp2 extends AppCompatActivity {
 
                     } else {
                         Log.d("SIgnUp2", "User exists ");
-                        Toast.makeText(getApplicationContext(), "AADHAR NO ALREADY EXISTS", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "EMAIL ID ALREADY EXISTS", Toast.LENGTH_LONG).show();
                     }
-                }//
-
                 }
-            //
+                }
             }
 
         );

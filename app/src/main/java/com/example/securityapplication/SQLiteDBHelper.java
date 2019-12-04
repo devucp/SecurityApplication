@@ -25,7 +25,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_GENDER = "gender";
     public static final String COLUMN_PASSWORD = "password";
     public static final String COLUMN_MOBILE = "mobile";
-    public static final String COLUMN_AADHAR = "aadhar";
+//    public static final String COLUMN_AADHAR = "aadhar";
     public static final String COLUMN_LOCATION = "location";
     public static final String COLUMN_IMEI = "imei";
     public static final String COLUMN_DOB = "dob";
@@ -37,12 +37,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
                     COLUMN_GENDER + " TEXT, " +
                     COLUMN_PASSWORD + " TEXT, " +
-                    COLUMN_MOBILE + " TEXT, " +
-                    COLUMN_AADHAR + " TEXT, " +
+                    COLUMN_MOBILE + " TEXT UNIQUE, " +
+//                    COLUMN_AADHAR + " TEXT, " +
                     COLUMN_LOCATION + " TEXT, " +
                     COLUMN_DOB + " TEXT, " +
                     COLUMN_IMEI + " TEXT " + ")";
-
 
     /**Constructor*/
 
@@ -73,7 +72,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_PASSWORD, user.getPassword());
         contentValues.put(COLUMN_GENDER, user.getGender());
         contentValues.put(COLUMN_MOBILE,user.getMobile());
-        contentValues.put(COLUMN_AADHAR, user.getAadhar());
+//        contentValues.put(COLUMN_AADHAR, user.getAadhar());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
         contentValues.put(COLUMN_IMEI, user.getImei());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
@@ -95,33 +94,33 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     /**Updating user*/
-    public void updateUser(User user){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-
-        contentValues.put(COLUMN_NAME, user.getName());
-        contentValues.put(COLUMN_EMAIL, user.getEmail());
-        contentValues.put(COLUMN_PASSWORD, user.getPassword());
-        contentValues.put(COLUMN_GENDER, user.getGender());
-        contentValues.put(COLUMN_MOBILE,user.getMobile());
-        contentValues.put(COLUMN_AADHAR, user.getAadhar());
-        contentValues.put(COLUMN_LOCATION, user.getLocation());
-        contentValues.put(COLUMN_IMEI, user.getImei());
-        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
-
-        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
-                new String[]{String.valueOf(user.getId())});
-        db.close();
-    }
+//    public void updateUser(User user){
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues contentValues = new ContentValues();
+//
+//        contentValues.put(COLUMN_NAME, user.getName());
+//        contentValues.put(COLUMN_EMAIL, user.getEmail());
+//        contentValues.put(COLUMN_PASSWORD, user.getPassword());
+//        contentValues.put(COLUMN_GENDER, user.getGender());
+//        contentValues.put(COLUMN_MOBILE,user.getMobile());
+//        contentValues.put(COLUMN_AADHAR, user.getAadhar());
+//        contentValues.put(COLUMN_LOCATION, user.getLocation());
+//        contentValues.put(COLUMN_IMEI, user.getImei());
+//        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
+//
+//        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
+//                new String[]{String.valueOf(user.getId())});
+//        db.close();
+//    }
 
     /**Checking if user is present*/
-    public boolean checkUser(String aadhar){
+    public boolean checkUser(String email){
         String[] columns = {
-                COLUMN_AADHAR   //NOTE:changed to column aadhar
+                COLUMN_EMAIL   //NOTE:changed to column Email
         };
         SQLiteDatabase db = this.getReadableDatabase();
-        String selection = COLUMN_AADHAR + " = ?";
-        String[] selectionArgs = {aadhar};
+        String selection = COLUMN_EMAIL + " = ?";
+        String[] selectionArgs = {email};
 
         Cursor cursor = db.query(TABLE_NAME,
                 columns,
@@ -133,26 +132,34 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         int cursorCount = cursor.getCount();
         cursor.close();
         db.close();
-        Log.d("DATABASE","Cursor count for aadhar"+cursorCount);
+        Log.d("DATABASE","Cursor count for email"+cursorCount);
         if(cursorCount == 0){
-
             return true;
         }
-        Log.d("DATABASE","Aadhar no  exists:"+aadhar);
+        Log.d("DATABASE","Email no  exists:"+email);
         return false;
 
     }
 
     /**Delete User */
-    public void deleteUser(User user) {
+    /*public void deleteUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // NOTE: delete user record by Aadhar
         db.delete(TABLE_NAME, COLUMN_AADHAR + " = ?",
                 new String[]{String.valueOf(user.getAadhar())});
         db.close();
-    }
+    }*/
 
+    public Cursor getAllData(String Mobile) {
+
+        Cursor cursor = getReadableDatabase().rawQuery("select * from "+TABLE_NAME, null);
+        if (cursor.getCount()!=0) {
+            Log.d("Database", "Details Fetched");
+        }
+        Log.d("Database","No records Found");
+        return cursor;
+    }
 
 
 

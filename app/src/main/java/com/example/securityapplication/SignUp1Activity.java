@@ -46,6 +46,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
+
+
        myDb = new Database_Helper(this);
        java.util.Calendar calendar=Calendar.getInstance();
       final int year=calendar.get(Calendar.YEAR);
@@ -61,6 +63,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
         gender_grp = findViewById(R.id.radiogrp);
         Btn_Submit = findViewById(R.id.btn_sub);
+
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,21 +116,33 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
         //Sending the user object
         myDb.setUser(user);
-        Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
+
+//        user=myDb.getUser();
+//        Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
+//        intent.putExtra("User",user);
+//        startActivityForResult(intent,1);
+
+//        user.setName(textinputName.getText().toString().trim());
+//        user.setGender(gender);
+//        user.setDob(textinputDOB.getText().toString().trim());
+//        user.setEmail(textinputEmail.getText().toString().trim());
+//        user.setPassword(textinputPass.getText().toString().trim());
+
+       Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
                 textinputDOB.getText().toString().trim(),
                 textinputEmail.getText().toString().trim(),
                 textinputPass.getText().toString().trim());
         if (isInserted) {
-//            textinputName.setText(null);
-//            gender_grp.clearCheck();
-//            textinputDOB.setText(null);
-//            textinputEmail.setText(null);
-//            textinputPass.setText(null);
-//            textinputCnfPass.setText(null);
-            //updates the Usr object with filled fields
+         /*   textinputName.setText(null);
+            gender_grp.clearCheck();
+            textinputDOB.setText(null);
+            textinputEmail.setText(null);
+            textinputPass.setText(null);
+            textinputCnfPass.setText(null);
+           // updates the Usr object with filled fields*/
             user=myDb.getUser();
-            //starting signup activity
+          //  starting signup activity
             Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
             intent.putExtra("User",user);
             startActivityForResult(intent,1);

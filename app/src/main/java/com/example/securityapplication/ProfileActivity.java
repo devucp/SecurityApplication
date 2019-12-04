@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView textName,textEmail,textPhone,textAddress,textGender,textDob,textAadhaar;
-    String ansName,ansEmail,ansPhone,ansAddress,ansGender,ansDob,ansAadhaar;
+    TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
+    String ansName,ansEmail,ansPhone,ansAddress,ansGender,ansDob;
     SQLiteDBHelper mydb ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,14 @@ public class ProfileActivity extends AppCompatActivity {
             ansEmail = res.getString(2);
             ansGender = res.getString(3);
             ansPhone = res.getString(5);
-            ansAadhaar = res.getString(6);
-            ansAddress = res.getString(7);
-            ansDob = res.getString(8);
+//            ansAadhaar = res.getString(6);
+            ansAddress = res.getString(6);
+            ansDob = res.getString(7);
         }
     }
     private void DisplayData() {
         textName.setText(ansName);
-        textAadhaar.setText(ansAadhaar);
+//        textAadhaar.setText(ansAadhaar);
         textDob.setText(ansDob);
         textGender.setText(ansGender);
         textAddress.setText(ansAddress);
@@ -62,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
         textAddress = findViewById(R.id.text_Address);
         textGender = findViewById(R.id.text_Gender);
         textDob = findViewById(R.id.text_DOB);
-        textAadhaar = findViewById(R.id.text_Aadhaar);
+//        textAadhaar = findViewById(R.id.text_Aadhaar);
     }
 
 }

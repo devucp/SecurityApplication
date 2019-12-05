@@ -181,6 +181,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //check permissions
 
         while(!checkSMSPermission());
+
+       // while(!checkGPSPermission());
+
+        Intent mGpsServiceIntent = new Intent(this, GetGPSCoordinates.class);
+        startService(mGpsServiceIntent);
     }
 
     public  boolean checkSMSPermission(){
@@ -191,6 +196,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     new String[]{Manifest.permission.SEND_SMS}, RC);
         }
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
+    }
+
+    public boolean checkGPSPermission(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Log.d("MainActivity", "PERMISSION FOR FINE GPS NOT GRANTED, REQUESTING PERMSISSION...");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, RC);
+        }
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this, "Permission Required for tracking Location in case of SOS", Toast.LENGTH_LONG).show();
+            Log.d("MainActivity", "PERMISSION FOR FINE GPS NOT GRANTED, REQUESTING PERMSISSION...");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, RC);
+        }
+        boolean coarse_loc_permission=ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED;
+        boolean fine_loc_permission=ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED;
+
+        return (coarse_loc_permission && fine_loc_permission);
+
     }
 
     public void onStart(){

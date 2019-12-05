@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application
         android:allowBackup="true"
         android:appComponentFactory="android.support.v7.app.CoreComponentFactory"
@@ -51,6 +52,11 @@
             android:enabled="true"
             android:exported="true"
             android:label="RestartServiceWhenStopped" />
+
+        <service
+            android:name=".GetGPSCoordinates"
+            android:enabled="true"
+            android:exported="true"></service>
         <!--
 <activity
 
@@ -74,8 +80,7 @@
         <service
             android:name=".SendSMSService"
             android:enabled="true"
-            android:exported="true"></service>
-
+            android:exported="true" />
         <service
             android:name=".SosPlayer"
             android:enabled="true"
@@ -84,11 +89,18 @@
         <service
             android:name=".RestartJobService"
             android:enabled="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service android:name=".GetGPSCoordinates"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

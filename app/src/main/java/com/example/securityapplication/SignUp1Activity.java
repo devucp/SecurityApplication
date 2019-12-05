@@ -54,7 +54,7 @@ public class SignUp1Activity extends AppCompatActivity {
     private User user;
 
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mEmailDatabaseRefernece;
+    private DatabaseReference mEmailDatabaseReference;
     private String uid;
 
     //
@@ -138,7 +138,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     }
 
     private void initDatabase(){
-        mEmailDatabaseRefernece = mFirebaseDatabase.getReference().child("Email");
+        mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
     }
 
     private void ShowMessage(String title,String Message){
@@ -218,8 +218,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         // replace "." with "," in email id to store in firebase db as key
         email = TextUtils.join(",", Arrays.asList(email.split("\\.")));
         Log.d(TAG,email);
-        Log.d(TAG,mEmailDatabaseRefernece.toString());
-        mEmailDatabaseRefernece.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.d(TAG,mEmailDatabaseReference.toString());
+        mEmailDatabaseReference.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
                 Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());

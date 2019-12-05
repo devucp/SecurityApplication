@@ -257,6 +257,10 @@ public class SignUp2 extends AppCompatActivity {
                                 Log.d("Pushed to db",mEmailDatabaseReference.getDatabase().toString());
                                 Log.d("Pushed to db",mMobileDatabaseReference.getDatabase().toString());
 
+                                Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                                setResult(10,null);//to finish sing up 1 activity
+                                //activity.finish();
+
                                 // check if user is signed in to google or facebook
                                 if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
                                     GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
@@ -282,9 +286,6 @@ public class SignUp2 extends AppCompatActivity {
                         }
                     });
 
-            Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-            setResult(10,null);//to finish sing up 1 activity
-            //activity.finish();
         }
         else
             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();

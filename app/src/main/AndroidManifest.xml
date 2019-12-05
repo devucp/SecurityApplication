@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
 
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:appComponentFactory="android.support.v7.app.CoreComponentFactory"
@@ -64,8 +67,5 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
     </application>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

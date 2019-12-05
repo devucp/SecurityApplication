@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDevicesDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mEmailDatabaseRefernece;
+    private DatabaseReference mEmailDatabaseReference;
 
     private Button mLinkAccountButton;
     private Button mVerifyEmailButton;
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Hashtable<String,String> userData = new Hashtable<String, String>();
                     userData.put("email",mEmail.getText().toString());
                     userData.put("password",mPassword.getText().toString());
-                    validateUserAndDevice("email",userData);
+                    validateBeforeSignIn("email",userData);
                 }
                 else {
                     Log.d(TAG,"Invalid credentials");
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
         else if (i==R.id.signUpButton){
-            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-            startActivity(signUpIntent);
+            // check if imei is registered
+            setDevice(mImeiNumber);
         }
         else if (i==R.id.linkAccountButton){
             Intent linkAccountIntent = new Intent(this,LinkAccountActivity.class);
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FirebaseApp.initializeApp(this);
         mAuth=FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
-        initDataBase();
+        initDataBaseReferences();
 
         /**  GOOGLE LOGIN  **/
 
@@ -240,11 +240,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.verifyEmailButton).setOnClickListener(this);
     }
 
-    private void initDataBase(){
+    private void initDataBaseReferences(){
         //Initialize Database
         mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-        mEmailDatabaseRefernece = mFirebaseDatabase.getReference().child("Email");
+        mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
     }
 
     private void deviceId() {
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Hashtable<String,String> userData = new Hashtable<String,String>();
                 userData.put("email",account.getEmail());
-                validateUserAndDevice("google",userData);
+                validateBeforeSignIn("google",userData);
                 Intent signUpIntent = new Intent(this,SignUp1Activity.class);
                 startActivityForResult(signUpIntent,1);
 
@@ -517,6 +517,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     device = null;
                 }
+                validateBeforeSignUp1();
             }
 
             @Override
@@ -527,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setEmailNode(String email){
-        mEmailDatabaseRefernece.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
+        mEmailDatabaseReference.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
                 Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());
@@ -584,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void validateUserAndDevice(String SignInType, Dictionary userData) {
+    private void validateBeforeSignIn(String SignInType, Dictionary userData) {
         String email=null, password=null;
 
         if (SignInType.equals("email")){
@@ -621,12 +622,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         // Password is invalid..prompt user to re-enter password
                         Log.d(TAG, "Invalid password");
                     } else {
-                        // Login the User
                         if (SignInType.equals("email")) {
+                            // Login the User
                             signIn(email, password);
                         }
                         else if (SignInType.equals("google")){
+                            // check in database if account is linked
+                            /*if(linked){
+                                //if linked then login the user
+                            }
+                             else {
+                                //if not linked then link the account then login the user
 
+                            }*/
                         }
                         else if (SignInType.equals("facebook")){
 
@@ -641,6 +649,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Log.d(TAG, "Imei not registered");
             furtherValidation(email);
+        }
+    }
+
+    private void validateBeforeSignUp1(){
+
+        if (device == null){
+            // go for signUp1
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+            startActivity(signUpIntent);
+
+        }
+        else {
+            final String uid = device.getUID();
+            if (uid == null){
+                // go for signUp1
+                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+                startActivity(signUpIntent);
+            }
+            else {
+                // user cannot register or
+                Toast.makeText(MainActivity.this,"User is already registered",Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

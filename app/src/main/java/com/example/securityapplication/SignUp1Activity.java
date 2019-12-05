@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,10 +23,18 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.Email;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Calendar;
 
 /*
@@ -43,11 +53,16 @@ public class SignUp1Activity extends AppCompatActivity {
     //Added user object to send to next
     private User user;
 
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mEmailDatabaseRefernece;
+    private String uid;
+
     //
 DatePickerDialog datePickerDialog;
 private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
     private TextInputEditText date;
 
+    private String TAG = "SignUp1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,8 +132,14 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         }
         else
             Log.d("isLoggedinGoogle","Not logged in");
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        initDatabase();
     }
 
+    private void initDatabase(){
+        mEmailDatabaseRefernece = mFirebaseDatabase.getReference().child("Email");
+    }
 
     private void ShowMessage(String title,String Message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -130,7 +151,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     public void Validater(View view) {
         if (val.validateName(textinputName) & val.validateGender(gender_grp,text_view) & val.validateDob(textinputDOB) & val.validateEmail(textinputEmail) &
                 val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass)){
-            AddData();
+            // set uid from firebase
+            setUidFromFirebase(textinputEmail.getText().toString().trim());
         }
         else {
             Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
@@ -141,6 +163,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         int selected_id = gender_grp.getCheckedRadioButtonId();
         Radio_Gender = (RadioButton) findViewById(selected_id);
         String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
+
         //Sending the user object
         myDb.setUser(user);
         Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
@@ -162,7 +185,6 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
             Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
             intent.putExtra("User",user);
             startActivityForResult(intent,1);
-
         }
         else {
             String UserEmail = textinputEmail.getText().toString().trim();
@@ -190,5 +212,45 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         returnIntent.putExtra("hasBackPressed",true);
         setResult(Activity.RESULT_OK,returnIntent);
         finish();
+    }
+
+    private void setUidFromFirebase(String email){
+        // replace "." with "," in email id to store in firebase db as key
+        email = TextUtils.join(",", Arrays.asList(email.split("\\.")));
+        Log.d(TAG,email);
+        Log.d(TAG,mEmailDatabaseRefernece.toString());
+        mEmailDatabaseRefernece.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
+                Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());
+                if (emailNodeDataSnapshot.exists()) {
+                    //emailNode = emailNodeDataSnapshot.getValue(Email.class);
+                    uid = emailNodeDataSnapshot.getValue().toString();
+                    Log.d(TAG,uid);
+                } else {
+                    uid = null;
+                }
+                // check in firebase db if email is registered
+                validateBeforeSignUp2();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void validateBeforeSignUp2(){
+
+        Log.d(TAG,"Inside validateBeforeSignUp2 with uid="+uid);
+        if (uid == null){
+            Log.d(TAG,"Email not stored in email node in firebase db");
+            // can proceed to signUp2
+            AddData();
+        }
+        else{
+            Toast.makeText(SignUp1Activity.this, "Email Id is already registered",Toast.LENGTH_LONG).show();
+        }
     }
 }

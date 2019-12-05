@@ -5,4 +5,11 @@
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
     <color name="signupColor">#066e8a</color>
+    <color name="cyan">#007CB6</color>
+    <color name="graylight">#fafafa </color>
+    <color name="endblue">#006B7A</color>
+    <color name="bluedecent">#71D6FF</color>
+    <color name="shadow">#292929</color>
+
+
 </resources>

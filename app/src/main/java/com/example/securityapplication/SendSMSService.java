@@ -12,7 +12,7 @@ public class SendSMSService extends Service {
     private String senderName;
     private String location;
     private String SOS_MESSAGE=" IS IN AN EMERGENCY AND NEEDS YOUR HELP. PLEASE HELP THEM." +
-                                "THE ALERT WAS SENT FROM LOCATION ";
+                                "THE ALERT WAS SENT FROM ";
     public SendSMSService() {
     }
 
@@ -69,7 +69,10 @@ public class SendSMSService extends Service {
     }
 
     public void sendMessage(String number,String location){
-        String messageToSend= getSenderName()+SOS_MESSAGE+" https://www.google.com/maps/place/"+location;
+        String messageToSend= getSenderName()+SOS_MESSAGE;
+        if(location!=null)
+                messageToSend+=" https://www.google.com/maps/place/";
+        messageToSend+=location;
         SmsManager.getDefault().sendTextMessage(number, null, messageToSend, null,null);
     }
 

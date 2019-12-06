@@ -108,8 +108,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_IMEI, user.getImei());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
 
-        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
-                new String[]{String.valueOf(user.getId())});
+        db.update(TABLE_NAME,contentValues,COLUMN_EMAIL + "=?",
+                new String[]{String.valueOf(user.getEmail())});
         db.close();
     }
 

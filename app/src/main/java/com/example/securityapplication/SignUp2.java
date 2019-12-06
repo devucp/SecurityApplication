@@ -2,6 +2,7 @@ package com.example.securityapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -41,7 +42,7 @@ public class SignUp2 extends AppCompatActivity {
 
 
     private Button btn_submit;
-
+    private Intent ReturnIntent;
     private InputValidation inputValidation;
     private  SQLiteDBHelper DBHelper;
     private User user;
@@ -169,13 +170,15 @@ public class SignUp2 extends AppCompatActivity {
                         //added conditional checking and showing respective Toast message
                         if (DBHelper.addUser(user))
                         {   Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                            setResult(10,null);//to finish sing up 1 activity
+                            ReturnIntent.putExtra("ResultIntent",user);
+                            Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
+                            setResult(10,ReturnIntent);//to finish sing up 1 activity
                             activity.finish();}
                         else
                             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
 
                     } else {
-                        Log.d("SIgnUp2", "User exists ");
+                        Log.d("SignUp2", "User exists ");
                         Toast.makeText(getApplicationContext(), "EMAIL ID ALREADY EXISTS", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -188,6 +191,7 @@ public class SignUp2 extends AppCompatActivity {
     private void initObjects(){
         inputValidation = new InputValidation(activity);
         DBHelper = new SQLiteDBHelper(activity);
+        ReturnIntent = new Intent();
         user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
     }
 }

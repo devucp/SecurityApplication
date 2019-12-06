@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.securityapplication.model.User;
 
@@ -37,7 +38,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
                     COLUMN_GENDER + " TEXT, " +
                     COLUMN_PASSWORD + " TEXT, " +
-                    COLUMN_MOBILE + " TEXT UNIQUE, " +
+                    COLUMN_MOBILE + " TEXT, " +
 //                    COLUMN_AADHAR + " TEXT, " +
                     COLUMN_LOCATION + " TEXT, " +
                     COLUMN_DOB + " TEXT, " +
@@ -94,24 +95,23 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     /**Updating user*/
-//    public void updateUser(User user){
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//
-//        contentValues.put(COLUMN_NAME, user.getName());
-//        contentValues.put(COLUMN_EMAIL, user.getEmail());
-//        contentValues.put(COLUMN_PASSWORD, user.getPassword());
-//        contentValues.put(COLUMN_GENDER, user.getGender());
-//        contentValues.put(COLUMN_MOBILE,user.getMobile());
-//        contentValues.put(COLUMN_AADHAR, user.getAadhar());
-//        contentValues.put(COLUMN_LOCATION, user.getLocation());
-//        contentValues.put(COLUMN_IMEI, user.getImei());
-//        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
-//
-//        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
-//                new String[]{String.valueOf(user.getId())});
-//        db.close();
-//    }
+    public void updateUser(User user){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(COLUMN_NAME, user.getName());
+        contentValues.put(COLUMN_EMAIL, user.getEmail());
+        contentValues.put(COLUMN_PASSWORD, user.getPassword());
+        contentValues.put(COLUMN_GENDER, user.getGender());
+        contentValues.put(COLUMN_MOBILE,user.getMobile());
+        contentValues.put(COLUMN_LOCATION, user.getLocation());
+        contentValues.put(COLUMN_IMEI, user.getImei());
+        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
+
+        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
+                new String[]{String.valueOf(user.getId())});
+        db.close();
+    }
 
     /**Checking if user is present*/
     public boolean checkUser(String email){
@@ -151,13 +151,15 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         db.close();
     }*/
 
-    public Cursor getAllData(String Mobile) {
+    public Cursor getAllData() {
 
         Cursor cursor = getReadableDatabase().rawQuery("select * from "+TABLE_NAME, null);
         if (cursor.getCount()!=0) {
-            Log.d("Database", "Details Fetched");
+            Log.d("Database", "Details loaded in Cursor");
         }
-        Log.d("Database","No records Found");
+        else {
+            Log.d("Database","No records Found");
+        }
         return cursor;
     }
 

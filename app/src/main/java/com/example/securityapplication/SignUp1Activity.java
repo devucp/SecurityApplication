@@ -117,17 +117,6 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         //Sending the user object
         myDb.setUser(user);
 
-//        user=myDb.getUser();
-//        Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
-//        intent.putExtra("User",user);
-//        startActivityForResult(intent,1);
-
-//        user.setName(textinputName.getText().toString().trim());
-//        user.setGender(gender);
-//        user.setDob(textinputDOB.getText().toString().trim());
-//        user.setEmail(textinputEmail.getText().toString().trim());
-//        user.setPassword(textinputPass.getText().toString().trim());
-
        Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
                 textinputDOB.getText().toString().trim(),
@@ -163,8 +152,12 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==10 && requestCode==1)
+        if(resultCode==10 && requestCode==1){
+            user=data.getParcelableExtra("ResultIntent");
+            Intent i = new Intent(this,ProfileActivity.class);
+            i.putExtra("User",user);
+            startActivity(i);
             finish();
-
+        }
     }
 }

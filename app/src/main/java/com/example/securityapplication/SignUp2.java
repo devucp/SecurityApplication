@@ -70,9 +70,6 @@ public class SignUp2 extends AppCompatActivity {
 
     /**Initialize Views*/
     private void initViews(){
-       // mobile = findViewById(R.id.mobile);
-       // aadhar = findViewById(R.id.aadhar);
-       // location = findViewById(R.id.location);
         input_mobile = findViewById(R.id.input_mobile);
 //        input_aadhar = findViewById(R.id.input_aadhar);
         input_location = findViewById(R.id.AutoCompleteTextView);
@@ -159,7 +156,6 @@ public class SignUp2 extends AppCompatActivity {
                         ActivityCompat.requestPermissions(activity,
                                 new String[]{Manifest.permission.READ_PHONE_STATE}, RC);
                     }
-
 
                     if (DBHelper.checkUser(input_mobile.getText().toString().trim()) ){
 

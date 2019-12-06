@@ -1,31 +1,63 @@
 package com.example.securityapplication;
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.User;
+
 public class ProfileActivity extends AppCompatActivity {
 
-    TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
-    String ansName,ansEmail,ansPhone,ansAddress,ansGender,ansDob;
+    private TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
+    private Button btn_edit;
     SQLiteDBHelper mydb ;
+    User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        mydb = new SQLiteDBHelper(this);
+
+        initObjects();
         initviews();
-        FetchAllData();
+//        FetchAllData();
         DisplayData();
+        initListeners();
+
 
     }
+
+    private void initObjects() {
+        user = getIntent().getParcelableExtra("User");
+        mydb = new SQLiteDBHelper(this);
+    }
+
+    private void initListeners() {
+        btn_edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(ProfileActivity.this,EditProfileActivity.class);
+                  /*  intent.putExtra("Name",ansName);
+                    intent.putExtra("Email",ansEmail);
+                    intent.putExtra("Phone",ansPhone);
+                    intent.putExtra("Address",ansAddress);*/
+                    intent.putExtra("User",user);
+                    startActivityForResult(intent,1);
+                }//Sending Data to EditProfileActivity
+            }
+        );
+    }
+
     private void FetchAllData(){
         Cursor res;
-        res = mydb.getAllData("7276625281"); //dummy identifier
+        res = mydb.getAllData();
         if (res.getCount() == 0){
             Toast toast = Toast.makeText(getApplicationContext(),
                     "No User Data Found",
@@ -35,24 +67,27 @@ public class ProfileActivity extends AppCompatActivity {
         }
 //        StringBuffer buffer = new StringBuffer();
         while (res.moveToNext()){
-            ansName = res.getString(1);
-            ansEmail = res.getString(2);
-            ansGender = res.getString(3);
-            ansPhone = res.getString(5);
+            user.setName(res.getString(1));
+            user.setEmail(res.getString(2));
+            user.setGender(res.getString(3));
+            user.setMobile(res.getString(5));
 //            ansAadhaar = res.getString(6);
-            ansAddress = res.getString(6);
-            ansDob = res.getString(7);
+            user.setLocation(res.getString(6));
+            user.setDob(res.getString(7));
+            Log.d("User Object","User Object set in Profile activity successfully");
         }
     }
     private void DisplayData() {
-        textName.setText(ansName);
+
+        textName.setText(user.getName());
 //        textAadhaar.setText(ansAadhaar);
-        textDob.setText(ansDob);
-        textGender.setText(ansGender);
-        textAddress.setText(ansAddress);
-        textEmail.setText(ansEmail);
-        textPhone.setText(ansPhone);
-        Log.d("Profile","Message displayed Successfully");
+        textDob.setText(user.getDob());
+        textGender.setText(user.getGender());
+        textAddress.setText(user.getLocation());
+        textEmail.setText(user.getEmail());
+        textPhone.setText(user.getMobile());
+
+        Log.d("Profile","Message displayed on profile Successfully");
     }
 
     private void initviews() {
@@ -62,7 +97,21 @@ public class ProfileActivity extends AppCompatActivity {
         textAddress = findViewById(R.id.text_Address);
         textGender = findViewById(R.id.text_Gender);
         textDob = findViewById(R.id.text_DOB);
+        btn_edit = findViewById(R.id.btn_Edit);
 //        textAadhaar = findViewById(R.id.text_Aadhaar);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1){
+            if (resultCode == 110){
+                user = data.getParcelableExtra("ResultUser");
+                Log.d("Profile","User object returned"+user.getEmail());
+                mydb.updateUser(user);
+                DisplayData();
+            }
+        }
+    }
 }

@@ -85,6 +85,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         }
         else{
             Log.d("Database","User object added successfully");
+
             return true;
             }
         }catch(Exception e){
@@ -162,7 +163,4 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
-
-
 }

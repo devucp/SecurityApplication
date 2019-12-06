@@ -357,12 +357,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
-                boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",false);
+                boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",true);
+                Log.d(TAG,"hasBackPressed:"+hasBackPressed);
                 if (hasBackPressed){
                     signOut();
                 }
             }
-            if (resultCode == Activity.RESULT_CANCELED) {
+            else if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
             }
         }
@@ -394,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void signOut(){
 
-        // first make uid under imei null
+        // first make uid under imei null in Devices and imei under uid null in Users
         deviceId();
         device = new Device();
         device.setUID("null");
@@ -402,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
+            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
             mAuth.signOut();
             Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
@@ -412,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             //updateUI(null);
-                            Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
                         }
                     });
         }
@@ -614,8 +616,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else if (SignInType.equals("google")){
                     // login the user through google
-                    //googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                    googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                    //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                 }
                 else if (SignInType.equals("facebook")){
 
@@ -631,9 +633,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (uid.equals("null")){
             // prompt user to signUp
             Log.d(TAG,"Email not registered");
-            //Toast.makeText(MainActivity.this,"SignUp to Register",Toast.LENGTH_LONG).show();
-            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-            startActivity(signUpIntent);
+            if (userData.get("SignInType").equals("google")){
+                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+                startActivityForResult(signUpIntent,1);
+            }
+            else
+                Toast.makeText(MainActivity.this,"Email Id not registered",Toast.LENGTH_LONG).show();
+
         }
         else {
             /*  case1: user tries to sign in from same device
@@ -664,6 +670,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         deviceId();
                                         device.setUID(uid);
                                         mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+                                        mUsersDatabaseReference.child(uid).child("imei").setValue(mImeiNumber);
 
                                         String SignInType = userData.get("SignInType");
                                         Log.d(TAG,"SignInType:"+SignInType);
@@ -672,8 +679,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 signIn(userData.get("email"),userData.get("password"));
                                                 break;
                                             case "google":
-                                                //googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                                googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                                googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                                //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                                 break;
                                             case "facebook":
 
@@ -691,9 +698,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         Log.d(TAG, "User is LoggedIn in other device");
                                         Toast.makeText(MainActivity.this,
                                                 "You are logged in another device .Please log Out from old device to continue", Toast.LENGTH_LONG).show();
+                                        signOut();
                                     }
                                 } else {
-                                    device = null;
+                                    //user can login
+                                    deviceId();
+                                    device.setUID(uid);
+                                    mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+                                    mUsersDatabaseReference.child(uid).child("imei").setValue(mImeiNumber);
+
+                                    String SignInType = userData.get("SignInType");
+                                    Log.d(TAG,"SignInType:"+SignInType);
+                                    switch (SignInType) {
+                                        case "email":
+                                            signIn(userData.get("email"),userData.get("password"));
+                                            break;
+                                        case "google":
+                                            googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                            //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                            break;
+                                        case "facebook":
+
+                                            break;
+                                        default:
+                                            Log.d(TAG, "Invalid SignInType");
+                                            return;
+                                    }
+
                                 }
                             }
 
@@ -760,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (device == null){
             // go for signUp1
             Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-            startActivity(signUpIntent);
+            startActivityForResult(signUpIntent,1);
 
         }
         else {
@@ -768,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (uid.equals("null")){
                 // go for signUp1
                 Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-                startActivity(signUpIntent);
+                startActivityForResult(signUpIntent,1);
             }
             else {
                 // user cannot register or

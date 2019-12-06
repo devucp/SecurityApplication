@@ -114,8 +114,8 @@ public class GoogleFirebaseSignIn implements Serializable {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            mDatabaseReference = mFirebaseDatabase.getReference().child("users");
-                            mDatabaseReference.setValue(mAuth.getCurrentUser().getUid());
+                            //mDatabaseReference = mFirebaseDatabase.getReference().child("Users");
+                            //mDatabaseReference.setValue(mAuth.getCurrentUser().getUid());
                             /*Log.d(TAG,mAuth.getUid());
                             Log.d(TAG,mAuth.getCurrentUser().getUid());
                             Log.d(TAG,mAuth.getCurrentUser().getDisplayName());

@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.widget.Toast;
 
 public class SendSMSService extends Service {
@@ -13,6 +14,10 @@ public class SendSMSService extends Service {
     private String SOS_MESSAGE=" IS IN AN EMERGENCY AND NEEDS YOUR HELP. PLEASE HELP THEM." +
                                 "THE ALERT WAS SENT FROM LOCATION ";
     public SendSMSService() {
+    }
+
+    public void updateLocation() {
+        this.location = GetGPSCoordinates.getLastKnownLocation();
     }
 
     public void setSenderName(String senderName) {
@@ -32,18 +37,27 @@ public class SendSMSService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        initiateMessage();
+    }
+    public void initiateMessage(){
+        updateLocation();
+        Log.d("SOS SMS","Location is"+location);
         //call setContactList
         if(contactList==null){
             //filling DUMMY values
             String number="9819931901";
             setSenderName("DG");
-            sendMessage(number,"Location unavailable");
+            if(location==null){
+                location="Location unavailable";
+            }
+            sendMessage(number,location);
 
         }
         else{
 
 
             for(int i=0;i<contactList.length;i++){
+
                 if(location==null)
                     sendMessage(contactList[i],"Location unavailable");
                 else
@@ -55,7 +69,7 @@ public class SendSMSService extends Service {
     }
 
     public void sendMessage(String number,String location){
-        String messageToSend= getSenderName()+SOS_MESSAGE+location;
+        String messageToSend= getSenderName()+SOS_MESSAGE+" https://www.google.com/maps/place/"+location;
         SmsManager.getDefault().sendTextMessage(number, null, messageToSend, null,null);
     }
 

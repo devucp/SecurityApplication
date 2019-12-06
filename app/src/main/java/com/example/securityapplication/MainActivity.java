@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         while(!checkSMSPermission());
 
-       // while(!checkGPSPermission());
+       if(!checkGPSPermission());
 
         Intent mGpsServiceIntent = new Intent(this, GetGPSCoordinates.class);
         startService(mGpsServiceIntent);
@@ -200,7 +200,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public boolean checkGPSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Permission Required for FINE GPS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR FINE GPS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, RC);
@@ -208,12 +208,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             Toast.makeText(this, "Permission Required for tracking Location in case of SOS", Toast.LENGTH_LONG).show();
-            Log.d("MainActivity", "PERMISSION FOR FINE GPS NOT GRANTED, REQUESTING PERMSISSION...");
+            Log.d("MainActivity", "PERMISSION FOR COARSE GPS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, RC);
         }
-        boolean coarse_loc_permission=ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED;
-        boolean fine_loc_permission=ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED;
+        boolean coarse_loc_permission=ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)== PackageManager.PERMISSION_GRANTED;
+        boolean fine_loc_permission=ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED;
 
         return (coarse_loc_permission && fine_loc_permission);
 

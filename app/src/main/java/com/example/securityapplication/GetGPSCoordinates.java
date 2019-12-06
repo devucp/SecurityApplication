@@ -20,11 +20,16 @@ import android.widget.Toast;
 public class GetGPSCoordinates extends Service {
     private LocationListener listener;
     private LocationManager locationManager;
+    private static String lastKnownLocation=null;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    public static String getLastKnownLocation(){
+        return lastKnownLocation;
     }
 
     @SuppressLint("MissingPermission")
@@ -36,9 +41,10 @@ public class GetGPSCoordinates extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 Intent i = new Intent("location_update");
-                i.putExtra("coordinates", location.getLongitude() + " " + location.getLatitude());
-                Log.d("GPSService","coordinates"+location.getLongitude() + " " + location.getLatitude());
-                Toast.makeText(getApplicationContext(),"coordinates"+location.getLongitude() + " " + location.getLatitude(),Toast.LENGTH_SHORT);
+                GetGPSCoordinates.lastKnownLocation=ddToDms(location.getLatitude(),location.getLongitude()) ;
+                i.putExtra("coordinates", location.getLatitude()+","+location.getLongitude() );
+                Log.d("GPSService","coordinates"+location.getLatitude()+","+location.getLongitude() );
+                Toast.makeText(getApplicationContext(),"coordinates"+location.getLatitude()+","+location.getLongitude() ,Toast.LENGTH_SHORT);
                 sendBroadcast(i);
             }
 
@@ -68,6 +74,46 @@ public class GetGPSCoordinates extends Service {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, listener);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,listener);
 
+    }
+    /*
+    public int[] degreeToDMS(double coordinate){
+        coordinate=Math.abs(coordinate);
+        int c_degrees= (int)coordinate ;
+
+        double minutes_seconds= coordinate-c_degrees;
+        double minutes= (minutes_seconds*60);
+        int c_minutes= (int)minutes;
+
+        double seconds= (minutes%1)*60;
+        int c_seconds=(int)seconds;
+
+    }*/
+    public String ddToDms(double ilat,double ilng) {
+
+        double lat = ilat;
+        double lng = ilng;
+        String latResult, lngResult;
+        String DMS_coordinates; //degree-minute-second converted decimal
+        // Make sure that you are working with numbers.
+        // This is important in case you are working with values
+
+        // Check the correspondence of the coordinates for latitude: North or South.
+
+        String Strlat= Location.convert(ilat,Location.FORMAT_SECONDS);
+        String[] split_Strlat=Strlat.split(":");
+        latResult=split_Strlat[0]+"°"+split_Strlat[1]+"\'"+split_Strlat[2]+"\'\'";
+        latResult += (lat >= 0)? "N" : "S";
+
+        // Check the correspondence of the coordinates for longitude: East or West.
+        String Strlon= Location.convert(ilng,Location.FORMAT_SECONDS);
+        String[] split_Strlon=Strlon.split(":");
+        lngResult=split_Strlon[0]+"°"+split_Strlon[1]+"\'"+split_Strlon[2]+"\'\'";
+        lngResult += (lng >= 0)? "E" : "W";
+
+        DMS_coordinates=latResult+"+"+lngResult;
+        Log.d("GPSService/Conversion","INPUT:"+ilat+","+ilng+" result:"+DMS_coordinates);
+
+        return DMS_coordinates;
     }
 
     @Override

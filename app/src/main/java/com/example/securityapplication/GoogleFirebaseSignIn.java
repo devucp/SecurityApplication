@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.Device;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
@@ -27,12 +28,15 @@ public class GoogleFirebaseSignIn implements Serializable {
     private MainActivity activity;
     private FirebaseUser user;
     private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mDevicesDatabaseReference;
     private static final String TAG = "GoogleSignIn";
     //private static final int RC_SIGN_IN = 9001;
 
     private static volatile GoogleFirebaseSignIn googleFirebaseInstance;
 
+    private String mImeiNumber;
+    private Device device;
     //private constructor
     private GoogleFirebaseSignIn(){
         //Prevent form the reflection api.
@@ -41,11 +45,12 @@ public class GoogleFirebaseSignIn implements Serializable {
         }
     }
 
-    public void init(MainActivity activity, FirebaseAuth mAuth, FirebaseDatabase mFirebaseDatabase){
+    public void init(MainActivity activity, FirebaseAuth mAuth, FirebaseDatabase firebaseDatabase, String imei){
 
         this.activity = activity;
         this.mAuth = mAuth;
-        this.mFirebaseDatabase = mFirebaseDatabase;
+        this.mFirebaseDatabase = firebaseDatabase;
+        this.mImeiNumber = imei;
     }
 
     public static GoogleFirebaseSignIn getInstance() {
@@ -114,8 +119,15 @@ public class GoogleFirebaseSignIn implements Serializable {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            //mDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-                            //mDatabaseReference.setValue(mAuth.getCurrentUser().getUid());
+
+                            // set imei and uid in firebase
+                            device = new Device();
+                            device.setUID(user.getUid());
+                            mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
+                            mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
+                            mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+                            mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
+
                             /*Log.d(TAG,mAuth.getUid());
                             Log.d(TAG,mAuth.getCurrentUser().getUid());
                             Log.d(TAG,mAuth.getCurrentUser().getDisplayName());

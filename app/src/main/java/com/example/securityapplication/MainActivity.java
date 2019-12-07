@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
         //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
-        googleFirebaseSignIn.init(this, mAuth, mFirebaseDatabase);
+        initializeGoogleFirebaseSignIn();
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -221,6 +221,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
+    }
+
+    private void initializeGoogleFirebaseSignIn(){
+        deviceId();
+        googleFirebaseSignIn.init(this, mAuth, mFirebaseDatabase, mImeiNumber);
     }
 
     public void initViews(){
@@ -374,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void signIn(final String email, final String password){
         Log.d(TAG,"Signing IN user with email "+email+" and password "+password);
+
          mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -384,7 +390,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             FirebaseUser user = mAuth.getCurrentUser();
                             Log.d(TAG, mDevicesDatabaseReference.toString());
-                            //mDatabaseReference.setValue(user.getUid());
+
+                            // set imei and uid in firebase
+                            deviceId();
+                            device = new Device();
+                            device.setUID(user.getUid());
+                            mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+                            mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
+
                             updateUI(user);
                         } else {
                             updateUI(null);
@@ -616,6 +629,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else if (SignInType.equals("google")){
                     // login the user through google
+                    initializeGoogleFirebaseSignIn();
                     googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                     //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                 }
@@ -639,11 +653,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else
                 Toast.makeText(MainActivity.this,"Email Id not registered",Toast.LENGTH_LONG).show();
-
         }
         else {
             /*  case1: user tries to sign in from same device
-                case2:user tries to sign in from other device
+                case2:user tries to sign in from other device and maybe registered or not
                 Solution for both is same:
                check if user logged out from previous device
                find imei of previous device: Email node->email->uid->imei
@@ -656,6 +669,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("User Data Snapshot:", userDataSnapshot.toString());
                     if (userDataSnapshot.exists()) {
                         user = userDataSnapshot.getValue(User.class);
+                        if (user.getImei().equals("null")){
+                            // unregistered user -> log in the user on this device after checking sign in type
+                            Log.d(TAG,"User not registered. Login the user after checking SignInType");
+                            String SignInType = userData.get("SignInType");
+                            Log.d(TAG,"SignInType:"+SignInType);
+                            switch (SignInType) {
+                                case "email":
+                                    signIn(userData.get("email"),userData.get("password"));
+                                    break;
+                                case "google":
+                                    initializeGoogleFirebaseSignIn();
+                                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                    //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                    break;
+                                case "facebook":
+
+                                    break;
+                                default:
+                                    Log.d(TAG, "Invalid SignInType");
+                                    return;
+                            }
+                        }
                         mDevicesDatabaseReference.child(user.getImei()).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
@@ -667,10 +702,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                            Now login the user and set uid under imei of device node
                                         */
                                         Log.d(TAG,"User is logged out from old device..Now user can login from new device");
-                                        deviceId();
                                         device.setUID(uid);
-                                        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-                                        mUsersDatabaseReference.child(uid).child("imei").setValue(mImeiNumber);
 
                                         String SignInType = userData.get("SignInType");
                                         Log.d(TAG,"SignInType:"+SignInType);
@@ -679,6 +711,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 signIn(userData.get("email"),userData.get("password"));
                                                 break;
                                             case "google":
+                                                initializeGoogleFirebaseSignIn();
                                                 googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                                 //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                                 break;
@@ -702,10 +735,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }
                                 } else {
                                     //user can login
-                                    deviceId();
-                                    device.setUID(uid);
-                                    mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-                                    mUsersDatabaseReference.child(uid).child("imei").setValue(mImeiNumber);
 
                                     String SignInType = userData.get("SignInType");
                                     Log.d(TAG,"SignInType:"+SignInType);
@@ -714,6 +743,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             signIn(userData.get("email"),userData.get("password"));
                                             break;
                                         case "google":
+                                            initializeGoogleFirebaseSignIn();
                                             googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                             //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                             break;
@@ -724,7 +754,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             Log.d(TAG, "Invalid SignInType");
                                             return;
                                     }
-
                                 }
                             }
 
@@ -750,21 +779,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void validateBeforeSignIn(Hashtable<String,String> userData) {
-        String email=null;
-        String SignInType = userData.get("SignInType");
-
-        switch (SignInType) {
-            case "email":
-            case "google":
-                email = userData.get("email").toString();
-                break;
-            case "facebook":
-
-                break;
-            default:
-                Log.d(TAG, "Invalid SignInType");
-                return;
-        }
 
         // Check if registered user sign's in using old device or new device using imei number.
         if (device != null) {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="yellow">#FFFF00</color>
-    <color name="cyan">#007CB6</color>
     <color name="fuchsia">#FF00FF</color>
     <color name="graylight">#fafafa </color>
     <color name="startblue">#0078A7</color>
@@ -16,8 +15,6 @@
     <color name="signupColor">#066e8a</color>
     <color name="redBackground">#C60202</color>
     <color name="cyan">#007CB6</color>
-    <color name="graylight">#fafafa </color>
-    <color name="endblue">#006B7A</color>
     <color name="accept">#00cc00</color>
 
     <color name="bluedecent">#71D6FF</color>

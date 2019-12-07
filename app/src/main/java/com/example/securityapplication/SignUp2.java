@@ -2,6 +2,7 @@ package com.example.securityapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -258,6 +259,8 @@ public class SignUp2 extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
                                 setResult(10,null);//to finish sing up 1 activity
                                 //activity.finish();
+                                Intent i = new Intent(SignUp2.this,home_fragment.class);
+                                startActivity(i);
 
                                 // check if user is signed in to google or facebook
                                 if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){

@@ -2,6 +2,7 @@ package com.example.securityapplication.model;
 
 
 import java.util.Date;
+import java.util.Map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -18,6 +19,7 @@ public class User implements Parcelable {
     private String imei;
     private String dob;
     private boolean ispaid;
+    private Map<String,String> sosContacts;
 
 
     public String getDob() {
@@ -131,6 +133,14 @@ public class User implements Parcelable {
     public boolean getIsPaid(){ return ispaid; }
 
     public void setIsPaid(boolean isPaid){ this.ispaid = isPaid; }
+
+    public void setSosContacts(Map<String,String> sosContacts){
+        this.sosContacts = sosContacts;
+    }
+
+    public Map<String,String> getSosContacts(){
+        return sosContacts;
+    }
 
 
     @Override

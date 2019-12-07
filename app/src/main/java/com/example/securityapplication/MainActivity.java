@@ -33,6 +33,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if (i==R.id.verifyEmailButton){
             if (validateForm()) {
                 mVerifyEmailButton.setEnabled(false);
-                verifyEmailId(mEmail.getText().toString());
+                verifyEmailId();
             }
         }
     }
@@ -351,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             device.setUID(user.getUid());
                             mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
                             mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
-
+                            verifyEmailId();
                             updateUI(user);
                         } else {
                             updateUI(null);
@@ -416,13 +417,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void verifyEmailId(String email){
+    private void verifyEmailId(){
+        Log.d(TAG,"Inside verify email");
+
         final FirebaseUser user = mAuth.getCurrentUser();
+
+        String url = "https://securityapplication.page.link/Tbeh?uid=" + user.getUid();
+        ActionCodeSettings actionCodeSettings = ActionCodeSettings.newBuilder()
+                .setUrl(url)
+                .setHandleCodeInApp(false)
+                .setAndroidPackageName("com.example.securityapplication.MainActivity",true,null)
+                .build();
+
         if (user.isEmailVerified())
             Log.d(TAG, "User Verified");
         else
             Log.d(TAG, "User not verified");
-        user.sendEmailVerification()
+        user.sendEmailVerification(actionCodeSettings)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

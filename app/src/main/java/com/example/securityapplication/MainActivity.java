@@ -7,6 +7,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager;
+
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -329,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**Checks whether service is running or not**/
+   /**Checks whether service is running or not**/
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -349,4 +351,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
 
     }
+
 }

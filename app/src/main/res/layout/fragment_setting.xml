@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/graylight"
+    android:layout_margin="1dp"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        >
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/graylight"
+            android:paddingLeft="42dp"
+            android:text="general"
+            android:textAlignment="textStart"
+            android:textColor="@color/cyan"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            >
+
+            <Button
+                android:id="@+id/settingsos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="sos"
+                android:background="@color/graylight"
+                android:paddingLeft="42dp"
+                android:text="EMERGENCY CONTACT"
+                android:textAlignment="textStart"
+                android:textColor="@color/cyan"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            >
+
+            <View
+
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimaryDark"
+                android:paddingRight="24dp"
+                android:layout_marginLeft="30dp"/>
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="42dp"
+            android:switchPadding="15dp"
+            android:theme="@style/SwitchTheme"
+            android:text="SAVIOUR"
+            android:textAlignment="textStart"
+            android:textColor="#016691"
+            android:textColorLink="#FFEB3B"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        >
+
+        <View
+
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"
+            android:paddingRight="24dp"
+            android:layout_marginLeft="30dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="0dp"
+        >
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="42dp"
+            android:textAlignment="textStart"
+            android:background="@color/graylight"
+            android:drawableRight="@drawable/ic_volume_up_black_24dp"
+            android:text="scream test"
+            android:textColor="@color/cyan"
+            android:textSize="20sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="42dp"
+            android:textAlignment="textStart"
+            android:textSize="20sp"
+            android:text="emergency signal test"
+            android:textColor="@color/cyan"
+            android:background="@color/graylight"
+            android:drawableRight="@drawable/ic_signal_cellular_4_bar_black_24dp"
+            android:drawablePadding="0dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <View
+
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"
+            android:paddingRight="24dp"
+            android:layout_marginLeft="30dp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="42dp"
+            android:textAlignment="textStart"
+            android:background="@color/graylight"
+            android:drawablePadding="130dp"
+            android:text="about us"
+
+
+            android:textColor="@color/cyan"
+            android:textSize="20sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/graylight"
+            android:drawablePadding="150dp"
+            android:paddingLeft="42dp"
+            android:text="Rate us"
+            android:textAlignment="textStart"
+
+            android:textColor="@color/cyan"
+            android:textSize="20sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/graylight"
+            android:drawablePadding="150dp"
+            android:paddingLeft="42dp"
+            android:text="community"
+            android:textAlignment="textStart"
+
+            android:textColor="@color/cyan"
+            android:textSize="20sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="42dp"
+            android:background="@color/graylight"
+            android:drawablePadding="150dp"
+            android:text="privacy policy"
+            android:textAlignment="textStart"
+            android:textColor="@color/cyan"
+            android:textSize="20sp" />
+    </LinearLayout>
+    </LinearLayout>
+
+
+    </ScrollView>
+</LinearLayout>

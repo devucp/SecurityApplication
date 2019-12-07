@@ -26,9 +26,6 @@ public class BackgroundSosPlayerService extends Service {
         return 1;
     }
 
-    public void onStart(Intent intent, int startId) {
-        // TO DO
-    }
     public IBinder onUnBind(Intent arg0) {
         // TO DO Auto-generated method
         return null;

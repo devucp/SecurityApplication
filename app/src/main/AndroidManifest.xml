@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:appComponentFactory="android.support.v7.app.CoreComponentFactory"
@@ -18,10 +15,17 @@
         tools:replace="android:appComponentFactory">
         <activity android:name=".recent_cards"></activity>
         <activity android:name=".sos_page"></activity>
-        <activity android:name=".navigation"></activity>
+        <activity android:name=".navigation">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
         <activity
             android:name=".ResetPasswordActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".SignUp2"
             android:screenOrientation="portrait">
@@ -47,6 +51,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <receiver
+            android:name=".RestartServiceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="RestartServiceWhenStopped" />
         <!--
 <activity
 
@@ -67,12 +80,24 @@
 
         </activity>
         -->
-        <service android:name=".SosPlayer" />
-        <service android:name=".BackgroundSosPlayerService" />
+        <service
+            android:name=".SendSMSService"
+            android:enabled="true"
+            android:exported="true"></service>
 
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+        <service
+            android:name=".SosPlayer"
+            android:enabled="true"
+            android:exported="true" />
+        <service android:name=".BackgroundSosPlayerService" />
+        <service
+            android:name=".RestartJobService"
+            android:enabled="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

@@ -21,7 +21,7 @@ public class Validation {
 
     private Pattern date_pattern,name_pattern,phone_pattern;
     private Matcher matcher;
-    private static final String NAME_PATTERN ="^[\\p{L} .'-]+$";
+    private static final String NAME_PATTERN ="^[A-Za-z\\s]{1,}[\\']{0,1}[A-Za-z\\s]{0,}$";
     private static final String DATE_PATTERN =
             "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)";
     private static final String PHONE_PATTERN = "^[0-9]+$";
@@ -141,7 +141,7 @@ public class Validation {
         if (nameinput.isEmpty()) {
             textInputName.setError("Field can't be empty");
             return false;
-        } else if (nameinput.length() > 40) {
+        } else if (nameinput.length() > 20) {
             textInputName.setError("Name too long");
             return false;
         }else if(!matcher.find()){

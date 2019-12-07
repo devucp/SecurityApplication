@@ -67,7 +67,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Calendar c= java.util.Calendar.getInstance();
+                final Calendar c= Calendar.getInstance();
                 int mYear = c.get(Calendar.YEAR); // current year
                 int mMonth = c.get(Calendar.MONTH); // current month
                 int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
@@ -84,6 +84,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 
                             }
                         }, mYear, mMonth, mDay);
+                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });

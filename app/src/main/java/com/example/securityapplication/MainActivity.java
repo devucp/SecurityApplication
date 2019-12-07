@@ -20,15 +20,7 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.securityapplication.model.Device;
-import com.example.securityapplication.model.Email;
 import com.example.securityapplication.model.User;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -49,7 +41,6 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.Hashtable;
 
 //import androidx.annotation.NonNull;
@@ -74,19 +65,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mLinkAccountButton;
     private Button mVerifyEmailButton;
 
-    //FaceBookLogin
-    private LoginButton mFaceBookLoginButton;
-    private CallbackManager callbackManager;
-    private static final String EMAIL = "email";
-    private FaceBookLoginIn faceBookLoginIn;
-
     //GoogleFirebaseSignIn
     private SignInButton mGoogleSignInButton;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
     private static final int RC_SIGN_IN = 9001;
 
-    private boolean isValidUser;
     private User user;
     private Device device;
     private String uid;
@@ -173,45 +157,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**  END GOOGLE LOGIN  **/
 
-
-        /**   FACEBOOK LOGIN   **/
-
-        //get single instance of user if logged in through facebook from user defined class FaceBookLoginIn
-        faceBookLoginIn = FaceBookLoginIn.getInstance();
-        //initialize user defined class FaceBookLoginIn with Firebase user instance andTAGusing user defined init method
-        faceBookLoginIn.init(MainActivity.this, mAuth, mFirebaseDatabase);
-
-        callbackManager = CallbackManager.Factory.create();
-        mFaceBookLoginButton = findViewById(R.id.facebook_login_button);
-        mFaceBookLoginButton.setPermissions(Arrays.asList(EMAIL));
-
-        // Callback registration
-        mFaceBookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("FB", "facebook:onSuccess:" + loginResult);
-                faceBookLoginIn.handleFacebookAccessToken(loginResult.getAccessToken());
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if(faceBookLoginIn.isLoggedIn())
-                    updateUI(currentUser);
-                else
-                    updateUI(null);
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d("FB", "facebook:onCancel");
-                updateUI(null);
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                Log.d("FB", "facebook:onError", exception);
-                updateUI(null);
-            }
-        });
-        /**  END FACEBOOK LOGIN  **/
-
         /** SosPlayer Service intent**/
         startService(new Intent(this, SosPlayer.class));
     }
@@ -282,17 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (requestCode) {
             case 101:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
-                        return;
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        mImeiNumber = telephonyManager.getImei(0);
-                        Log.d("IMEI", "IMEI Number of slot 1 is:" + mImeiNumber);
-                    }
-                    else {
-                        mImeiNumber = telephonyManager.getDeviceId();
-                    }
+                    deviceId();
                 } else {
                     closeNow();
                     Toast.makeText(this, "Without permission we check", Toast.LENGTH_LONG).show();
@@ -349,17 +284,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, "Authentication failed. Try Again",Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
-
-            /*try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-            } catch (ApiException e) {
-                // The ApiException status code indicates the detailed failure reason.
-                // Please refer to the GoogleSignInStatusCodes class reference for more information.
-                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                updateUI(null);
-            }
-            googleFirebaseSignIn.handleSignInResult(task);*/
         }
+
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",true);
@@ -372,13 +298,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //Write your code if there's no result
             }
         }
-
-        // Pass the activity result back to the Facebook SDK
-        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     public void signIn(final String email, final String password){
-        Log.d(TAG,"Signing IN user with email "+email+" and password "+password);
+         Log.d(TAG,"Signing IN user with email "+email+" and password "+password);
 
          mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
@@ -431,14 +354,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     });
         }
-
-        //Facebook signOut
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedInFaceBook = accessToken != null && !accessToken.isExpired();
-        if(isLoggedInFaceBook) {
-            LoginManager.getInstance().logOut();
-            Toast.makeText(this,"Logged Out from Facebook",Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void updateUI(FirebaseUser user){
@@ -448,7 +363,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mEmail.setVisibility(View.VISIBLE);
             mPassword.setVisibility(View.VISIBLE);
             mGoogleSignInButton.setVisibility(View.VISIBLE);
-            mFaceBookLoginButton.setVisibility(View.VISIBLE);
             mLinkAccountButton.setVisibility(View.GONE);
             mVerifyEmailButton.setVisibility(View.GONE);
         }
@@ -458,7 +372,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mEmail.setVisibility(View.GONE);
             mPassword.setVisibility(View.GONE);
             mGoogleSignInButton.setVisibility(View.GONE);
-            mFaceBookLoginButton.setVisibility(View.GONE);
             mLinkAccountButton.setVisibility(View.VISIBLE);
             mVerifyEmailButton.setVisibility(View.VISIBLE);
             Toast.makeText(this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
@@ -599,9 +512,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case "google":
                 email = userData.get("email").toString();
                 break;
-            case "facebook":
-
-                break;
             default:
                 Log.d(TAG, "Invalid SignInType");
                 return;
@@ -632,9 +542,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     initializeGoogleFirebaseSignIn();
                     googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                     //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                }
-                else if (SignInType.equals("facebook")){
-
                 }
             }
         } else {
@@ -676,15 +583,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Log.d(TAG,"SignInType:"+SignInType);
                             switch (SignInType) {
                                 case "email":
-                                    signIn(userData.get("email"),userData.get("password"));
+                                    if (!user.getPassword().equals(userData.get("password"))) {
+                                        // Password is invalid..prompt user to re-enter password
+                                        Log.d(TAG, "Invalid password");
+                                        Toast.makeText(MainActivity.this,"Invalid Password",Toast.LENGTH_LONG).show();
+                                    }
+                                    else
+                                        signIn(userData.get("email"),userData.get("password"));
                                     break;
                                 case "google":
                                     initializeGoogleFirebaseSignIn();
                                     googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                     //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                    break;
-                                case "facebook":
-
                                     break;
                                 default:
                                     Log.d(TAG, "Invalid SignInType");
@@ -715,9 +625,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                                 //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                                 break;
-                                            case "facebook":
-
-                                                break;
                                             default:
                                                 Log.d(TAG, "Invalid SignInType");
                                                 return;
@@ -746,9 +653,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             initializeGoogleFirebaseSignIn();
                                             googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                                             //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                            break;
-                                        case "facebook":
-
                                             break;
                                         default:
                                             Log.d(TAG, "Invalid SignInType");
@@ -822,236 +726,3 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 }
-
-
-/*
-package com.example.securityapplication;
-
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.example.securityapplication.model.Device;
-import com.example.securityapplication.model.User;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-
-public class FirebaseValidation {
-
-    private String TAG = "FirebaseValidation";
-
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDevicesDatabaseReference;
-    private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mEmailDatabaseRefernece;
-
-    private FirebaseValidation(){
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        initDatabase();
-    }
-
-    private void initDatabase(){
-        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-        mEmailDatabaseRefernece = mFirebaseDatabase.getReference().child("Email");
-    }
-
-    public boolean validateUserAndDevice(String SignInType) {
-        // 1.Check if registered user sign's in using old device or new device using imei number.
-
-        mDevicesDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull final DataSnapshot deviceDataSnapshot) {
-                if (deviceDataSnapshot.exists()) {
-                    Log.d(TAG, "Devices node exists in json tree");
-                    Log.d("MainActiity", deviceDataSnapshot.toString());
-                    Log.d(TAG, "From mobile: " + mImeiNumber);
-                    Log.d(TAG, "From firebase: " + deviceDataSnapshot.hasChild(mImeiNumber));
-                    if (deviceDataSnapshot.hasChild(mImeiNumber)) {
-                        // implies user tries to log in from same device as registered
-                        // now check if email and password matches with credentials stored in db
-                        // first get uid from imei
-                        Device deviceUser = deviceDataSnapshot.child(mImeiNumber).getValue(Device.class);
-                        final String uid = deviceUser.getUID();
-                        if (uid == null) {
-
-                            //check if email is registered
-                            mEmailDatabaseRefernece.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot emailDataSnapshot) {
-                                    Log.d("Email Data Snapshot:", emailDataSnapshot.toString());
-                                    if (emailDataSnapshot.exists()) {
-                                        if (!emailDataSnapshot.hasChild(email)) {
-                                            // prompt user to signUp
-                                        } else {
-                                            /* user tries to sign in from other device
-                                             check if user logged out from previous device
-                                             find imei of previous device: Email node->email->uid->imei
-                                             if uid under Devices node of previous device is null then logged out..else prompt user to log out
-                                             */
-                                         /*   uid = emailDataSnapshot.getValue(email);
-                                                    Log.d(TAG, uid);
-                                                    mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-@Override
-public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-        Log.d("User Data Snapshot:", userDataSnapshot.toString());
-        if (userDataSnapshot.exists()) {
-        if (userDataSnapshot.hasChild(uid)) {
-        User oldUser = userDataSnapshot.child(uid).getValue(User.class);
-        Device oldDeviceUser = deviceDataSnapshot.child(oldUser.getImei()).getValue(Device.class);
-        if (oldDeviceUser.getUID() == null) {*/
-                                                                /* implies user logged out from old device
-                                                                    Now login the user
-                                                                 *//*
-        return true;
-        } else {
-                                                                /* User not logged out from old device
-                                                                    prompt user to log out from old device
-                                                                 *//*
-        Log.d(TAG, "LoggedIn in other device");
-        }
-        } else {
-        //
-        }
-        } else {
-        Log.d(TAG, "Users node does not exists in json tree");
-        }
-        }
-
-@Override
-public void onCancelled(@NonNull DatabaseError databaseError) {
-        // Getting User failed, log a message
-        Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-        Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
-        }
-        });
-        }
-        }
-        }
-
-@Override
-public void onCancelled(@NonNull DatabaseError databaseError) {
-
-        }
-        });
-        } else {
-        //Log.d(TAG, "Inside dataSnapshot.hasChild(mImeiNumber) method");
-        Log.d(TAG, uid);
-        mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-@Override
-public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-        Log.d("User Data Snapshot:", userDataSnapshot.toString());
-        if (userDataSnapshot.exists()) {
-        if (userDataSnapshot.hasChild(uid)) {
-        User user = userDataSnapshot.child(uid).getValue(User.class);
-        Log.d("password:", user.getPassword());
-        if (!user.getEmail().equals(email)) {
-        // Either email is invalid or prompt user that this device is stored
-        // under other user ...ask previous user to logout
-        } else if (!user.getPassword().equals(password)) {
-        // Password is invalid..prompt user to re-enter password
-        Log.d(TAG, "Invalid password");
-        } else {
-        // Login the User
-        return true;
-        }
-        } else {
-        // remove uid from imei in devices node
-        }
-        } else {
-        Log.d(TAG, "Users node does not exists in json tree");
-        }
-        }
-
-@Override
-public void onCancelled(@NonNull DatabaseError databaseError) {
-        // Getting User failed, log a message
-        Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-        Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
-        }
-        });
-        }
-
-        } else {
-        Log.d(TAG, "Imei not registered");
-        //check if email is registered
-        mEmailDatabaseRefernece.addListenerForSingleValueEvent(new ValueEventListener() {
-@Override
-public void onDataChange(@NonNull DataSnapshot emailDataSnapshot) {
-        Log.d("Email Data Snapshot:", emailDataSnapshot.toString());
-        if (emailDataSnapshot.exists()) {
-        if (!emailDataSnapshot.hasChild(email)) {
-        // prompt user to signUp
-        } else {
-                                            /* user tries to sign in from other device
-                                             check if user logged out from previous device
-                                             find imei of previous device: Email node->email->uid->imei
-                                             if uid under Devices node of previous device is null then logged out..else prompt user to log out
-                                             *//*
-        uid = emailDataSnapshot.getValue(email);
-        Log.d(TAG, uid);
-        mUsersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-@Override
-public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-        Log.d("User Data Snapshot:", userDataSnapshot.toString());
-        if (userDataSnapshot.exists()) {
-        if (userDataSnapshot.hasChild(uid)) {
-        User oldUser = userDataSnapshot.child(uid).getValue(User.class);
-        Device oldDeviceUser = deviceDataSnapshot.child(oldUser.getImei()).getValue(Device.class);
-        if (oldDeviceUser.getUID() == null) {
-                                                                /* implies user logged out from old device
-                                                                    Now login the user
-                                                                 *//*
-        return true;
-        } else {
-                                                                /* User not logged out from old device
-                                                                    prompt user to log out from old device
-                                                                 *//*
-        Log.d(TAG, "LoggedIn in other device");
-        }
-        } else {
-        //
-        }
-        } else {
-        Log.d(TAG, "Users node does not exists in json tree");
-        }
-        }
-
-@Override
-public void onCancelled(@NonNull DatabaseError databaseError) {
-        // Getting User failed, log a message
-        Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-        Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
-        }
-        });
-        }
-        }
-        }
-
-@Override
-public void onCancelled(@NonNull DatabaseError databaseError) {
-
-        }
-        });
-        }
-        } else {
-        Log.d(TAG, "Devices node does not exists in json tree");
-        //mDevicesDatabaseReference.child(mImeiNumber).child("uid").setValue("CM2RyALv19Sk6iAQVPlHB538auv1");
-        }
-        }
-
-@Override
-public void onCancelled(@NonNull DatabaseError databaseError) {
-        // Getting Device failed, log a message
-        Log.w(TAG, "loadDevice:onCancelled", databaseError.toException());
-        Toast.makeText(MainActivity.this, "Failed to load Device Information.", Toast.LENGTH_SHORT).show();
-        }
-        });
-        }
-        }
-
-* */

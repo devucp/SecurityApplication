@@ -20,8 +20,6 @@ import android.widget.Toast;
 
 
 import com.example.securityapplication.model.Device;
-import com.example.securityapplication.model.Email;
-import com.example.securityapplication.model.Mobile;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -54,7 +52,7 @@ public class SignUp2 extends AppCompatActivity {
     private Button btn_submit;
 
     private InputValidation inputValidation;
-    private  SQLiteDBHelper DBHelper;
+    private SQLiteDBHelper DBHelper;
     private User user;
     private Device device;
     private String blockcharset = "~#^|$%&*!,.";
@@ -302,7 +300,7 @@ public class SignUp2 extends AppCompatActivity {
         mMobileDatabaseReference.child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot mobileNodeDataSnapshot) {
-                Log.d("Email Data Snapshot:", mobileNodeDataSnapshot.toString());
+                Log.d("Mobile Data Snapshot:", mobileNodeDataSnapshot.toString());
                 if (mobileNodeDataSnapshot.exists()) {
                     uid = mobileNodeDataSnapshot.getValue().toString();
                 } else {

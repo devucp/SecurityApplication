@@ -11,9 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /*
-*NOTE: Earlier TextInputLayout was used as parameter for all validation function
-*They have been changed to TextInputEditText
-* and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
+ *NOTE: Earlier TextInputLayout was used as parameter for all validation function
+ *They have been changed to TextInputEditText
+ * and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
  */
 public class Validation {
 

@@ -21,7 +21,6 @@ public class VerifyEmail {
     public VerifyEmail(FirebaseUser firebaseUser, Context context){
         this.firebaseUser = firebaseUser;
         this.context = context;
-
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
@@ -66,7 +65,15 @@ public class VerifyEmail {
                                     "Failed to send verification email. Try Again",
                                     Toast.LENGTH_LONG).show();
                         }
+                        signOut();
                     }
                 });
+    }
+
+    private void signOut(){
+        if (firebaseUser != null) {
+            firebaseAuth.signOut();
+            Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+        }
     }
 }

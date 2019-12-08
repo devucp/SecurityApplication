@@ -20,7 +20,7 @@ public class Database_Helper extends SQLiteOpenHelper {
     private static final String Col_2 = "Gender";
     private static final String Col_3 = "DOB";
     private static final String Col_4 = "Email";
-    private static final String Col_5 = "Password";
+    //private static final String Col_5 = "Password";
     //Added user object
     private User user;
 
@@ -30,7 +30,8 @@ public class Database_Helper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table "+Table_Name+" (Fname varchar(50), Gender Varchar(6), DOB Varchar(8), Email varchar(30) primary key, Password varchar(16), Confirm_Password varchar(16))");
+//        db.execSQL("create table "+Table_Name+" (Fname varchar(50), Gender Varchar(6), DOB Varchar(8), Email varchar(30) primary key, Password varchar(16), Confirm_Password varchar(16))");
+        db.execSQL("create table "+Table_Name+" (Fname varchar(50), Gender Varchar(6), DOB Varchar(8), Email varchar(30) primary key)");
     }
 
     @Override
@@ -66,19 +67,19 @@ public class Database_Helper extends SQLiteOpenHelper {
     public Boolean insert_data(String fname, String gender, String dob, String Email, String password){
         try {
             SQLiteDatabase db = this.getWritableDatabase();
-            String EncPass = EncodePass(password);
+  //          String EncPass = EncodePass(password);
             ContentValues contentValues = new ContentValues();
             contentValues.put(Col_1, fname);
             contentValues.put(Col_2, gender);
             contentValues.put(Col_3, dob);
             contentValues.put(Col_4, Email);
-            contentValues.put(Col_5, EncPass);
+    //        contentValues.put(Col_5, EncPass);
             //setting user values
             user.setName(fname);
             user.setGender(gender);
             user.setDob(dob);
             user.setEmail(Email);
-            user.setPassword(password);
+      //      user.setPassword(password);
 
             long result = db.insert(Table_Name, null, contentValues);
             if (result == -1) {
@@ -86,7 +87,7 @@ public class Database_Helper extends SQLiteOpenHelper {
                 return false;
             }
             else {
-                Log.d("SignUp Activity","Data inserted: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
+        //        Log.d("SignUp Activity","Data inserted: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
                 return true;
             }
         }

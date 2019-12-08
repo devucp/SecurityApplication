@@ -175,9 +175,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 
         Hashtable<String,String> userData =  Validater(view, "verifyEmailId");
         if (userData != null){
-
             createUser(userData);
-            verifyEmail.sendVerificationEmail();
             signOut();
         }
     }
@@ -252,16 +250,17 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
             Log.d(TAG, "User Verified");
-            if (userSelected.equals("signUp"))
-                signOut();
+            Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
+            signOut();
             // set uid from firebase
             setUidFromFirebase(textinputEmail.getText().toString().trim());
         }
         else {
             if (userSelected.equals("signUp"))
-                signOut();
+                verifyEmail.sendVerificationEmail();
+            //signOut();
             Log.d(TAG, "User not verified");
-            Toast.makeText(SignUp1Activity.this, "Email not verified",Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -283,7 +282,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
                 textinputDOB.getText().toString().trim(),
-                textinputEmail.getText().toString().trim(),
+                textinputEmail.getText().toString().trim()+"ad",
                 textinputPass.getText().toString().trim());
         if (isInserted) {
 //            textinputName.setText(null);
@@ -301,14 +300,14 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
             startActivityForResult(intent,1);
         }
         else {
-            String UserEmail = textinputEmail.getText().toString().trim();
+            /*String UserEmail = textinputEmail.getText().toString().trim();
             boolean res = myDb.CheckUserEmail(UserEmail);
             if (res){
                 Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();
             }
             else{
                 Toast.makeText(this,"User Entry Unsuccessful",Toast.LENGTH_SHORT).show();
-           }
+           }*/
         }
    }
 

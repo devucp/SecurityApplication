@@ -355,6 +355,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //verifyEmailId();
                             updateUI(user);
                         } else {
+                            try{
+                                throw task.getException();
+                            }
+                            catch (Exception e){
+                                Log.d(TAG,"Exception:"+e.getMessage());
+                            }
                             updateUI(null);
                         }
                     }
@@ -514,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (SignInType) {
             case "email":
-                password = userData.get("password").toString();
+                //password = userData.get("password").toString();
             case "google":
                 email = userData.get("email").toString();
                 break;
@@ -524,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (user != null) {
-            Log.d("password:", user.getPassword());
+            //Log.d("password:", user.getPassword());
             if (!user.getEmail().equals(email)) {
                 // Case1:Either email entered is invalid or different
                 // Case2:prompt user that this device is stored under other user ...ask previous user to logout
@@ -534,14 +540,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     signOut();
                 }
 
-            } else if (SignInType.equals("email") && !user.getPassword().equals(password)) {
+            } /*else if (SignInType.equals("email") && !user.getPassword().equals(password)) {
                 // Password is invalid..prompt user to re-enter password
                 Log.d(TAG, "Invalid password");
                 Toast.makeText(MainActivity.this,"Invalid Password",Toast.LENGTH_LONG).show();
-            } else {
+            } */else {
                 if (SignInType.equals("email")) {
                     // Login the User through email
-                    signIn(email, password);
+                    signIn(email, mPassword.getText().toString().trim());
                 }
                 else if (SignInType.equals("google")){
                     // login the user through google
@@ -589,13 +595,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Log.d(TAG,"SignInType:"+SignInType);
                             switch (SignInType) {
                                 case "email":
-                                    if (!user.getPassword().equals(userData.get("password"))) {
+                                    /*if (!user.getPassword().equals(userData.get("password"))) {
                                         // Password is invalid..prompt user to re-enter password
                                         Log.d(TAG, "Invalid password");
                                         Toast.makeText(MainActivity.this,"Invalid Password",Toast.LENGTH_LONG).show();
                                     }
-                                    else
-                                        signIn(userData.get("email"),userData.get("password"));
+                                    else*/
+                                        //signIn(userData.get("email"),userData.get("password"));
+                                    signIn(userData.get("email"),mPassword.getText().toString().trim());
                                     break;
                                 case "google":
                                     initializeGoogleFirebaseSignIn();

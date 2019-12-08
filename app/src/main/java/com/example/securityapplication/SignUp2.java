@@ -26,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -66,6 +67,7 @@ public class SignUp2 extends AppCompatActivity {
     private DatabaseReference mEmailDatabaseReference;
     private DatabaseReference mMobileDatabaseReference;
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
 
     private String uid;
@@ -94,6 +96,28 @@ public class SignUp2 extends AppCompatActivity {
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
         //initialize user defined class GoogleFirebaseSignIn with Firebase user instance and TAG using user defined init method
         //googleFirebaseSignIn.init(this, mAuth, mFirebaseDatabase);
+
+     /*   mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG,"Calling func sendVerificationEmail");
+                    sendVerificationEmail(user);
+                } else {
+                    // User is signed out
+                    Log.d(TAG,"User is signed out");
+                }
+            }
+        };*/
+    }
+
+    private void signOut(){
+        if (mAuth.getCurrentUser() != null) {
+            mAuth.signOut();
+            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**Initialize Views*/
@@ -223,6 +247,23 @@ public class SignUp2 extends AppCompatActivity {
         );
     }
 
+    private void writeDataToFirebase(FirebaseUser firebaseUser){
+        //push user to firebase database 'Users' node
+        mUsersDatabaseReference.child(firebaseUser.getUid()).setValue(user);
+        //push device to firebase database 'Devices' node
+        mDevicesDatabaseReference.child(user.getImei()).setValue(device);
+        //push email and mobile no. on root node
+        String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
+        mEmailDatabaseReference.child(emailKey).setValue(firebaseUser.getUid());
+        mMobileDatabaseReference.child(user.getMobile()).setValue(firebaseUser.getUid());
+
+        Log.d("Pushed to db",mUsersDatabaseReference.getDatabase().toString());
+        Log.d("Pushed to db",mDevicesDatabaseReference.getDatabase().toString());
+        Log.d("Pushed to db",mEmailDatabaseReference.getDatabase().toString());
+        Log.d("Pushed to db",mMobileDatabaseReference.getDatabase().toString());
+
+    }
+
     private void AddUser(){
         //added conditional checking and showing respective Toast message
         if (DBHelper.addUser(user))
@@ -238,29 +279,19 @@ public class SignUp2 extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "createUserWithEmail:success");
+                                Log.d(TAG,"new user ? ->"+task.getResult().getAdditionalUserInfo().isNewUser());
                                 FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
                                 device.setUID(firebaseUser.getUid());
 
-                                //push user to firebase database 'Users' node
-                                mUsersDatabaseReference.child(firebaseUser.getUid()).setValue(user);
-                                //push device to firebase database 'Devices' node
-                                mDevicesDatabaseReference.child(user.getImei()).setValue(device);
-                                //push email and mobile no. on root node
-                                String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
-                                mEmailDatabaseReference.child(emailKey).setValue(firebaseUser.getUid());
-                                mMobileDatabaseReference.child(user.getMobile()).setValue(firebaseUser.getUid());
-
-                                Log.d("Pushed to db",mUsersDatabaseReference.getDatabase().toString());
-                                Log.d("Pushed to db",mDevicesDatabaseReference.getDatabase().toString());
-                                Log.d("Pushed to db",mEmailDatabaseReference.getDatabase().toString());
-                                Log.d("Pushed to db",mMobileDatabaseReference.getDatabase().toString());
+                                // write data to firebase
+                                writeDataToFirebase(firebaseUser);
 
                                 Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
                                 setResult(10,null);//to finish sing up 1 activity
                                 //activity.finish();
-                                Intent i = new Intent(SignUp2.this,home_fragment.class);
-                                startActivity(i);
+                                /*Intent i = new Intent(SignUp2.this,home_fragment.class);
+                                startActivity(i);*/
 
                                 // check if user is signed in to google or facebook
                                 if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){

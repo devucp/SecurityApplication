@@ -19,9 +19,16 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Hashtable;
 
 /*
         *NOTE: Earlier TextInputLayout was used as parameter for all validation function
@@ -47,9 +55,13 @@ public class SignUp1Activity extends AppCompatActivity {
     //Added user object to send to next
     private User user;
 
+    private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mEmailDatabaseReference;
     private String uid;
+
+    private Button verifyButton;
+    private VerifyEmail verifyEmail;
 
     //
 DatePickerDialog datePickerDialog;
@@ -77,6 +89,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
         gender_grp = findViewById(R.id.radiogrp);
         Btn_Submit = findViewById(R.id.btn_sub);
+        verifyButton = findViewById(R.id.btn_verify);
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,6 +140,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         else
             Log.d("isLoggedinGoogle","Not logged in");
 
+        mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         initDatabase();
     }
@@ -142,14 +156,120 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         builder.setMessage(Message);
     }
 
-    public void Validater(View view) {
+    public Hashtable<String, String> Validater(View view, String userSelected) {
         if (val.validateName(textinputName) & val.validateGender(gender_grp,text_view) & val.validateDob(textinputDOB) & val.validateEmail(textinputEmail) &
                 val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass)){
+            Hashtable<String,String> userData = new Hashtable<>();
+            userData.put("email",textinputEmail.getText().toString().trim());
+            userData.put("password", textinputPass.getText().toString().trim());
+            userData.put("userSelected", userSelected);
+            return userData;
+        }
+        else {
+            Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    public void verifyEmailId(View view){
+
+        Hashtable<String,String> userData =  Validater(view, "verifyEmailId");
+        if (userData != null){
+
+            createUser(userData);
+            verifyEmail.sendVerificationEmail();
+            signOut();
+        }
+    }
+
+    public void signUp(View view){
+
+        // disable screen and show spinner
+        //
+        Hashtable<String,String> userData = Validater(view, "signUp");
+        if (userData != null){
+            createUser(userData);
+        }
+    }
+
+    private void createUser(final Hashtable<String,String> userData){
+
+        mAuth.createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
+                .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+
+                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
+                            checkIsEmailVerified(firebaseUser, userData.get("userSelected"));
+
+                        } else {
+                            try {
+                                throw task.getException();
+                            } catch (FirebaseAuthUserCollisionException e){
+                                //signIn the user
+                                signIn(userData);
+                            } catch (Exception e){
+                                Log.e(TAG,e.getMessage());
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                Toast.makeText(SignUp1Activity.this, "Authentication failed.Please check your connection and try again",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void signIn(final Hashtable<String,String> userData){
+        Log.d(TAG,"Signing IN user with email "+userData.get("email")+" and password "+userData.get("password"));
+
+        mAuth.signInWithEmailAndPassword(userData.get("email"), userData.get("password"))
+                .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
+                            Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+
+                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            checkIsEmailVerified(firebaseUser, userData.get("userSelected"));
+                        } else {
+                            try {
+                                throw task.getException();
+                            }catch (Exception e){
+                                Log.d(TAG, "Exception while signIN:"+e.getMessage());
+                                Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void checkIsEmailVerified(FirebaseUser firebaseUser, String userSelected){
+
+        verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
+        if (verifyEmail.isEmailIdVerified()) {
+            Log.d(TAG, "User Verified");
+            if (userSelected.equals("signUp"))
+                signOut();
             // set uid from firebase
             setUidFromFirebase(textinputEmail.getText().toString().trim());
         }
         else {
-            Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+            if (userSelected.equals("signUp"))
+                signOut();
+            Log.d(TAG, "User not verified");
+            Toast.makeText(SignUp1Activity.this, "Email not verified",Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void signOut(){
+        if (mAuth.getCurrentUser() != null) {
+            mAuth.signOut();
+            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
     }
 

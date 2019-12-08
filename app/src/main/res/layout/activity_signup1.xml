@@ -267,7 +267,7 @@
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="50dp"
                 android:background="@drawable/btn_cus"
-                android:onClick="Validater"
+                android:onClick="signUp"
                 android:paddingTop="9dp"
                 android:paddingBottom="9dp"
                 android:text="@string/submit"

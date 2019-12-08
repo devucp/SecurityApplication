@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else if (i==R.id.verifyEmailButton){
             if (validateForm()) {
                 mVerifyEmailButton.setEnabled(false);
-                verifyEmailId();
+                //verifyEmailId();
             }
         }
     }
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             device.setUID(user.getUid());
                             mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
                             mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
-                            verifyEmailId();
+                            //verifyEmailId();
                             updateUI(user);
                         } else {
                             updateUI(null);
@@ -415,42 +415,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //Log.d(TAG,mAuth.getCurrentUser().getProviderData().get(i).getDisplayName());
             }
         }
-    }
-
-    private void verifyEmailId(){
-        Log.d(TAG,"Inside verify email");
-
-        final FirebaseUser user = mAuth.getCurrentUser();
-
-        String url = "https://securityapplication.page.link/Tbeh?uid=" + user.getUid();
-        ActionCodeSettings actionCodeSettings = ActionCodeSettings.newBuilder()
-                .setUrl(url)
-                .setHandleCodeInApp(false)
-                .setAndroidPackageName("com.example.securityapplication.MainActivity",true,null)
-                .build();
-
-        if (user.isEmailVerified())
-            Log.d(TAG, "User Verified");
-        else
-            Log.d(TAG, "User not verified");
-        user.sendEmailVerification(actionCodeSettings)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // Re-enable button
-                        findViewById(R.id.verifyEmailButton).setEnabled(true);
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this,
-                                    "Verification email sent to " + user.getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.e(TAG, "sendEmailVerification", task.getException());
-                            Toast.makeText(MainActivity.this,
-                                    "Failed to send verification email.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
     }
 
     private void setUserForSignIn(String uid, final Hashtable<String,String> userData){

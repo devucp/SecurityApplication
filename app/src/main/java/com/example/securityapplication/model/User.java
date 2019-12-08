@@ -58,14 +58,6 @@ public class User implements Parcelable {
         }
     };
 
-    /*public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-*/
     public String getName() {
         return name;
     }
@@ -105,14 +97,6 @@ public class User implements Parcelable {
     public void setMobile(String mobile) {
         this.mobile = mobile;
     }
-
-    /*public String getAadhar() {
-        return aadhar;
-    }
-
-    public void setAadhar(String aadhar) {
-        this.aadhar = aadhar;
-    }*/
 
     public String getLocation() {
         return location;

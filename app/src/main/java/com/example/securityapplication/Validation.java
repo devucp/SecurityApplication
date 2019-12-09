@@ -3,6 +3,7 @@ package com.example.securityapplication;
 //import android.support.design.widget.TextInputLayout;
 import android.graphics.Color;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.util.Patterns;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -151,32 +152,32 @@ public class Validation {
         }
     }
 
-    boolean validatePassword(TextInputEditText textInputPassword) {
+    boolean validatePassword(TextInputEditText textInputPassword, TextView t1) {
         String passwordinput = textInputPassword.getText().toString().trim();
 
         if (passwordinput.isEmpty()) {
-            textInputPassword.setError("Password can't be empty");
+            SignUp1Activity.setError("Password can't be empty",t1);
             return false;
         } else if (!PASSWORD_PATTERN.matcher(passwordinput).matches()) {
-            textInputPassword.setError("Password does not fit the specified criteria");
+            SignUp1Activity.setError("Password does not fit the specified criteria",t1);
             return false;
         } else {
-            textInputPassword.setError(null);
+            SignUp1Activity.setError(null,t1);
             return true;
         }
     }
-    boolean validateCnfPassword(TextInputEditText textInputPassword,TextInputEditText textInputCnfPassword){
+    boolean validateCnfPassword(TextInputEditText textInputPassword, TextInputEditText textInputCnfPassword,TextView t2){
         String passinput = textInputPassword.getText().toString().trim();
         String cnfpassinput = textInputCnfPassword.getText().toString().trim();
 
         if (cnfpassinput.isEmpty()) {
-            textInputCnfPassword.setError("Confirm Password required");
+            SignUp1Activity.setError("Confirm Password required",t2);
             return false;
         }else if (!cnfpassinput.equals(passinput)){
-            textInputCnfPassword.setError("Passwords does not match");
+            SignUp1Activity.setError("Passwords does not match",t2);
             return false;
         }else{
-            textInputCnfPassword.setError(null);
+            SignUp1Activity.setError(null,t2);
             return true;
         }
     }

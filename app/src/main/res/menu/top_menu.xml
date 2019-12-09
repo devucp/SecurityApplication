@@ -5,7 +5,6 @@
         android:checkable="true"
         android:checked="false"
         android:enabled="true"
-        android:icon="@drawable/ic_remove_red_eye_black_24dp"
         android:title="Test Mode"
         android:visible="true"
 

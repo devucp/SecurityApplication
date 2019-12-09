@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,7 @@ public class sos_page extends AppCompatActivity {
     String n5 = "";
 
     TextInputEditText c1, c2, c3, c4, c5,current;
+    TextInputLayout cc1,cc2,cc3,cc4,cc5;
     private final static int CONTACT_PICKER_RESULT = 1001;
 
 
@@ -48,6 +50,12 @@ public class sos_page extends AppCompatActivity {
         c3 = (TextInputEditText) findViewById(R.id.sose3);
         c4 = (TextInputEditText) findViewById(R.id.sose4);
         c5 = (TextInputEditText) findViewById(R.id.sose5);
+        cc1 = (TextInputLayout) findViewById(R.id.sosl1);
+        cc2 = (TextInputLayout) findViewById(R.id.sosl2);
+        cc3 = (TextInputLayout) findViewById(R.id.sosl3);
+        cc4 = (TextInputLayout) findViewById(R.id.sosl4);
+        cc5 = (TextInputLayout) findViewById(R.id.sosl5);
+
         if (n1.length() > 9)
             c1.setText(n1);
         if (n2.length() > 9)
@@ -192,7 +200,13 @@ public class sos_page extends AppCompatActivity {
             public void onClick(View view) {
 
                 edit.setBackground(getResources().getDrawable(R.drawable.btn_cus_edit));
+
             c1.setEnabled(true);
+                cc1.setAlpha(1);
+                cc2.setAlpha(1);
+                cc3.setAlpha(1);
+                cc4.setAlpha(1);
+                cc5.setAlpha(1);
             c2.setEnabled(true);
             c3.setEnabled(true);
             c4.setEnabled(true);

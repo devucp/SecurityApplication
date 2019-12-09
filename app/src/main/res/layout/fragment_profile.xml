@@ -24,37 +24,36 @@
                 android:layout_gravity="top"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="230dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:background="@drawable/gradientbackground"
-                    android:orientation="vertical"
-                    >
 
-                    <ImageView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/gradientbackground"
+            android:orientation="vertical"
+            >
 
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/ic_account_circle_cyan_24dp"
-                        android:layout_marginTop="15dp"
-                        />
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_account_circle_cyan_24dp"
+                android:layout_marginTop="15dp"
+                />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="15dp"
-                        android:text="USER"
-                        android:textColor="#fff"
-                        android:textSize="25sp"
-                        android:textStyle="bold" />
-
-
+            <TextView
+                android:id="@+id/text_Name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="15dp"
+                android:text="user"
+                android:textColor="#fff"
+                android:textSize="35sp"
+                android:textStyle="bold" />
                 </LinearLayout>
 
 
@@ -73,6 +72,7 @@
                         android:src="@drawable/ic_email_black_24dp" />
 
                     <TextView
+                        android:id="@+id/text_Email"
                         android:layout_width="257dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -98,6 +98,7 @@
                         android:src="@drawable/ic_local_phone_black_24dp" />
 
                     <TextView
+                        android:id="@+id/text_Phone"
                         android:layout_width="209dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -118,11 +119,12 @@
                     android:paddingLeft="25dp">
 
                     <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:src="@drawable/ic_home_cyan_24dp" />
 
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_home_black_24dp" />
                     <TextView
+                        android:id="@+id/text_Address"
                         android:layout_width="155dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -148,6 +150,7 @@
                         android:src="@drawable/ic_wc_black_24dp" />
 
                     <TextView
+                        android:id="@+id/text_Gender"
                         android:layout_width="241dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -173,6 +176,7 @@
                         android:src="@drawable/ic_date_range_black_24dp" />
 
                     <TextView
+                        android:id="@+id/text_DOB"
                         android:layout_width="262dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -191,10 +195,11 @@
                     android:orientation="horizontal"
                     android:gravity="center_horizontal"
                     >
+
                     <Button
+                        android:id="@+id/btn_Edit"
                         android:layout_width="125dp"
                         android:layout_height="wrap_content"
-                        android:id="@+id/button1"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
                         android:background="@drawable/buttonstylegradient"
@@ -205,9 +210,9 @@
                         android:textSize="20sp" />
 
                     <Button
+                        android:id="@+id/btn_Logout"
                         android:layout_marginLeft="25dp"
-                        android:id="@+id/button2"
-                        android:layout_width="125dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
@@ -217,8 +222,15 @@
                         android:textColor="#fff"
                         android:textSize="20sp" />
                 </LinearLayout>
-
+               <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="change password ?"
+                    android:textSize="16sp"
+                    android:textColor="@color/cyan"
+                    android:gravity="end"/>
             </LinearLayout>
+
         </ScrollView>
     </LinearLayout>
 </LinearLayout>

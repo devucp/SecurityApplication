@@ -65,14 +65,15 @@ public class Database_Helper extends SQLiteOpenHelper {
 
     public Boolean insert_data(String fname, String gender, String dob, String Email, String password){
         try {
-            SQLiteDatabase db = this.getWritableDatabase();
             String EncPass = EncodePass(password);
+
+     /*       SQLiteDatabase db = this.getWritableDatabase();
             ContentValues contentValues = new ContentValues();
             contentValues.put(Col_1, fname);
             contentValues.put(Col_2, gender);
             contentValues.put(Col_3, dob);
             contentValues.put(Col_4, Email);
-            contentValues.put(Col_5, EncPass);
+            contentValues.put(Col_5, EncPass);*/
             //setting user values
             user.setName(fname);
             user.setGender(gender);
@@ -80,15 +81,18 @@ public class Database_Helper extends SQLiteOpenHelper {
             user.setEmail(Email);
             user.setPassword(password);
 
-            long result = db.insert(Table_Name, null, contentValues);
+     /*       long result = db.insert(Table_Name, null, contentValues);
             if (result == -1) {
                 Log.d("SignUp Activity","Data not inserted");
                 return false;
             }
             else {
-                Log.d("SignUp Activity","Data inserted: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
+                Log.d("SignUp Activity","Data acquired fro signup1: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
                 return true;
-            }
+            }*/
+            Log.d("SignUp Activity","Data acquired fro signup1: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
+            return true;
+
         }
         catch (Exception E){
             E.printStackTrace();

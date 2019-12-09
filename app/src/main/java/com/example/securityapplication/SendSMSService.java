@@ -12,6 +12,10 @@ public class SendSMSService extends Service {
     private String senderName;
     private String location;
     private Integer alert;
+    private Integer safe;
+    private Integer emergency;
+
+
     private String SOS_MESSAGE;
     public SendSMSService() {
     }
@@ -69,7 +73,21 @@ public class SendSMSService extends Service {
                     sendMessage(contactList[i],location);
             }
         }
-        Toast.makeText(getApplicationContext(), "Sent SOS Messages", Toast.LENGTH_LONG).show();
+        String toastmsg;
+
+        if(alert==1)
+        {
+            toastmsg="send alert sos message";
+        }
+        else if(emergency==1)
+        {
+            toastmsg="send emergency sos message";
+        }
+        else
+        {
+            toastmsg="send safety sos message";
+        }
+        Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
         this.stopSelf();//FINISH the service
     }
 
@@ -78,8 +96,14 @@ public class SendSMSService extends Service {
         {
             SOS_MESSAGE="HELP";
         }
-        else {
+        else if(emergency==2)
+        {
             SOS_MESSAGE="SAFE";
+        }
+        else
+        {
+            SOS_MESSAGE="EMERGENCY";
+
         }
 
         String messageToSend= getSenderName()+SOS_MESSAGE;
@@ -107,7 +131,13 @@ public class SendSMSService extends Service {
 
 
         alert=intent.getIntExtra("alert",0);
-        Log.d("SOS SMS","alert is"+alert);
+        safe=intent.getIntExtra("safe",0);
+        emergency=intent.getIntExtra("emergency",0);
+
+        Log.d("SOS SMS","alert is "+alert);
+        Log.d("SOS SMS","safe is "+safe);
+        Log.d("SOS SMS","emergency is "+emergency);
+
         initiateMessage();
 
 

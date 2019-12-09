@@ -1,5 +1,6 @@
 package com.example.securityapplication;
 
+import android.annotation.SuppressLint;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.Manifest;
@@ -23,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 import static android.content.Intent.getIntent;
 
 public class home_fragment extends Fragment {
@@ -45,11 +48,12 @@ public class home_fragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        alert = getActivity().findViewById(R.id.alert);
+        alert = Objects.requireNonNull(getActivity()).findViewById(R.id.alert);
         emergency = getActivity().findViewById(R.id.emergency);
         informsafety = getActivity().findViewById(R.id.inform);
 
         alert.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ShowToast")
             @Override
             public void onClick(View v) {
                 if(!checkSMSPermission()) {
@@ -66,7 +70,7 @@ public class home_fragment extends Fragment {
 
                 if (!isMyServiceRunning(SendSMSService.class)){
 
-                    getContext().startService(mSosPlayerIntent);
+                    Objects.requireNonNull(getContext()).startService(mSosPlayerIntent);
 
 
 
@@ -82,8 +86,18 @@ public class home_fragment extends Fragment {
                 //emergency.setBackgroundColor(getResources().getColor(R.drawable.buttonshape_emer));
                 Context c2 = getContext();
 
-                Intent emergencyintent=new Intent(getContext(), BackgroundSosPlayerService.class);
-                c2.startService(emergencyintent);
+                Intent emergencyintent1=new Intent(getContext(), BackgroundSosPlayerService.class);
+
+                if (c2 != null) {
+                    c2.startService(emergencyintent1);
+                }
+
+                Intent emergencyintent2 = new Intent(getContext(), SendSMSService.class);
+                emergencyintent2.putExtra("emergency",1);
+                assert c2 != null;
+                c2.startService(emergencyintent2);
+
+
 
             }
         });
@@ -93,18 +107,28 @@ public class home_fragment extends Fragment {
             public void onClick(View v) {
 
                 Context c3 = getContext();
+                Intent stopsms = new Intent(getContext(),SendSMSService.class);
+                stopsms.putExtra("safe",1);
+                if (c3 != null) {
+                    c3.startService(stopsms);
+                }
 
-               if(isMyServiceRunning(SendSMSService.class))
+
+                if(isMyServiceRunning(SendSMSService.class))
                {
-                   Intent stopsms = new Intent(getContext(),SendSMSService.class);
 
-                   c3.stopService(stopsms);
+
+                   if (c3 != null) {
+                       c3.stopService(stopsms);
+                   }
                }
 
                if(isMyServiceRunning(BackgroundSosPlayerService.class))
                {
                    Intent stopemergency = new Intent(getContext(),BackgroundSosPlayerService.class);
-                   c3.stopService(stopemergency);
+                   if (c3 != null) {
+                       c3.stopService(stopemergency);
+                   }
                }
 
 

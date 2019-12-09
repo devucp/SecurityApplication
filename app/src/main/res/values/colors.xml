@@ -10,7 +10,7 @@
     <color name="graylight">#fafafa </color>
     <color name="endblue">#006B7A</color>
     <color name="accept">#00cc00</color>
-
+    <color name="btnPressedColor">#FF0000</color>
     <color name="bluedecent">#71D6FF</color>
     <color name="shadow">#292929</color>
 

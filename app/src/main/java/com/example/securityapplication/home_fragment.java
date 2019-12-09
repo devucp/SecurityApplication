@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.support.v4.content.ContextCompat;
 
 import android.support.annotation.NonNull;
@@ -51,13 +52,25 @@ public class home_fragment extends Fragment {
         alert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!checkSMSPermission()) {
+
+                }
+                else
+                {
+                    Toast.makeText(getContext(),"sms permisssion noy enabled",Toast.LENGTH_LONG);
+                }
+
                 Intent mSosPlayerIntent = new Intent(getContext(), SendSMSService.class);
-                //checks if service is running and if not running then starts it
+                mSosPlayerIntent.putExtra("alert",1);
+
+
                 if (!isMyServiceRunning(SendSMSService.class)){
+
                     getContext().startService(mSosPlayerIntent);
 
 
-                    while(!checkSMSPermission());
+
+
                 }
             }
         });
@@ -65,6 +78,8 @@ public class home_fragment extends Fragment {
         emergency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //emergency.setBackgroundColor(getResources().getColor(R.drawable.buttonshape_emer));
                 Context c2 = getContext();
 
                 Intent emergencyintent=new Intent(getContext(), BackgroundSosPlayerService.class);
@@ -82,7 +97,8 @@ public class home_fragment extends Fragment {
                if(isMyServiceRunning(SendSMSService.class))
                {
                    Intent stopsms = new Intent(getContext(),SendSMSService.class);
-                  c3.stopService(stopsms);
+
+                   c3.stopService(stopsms);
                }
 
                if(isMyServiceRunning(BackgroundSosPlayerService.class))
@@ -90,6 +106,7 @@ public class home_fragment extends Fragment {
                    Intent stopemergency = new Intent(getContext(),BackgroundSosPlayerService.class);
                    c3.stopService(stopemergency);
                }
+
 
 
 

@@ -11,13 +11,17 @@ public class SendSMSService extends Service {
     private String[] contactList=null; //TODO: stores the number of the emergency contacts
     private String senderName;
     private String location;
-    private String SOS_MESSAGE=" IS IN AN EMERGENCY AND NEEDS YOUR HELP.";
+    private Integer alert;
+    private String SOS_MESSAGE;
     public SendSMSService() {
     }
 
     public void updateLocation() {
         this.location = GetGPSCoordinates.getLastKnownLocation();
     }
+
+
+
 
     public void setSenderName(String senderName) {
         this.senderName = senderName;
@@ -36,7 +40,9 @@ public class SendSMSService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        initiateMessage();
+
+
+        //initiateMessage();
     }
     public void initiateMessage(){
         updateLocation();
@@ -68,16 +74,46 @@ public class SendSMSService extends Service {
     }
 
     public void sendMessage(String number,String location){
+        if(alert==1)
+        {
+            SOS_MESSAGE="HELP";
+        }
+        else {
+            SOS_MESSAGE="SAFE";
+        }
+
         String messageToSend= getSenderName()+SOS_MESSAGE;
         if(location!=null)
                 messageToSend+=" https://www.google.com/maps/place/";
         messageToSend+=location;
+
+
         SmsManager.getDefault().sendTextMessage(number, null, messageToSend, null,null);
+
+
+
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+
+
+
+        alert=intent.getIntExtra("alert",0);
+        Log.d("SOS SMS","alert is"+alert);
+        initiateMessage();
+
+
+
+        return super.onStartCommand(intent, flags, startId);
+
+
     }
 }

@@ -184,11 +184,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         while(!checkSMSPermission());
 
-       if(!checkGPSPermission());
+      while(!checkGPSPermission());
+
 
         Intent mGpsServiceIntent = new Intent(this, GetGPSCoordinates.class);
         startService(mGpsServiceIntent);
     }
+
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
@@ -328,6 +330,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mPassword.setVisibility(View.GONE);
             mGoogleSignInButton.setVisibility(View.GONE);
             mFaceBookLoginButton.setVisibility(View.GONE);
+
+            Intent i = new Intent(MainActivity.this, navigation.class);
+            startActivity(i);
+
         }
     }
 

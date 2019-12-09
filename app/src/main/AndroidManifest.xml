@@ -27,7 +27,10 @@
 
         <activity android:name=".recent_cards"></activity>
         <activity android:name=".sos_page"></activity>
-        <activity android:name=".navigation"></activity>
+        <activity android:name=".navigation">
+
+
+        </activity>
 
 
         <activity

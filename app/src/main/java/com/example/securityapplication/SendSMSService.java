@@ -11,8 +11,7 @@ public class SendSMSService extends Service {
     private String[] contactList=null; //TODO: stores the number of the emergency contacts
     private String senderName;
     private String location;
-    private String SOS_MESSAGE=" IS IN AN EMERGENCY AND NEEDS YOUR HELP. PLEASE HELP THEM." +
-                                "THE ALERT WAS SENT FROM ";
+    private String SOS_MESSAGE=" IS IN AN EMERGENCY AND NEEDS YOUR HELP.";
     public SendSMSService() {
     }
 
@@ -45,7 +44,7 @@ public class SendSMSService extends Service {
         //call setContactList
         if(contactList==null){
             //filling DUMMY values
-            String number="9819931901";
+            String number="9673153564";
             setSenderName("DG");
             if(location==null){
                 location="Location unavailable";
@@ -73,7 +72,7 @@ public class SendSMSService extends Service {
         if(location!=null)
                 messageToSend+=" https://www.google.com/maps/place/";
         messageToSend+=location;
-        SmsManager.getDefault().sendTextMessage(number, null, messageToSend, null,null);
+        SmsManager.getDefault().sendTextMessage(number, null, "help", null,null);
     }
 
     @Override

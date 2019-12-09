@@ -72,7 +72,7 @@ public class SendSMSService extends Service {
         if(location!=null)
                 messageToSend+=" https://www.google.com/maps/place/";
         messageToSend+=location;
-        SmsManager.getDefault().sendTextMessage(number, null, "help", null,null);
+        SmsManager.getDefault().sendTextMessage(number, null, messageToSend, null,null);
     }
 
     @Override

@@ -28,6 +28,7 @@ public class home_fragment extends Fragment {
 
     public Button alert;
     public Button emergency;
+    public Button informsafety;
     int RC;
 
     @Nullable
@@ -45,6 +46,7 @@ public class home_fragment extends Fragment {
 
         alert = getActivity().findViewById(R.id.alert);
         emergency = getActivity().findViewById(R.id.emergency);
+        informsafety = getActivity().findViewById(R.id.inform);
 
         alert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +73,28 @@ public class home_fragment extends Fragment {
             }
         });
 
+        informsafety.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Context c3 = getContext();
+
+               if(isMyServiceRunning(SendSMSService.class))
+               {
+                   Intent stopsms = new Intent(getContext(),SendSMSService.class);
+                  c3.stopService(stopsms);
+               }
+
+               if(isMyServiceRunning(BackgroundSosPlayerService.class))
+               {
+                   Intent stopemergency = new Intent(getContext(),BackgroundSosPlayerService.class);
+                   c3.stopService(stopemergency);
+               }
+
+
+
+            }
+        });
 
     }
 

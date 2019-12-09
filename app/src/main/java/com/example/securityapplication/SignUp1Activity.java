@@ -48,10 +48,7 @@ public class SignUp1Activity extends AppCompatActivity {
 //
    Database_Helper myDb;
     Validation val = new Validation();
-    private TextView text_view;
     private Button Btn_Submit;
-    private RadioGroup gender_grp;
-    private RadioButton Radio_Gender;
     //Added user object to send to next
     private User user;
 
@@ -60,13 +57,9 @@ public class SignUp1Activity extends AppCompatActivity {
     private DatabaseReference mEmailDatabaseReference;
     private String uid;
 
-    private Button verifyButton;
+    private Button verifyEmailButton;
     private VerifyEmail verifyEmail;
-
-    //
-DatePickerDialog datePickerDialog;
-private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
-    private TextInputEditText date;
+    private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
 
     private String TAG = "SignUp1";
 
@@ -81,40 +74,11 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
       final int year=calendar.get(Calendar.YEAR);
 
       //removed most the view castings as they're unnecessary
-
-        text_view = findViewById(R.id.text_gender);
-        textinputName = findViewById(R.id.textlayout_Name);
-        textinputDOB = findViewById(R.id.textlayout_Dob);
-        date=findViewById(R.id.textlayout_Dob);
         textinputEmail = findViewById(R.id.textlayout_Email);
         textinputPass =  findViewById(R.id.textlayout_Pass);
         textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
-        gender_grp = findViewById(R.id.radiogrp);
         Btn_Submit = findViewById(R.id.btn_sub);
-        verifyButton = findViewById(R.id.btn_verify);
-        date.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Calendar c= java.util.Calendar.getInstance();
-                int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
-                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
-                // date picker dialog
-                datePickerDialog = new DatePickerDialog(SignUp1Activity.this,
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-                                // set day of month , month and year value in the edit text
-                                date.setText(dayOfMonth + "/"
-                                        + (monthOfYear + 1) + "/" + year);
-
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
-        });
+        verifyEmailButton = findViewById(R.id.btn_verify);
 
         user=new User();
 
@@ -131,8 +95,6 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
                 //Uri personPhoto = acct.getPhotoUrl();
                 Log.d("Usernanme",personName);
                 Log.d("Email",personEmail);
-                if (personName != null)
-                    textinputName.setText(personName);
                 if (personEmail != null) {
                     textinputEmail.setText(personEmail);
                     textinputEmail.setEnabled(false);
@@ -158,9 +120,8 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         builder.setMessage(Message);
     }
 
-    public Hashtable<String, String> Validater(View view, String userSelected) {
-        if (val.validateName(textinputName) & val.validateGender(gender_grp,text_view) & val.validateDob(textinputDOB) & val.validateEmail(textinputEmail) &
-                val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass)){
+    public Hashtable<String, String> Validater(String userSelected) {
+        if (val.validateEmail(textinputEmail) & val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass)){
             Hashtable<String,String> userData = new Hashtable<>();
             userData.put("email",textinputEmail.getText().toString().trim());
             userData.put("password", textinputPass.getText().toString().trim());
@@ -173,26 +134,25 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         }
     }
 
-    public void verifyEmailId(View view){
+    public void verifyEmailId(){
 
-        Hashtable<String,String> userData =  Validater(view, "verifyEmailId");
+        Hashtable<String,String> userData =  Validater("verifyEmailId");
         if (userData != null){
-            createUser(userData);
-            signOut();
+            createUserAndVerifyEmail(userData);
         }
     }
 
-    public void signUp(View view){
+    public void signUp(){
 
         // disable screen and show spinner
         //
-        Hashtable<String,String> userData = Validater(view, "signUp");
+        Hashtable<String,String> userData = Validater("signUp");
         if (userData != null){
-            createUser(userData);
+            setUidFromFirebase(userData);
         }
     }
 
-    private void createUser(final Hashtable<String,String> userData){
+    private void createUserAndVerifyEmail(final Hashtable<String,String> userData){
 
         mAuth.createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
                 .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
@@ -253,16 +213,20 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         if (verifyEmail.isEmailIdVerified()) {
             Log.d(TAG, "User Verified");
             Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
+            String emailId = firebaseUser.getEmail();
             signOut();
             // set uid from firebase
-            setUidFromFirebase(textinputEmail.getText().toString().trim());
+            if (userSelected.equals("signUp")){
+                // can proceed to signUp2
+                AddData();
+            }
         }
         else {
-            if (userSelected.equals("signUp"))
+            if (userSelected.equals("verifyEmail"))
                 verifyEmail.sendVerificationEmail();
             //signOut();
             Log.d(TAG, "User not verified");
-            Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -275,18 +239,11 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     }
 
     private void AddData() {
-        int selected_id = gender_grp.getCheckedRadioButtonId();
-        Radio_Gender = (RadioButton) findViewById(selected_id);
-        String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
 
         //Sending the user object
         myDb.setUser(user);
 
-       Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
-                gender,
-                textinputDOB.getText().toString().trim(),
-                textinputEmail.getText().toString().trim()+"ad",
-                textinputPass.getText().toString().trim());
+       Boolean isInserted = myDb.insert_data(textinputEmail.getText().toString().trim(), textinputPass.getText().toString().trim());
         if (isInserted) {
          /*   textinputName.setText(null);
             gender_grp.clearCheck();
@@ -303,14 +260,14 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
             startActivityForResult(intent,1);
         }
         else {
-            /*String UserEmail = textinputEmail.getText().toString().trim();
+            String UserEmail = textinputEmail.getText().toString().trim();
             boolean res = myDb.CheckUserEmail(UserEmail);
             if (res){
                 Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();
             }
             else{
-                Toast.makeText(this,"User Entry Unsuccessful",Toast.LENGTH_SHORT).show();
-           }*/
+                //Toast.makeText(this,"User Entry Unsuccessful",Toast.LENGTH_SHORT).show();
+           }
         }
    }
 
@@ -324,6 +281,9 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
             startActivity(i);
             finish();
         }
+        if (requestCode==2){
+            Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -334,8 +294,9 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         finish();
     }
 
-    private void setUidFromFirebase(String email){
+    private void setUidFromFirebase(final Hashtable<String,String> userData){
         // replace "." with "," in email id to store in firebase db as key
+        String email = userData.get("email");
         email = TextUtils.join(",", Arrays.asList(email.split("\\.")));
         Log.d(TAG,email);
         Log.d(TAG,mEmailDatabaseReference.toString());
@@ -351,7 +312,7 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
                     uid = null;
                 }
                 // check in firebase db if email is registered
-                validateBeforeSignUp2();
+                validateBeforeSignUp2(userData);
             }
 
             @Override
@@ -361,13 +322,12 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         });
     }
 
-    private void validateBeforeSignUp2(){
+    private void validateBeforeSignUp2(Hashtable<String,String> userData){
 
         Log.d(TAG,"Inside validateBeforeSignUp2 with uid="+uid);
         if (uid == null){
+            createUserAndVerifyEmail(userData);
             Log.d(TAG,"Email not stored in email node in firebase db");
-            // can proceed to signUp2
-            AddData();
         }
         else{
             Toast.makeText(SignUp1Activity.this, "Email Id is already registered",Toast.LENGTH_LONG).show();

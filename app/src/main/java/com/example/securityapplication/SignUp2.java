@@ -1,6 +1,7 @@
 package com.example.securityapplication;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +21,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +37,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,6 +46,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
+import java.util.Calendar;
 
 
 public class SignUp2 extends AppCompatActivity {
@@ -56,6 +62,7 @@ public class SignUp2 extends AppCompatActivity {
     private Button btn_submit;
     private Intent ReturnIntent;
     private InputValidation inputValidation;
+    private Validation validation;
     private SQLiteDBHelper DBHelper;
     private User user;
     private Device device;
@@ -75,6 +82,13 @@ public class SignUp2 extends AppCompatActivity {
     private String uid;
 
     private String TAG = "SignUp2";
+
+    private TextView text_view;
+    private RadioGroup gender_grp;
+    private RadioButton Radio_Gender;
+    private DatePickerDialog datePickerDialog;
+    private TextInputEditText textinputName,textinputDOB;
+    private TextInputEditText date;
 
 
     @Override
@@ -129,11 +143,22 @@ public class SignUp2 extends AppCompatActivity {
     /**Initialize Views*/
     private void initViews(){
         input_mobile = findViewById(R.id.input_mobile);
-//        input_aadhar = findViewById(R.id.input_aadhar);
         input_location = findViewById(R.id.AutoCompleteTextView);
 //        input_actv = findViewById(R.id.AutoCompleteTextView);
        // error_message = findViewById(R.id.error_message);
         btn_submit = findViewById(R.id.btn_submit);
+        text_view = findViewById(R.id.text_gender);
+        textinputName = findViewById(R.id.textlayout_Name);
+        textinputDOB = findViewById(R.id.textlayout_Dob);
+        date=findViewById(R.id.textlayout_Dob);
+        gender_grp = findViewById(R.id.radiogrp);
+    }
+
+    private void initObjects(){
+        inputValidation = new InputValidation(activity);
+        DBHelper = new SQLiteDBHelper(activity);
+        ReturnIntent = new Intent();
+        user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
     }
 
     private void initDatabaseReferences(){
@@ -145,9 +170,38 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void initListeners(){
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar c= java.util.Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(SignUp2.this,
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                date.setText(dayOfMonth + "/"
+                                        + (monthOfYear + 1) + "/" + year);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
+
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
+                    Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 //Call the method to validate the fields
                 boolean valid_mobile = false;
 //                boolean valid_aadhar = false;
@@ -159,25 +213,11 @@ public class SignUp2 extends AppCompatActivity {
                         input_mobile.setError(getString(R.string.no_phone));
 
                     }
-                     else {
+                    else {
                         valid_mobile = true;
                         input_mobile.setError(null);
                     }
                 }
-
-            /*    boolean empty_aadhar = inputValidation.is_Empty(input_aadhar, getString(R.string.no_aadhar));
-                if (!empty_aadhar) {
-                    if (!inputValidation.isMinLength(input_aadhar, 12, getString(R.string.no_aadhar)) ||
-                            !inputValidation.is_numeric(input_aadhar)) {
-
-                                input_aadhar.setError(getString(R.string.no_aadhar));
-                        }
-
-                    else {
-                        valid_aadhar = true;
-                        input_aadhar.setError(null);
-                    }
-                }*/
 
                 if (input_location.getText().toString().isEmpty()) {
                     input_location.setError(getString(R.string.no_location));
@@ -199,6 +239,10 @@ public class SignUp2 extends AppCompatActivity {
                 boolean valid = valid_mobile && valid_location;
 
                 Log.d("SIgnUP2","Empty:"+empty+" Valid"+valid);
+
+                int selected_id = gender_grp.getCheckedRadioButtonId();
+                Radio_Gender = (RadioButton) findViewById(selected_id);
+                String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
 
                 //NOTE: Allow database entry only if not empty AND valid
                 if(!empty && valid){
@@ -225,8 +269,15 @@ public class SignUp2 extends AppCompatActivity {
 
                     if (DBHelper.checkUser(input_mobile.getText().toString().trim()) ){
 
+                        if (user.getEmail() == null || user.getPassword() == null){
+                            // go back to signUp1
+                            finishActivity(2);
+                        }
+
+                        user.setName(textinputName.getText().toString().trim());
+                        user.setGender(gender);
+                        user.setDob(textinputDOB.getText().toString().trim());
                         user.setMobile(input_mobile.getText().toString().trim());
-                        //user.setAadhar(input_aadhar.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
                         user.setIsPaid(false);
@@ -234,19 +285,10 @@ public class SignUp2 extends AppCompatActivity {
                         // check if mobile number exists
                         setUidFromFirebase(user.getMobile());
                         //added conditional checking and showing respective Toast message
-                        if (DBHelper.addUser(user))
-                        {   Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                            ReturnIntent.putExtra("ResultIntent",user);
-                            Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
-                            setResult(10,ReturnIntent);//to finish sing up 1 activity
-                            activity.finish();}
-                        else
-                            Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
-
 
                     } else {
                         Log.d("SignUp2", "User exists ");
-                        Toast.makeText(getApplicationContext(), "EMAIL ID ALREADY EXISTS", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "MOBILE NO. ALREADY EXISTS", Toast.LENGTH_LONG).show();
                     }
                 }
                 }
@@ -280,7 +322,7 @@ public class SignUp2 extends AppCompatActivity {
             Log.d("User imei:",user.getImei());
 
             // create the User
-            mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+             mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
                     .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -290,53 +332,74 @@ public class SignUp2 extends AppCompatActivity {
                                 Log.d(TAG,"new user ? ->"+task.getResult().getAdditionalUserInfo().isNewUser());
                                 FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
-                                device.setUID(firebaseUser.getUid());
+                                storeAndStartNextActivity(firebaseUser);
 
-                                // write data to firebase
-                                writeDataToFirebase(firebaseUser);
-
-                                Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                                setResult(10,null);//to finish sing up 1 activity
-                                //activity.finish();
-                                /*Intent i = new Intent(SignUp2.this,home_fragment.class);
-                                startActivity(i);*/
-
-                                // check if user is signed in to google or facebook
-                                if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
-                                    GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
-                                    if (acct != null) {
-                                        //link google acc to email acc
-                                        googleFirebaseSignIn.linkGoogleAccount(acct);
-                                        Log.d(TAG,"Returned Back to SignUp2");
-                                    }
-                                }
-                                else
-                                    Log.d("isLoggedinGoogle","Not logged in");
-
-                                //updateUI(user);
                             } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignUp2.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                                //updateUI(null);
+                                try{
+                                    throw task.getException();
+                                }
+                                catch (FirebaseAuthUserCollisionException e){
+                                    // user exists -> sign in the user
+                                    mAuth.signInWithEmailAndPassword(user.getEmail(), user.getPassword())
+                                            .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                                    if (task.isSuccessful()) {
+                                                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                                                        storeAndStartNextActivity(firebaseUser);
+                                                    } else {
+                                                        try{
+                                                            throw task.getException();
+                                                        }
+                                                        catch (Exception e){
+                                                            Log.d(TAG,"Exception:"+e.getMessage());
+                                                            Toast.makeText(SignUp2.this, "Authentication failed.",
+                                                                    Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                }
+                                catch (Exception e){
+                                    // If sign in fails, display a message to the user.
+                                    Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
+                                    Toast.makeText(SignUp2.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
                             }
-
-                            // ...
                         }
                     });
-
         }
         else
             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
 
     }
 
-    private void initObjects(){
-        inputValidation = new InputValidation(activity);
-        DBHelper = new SQLiteDBHelper(activity);
-        ReturnIntent = new Intent();
-        user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
+    private void storeAndStartNextActivity(FirebaseUser firebaseUser){
+        device.setUID(firebaseUser.getUid());
+
+        // write data to firebase
+        writeDataToFirebase(firebaseUser);
+        Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                                /*ReturnIntent.putExtra("ResultIntent",user);
+                                Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
+                                setResult(10,ReturnIntent);//to finish sing up 1 activity
+                                activity.finish();*/
+
+        // check if user is signed in to google or facebook
+        if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
+            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
+            if (acct != null) {
+                //link google acc to email acc
+                googleFirebaseSignIn.linkGoogleAccount(acct);
+                Log.d(TAG,"Logged in to google");
+            }
+        }
+        else
+            Log.d("isLoggedinGoogle:","Not logged in");
+
+        Intent homeFragement = new Intent(SignUp2.this,home_fragment.class);
+        startActivity(homeFragement);
     }
 
     private void setUidFromFirebase(final String mobile){

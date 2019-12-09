@@ -1,14 +1,14 @@
+
 package com.example.securityapplication.model;
 
 
 import java.util.Date;
-import java.util.Map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class User implements Parcelable {
-    //private int id;
+    private int id;
     private String name;
     private String email;
     private String password;
@@ -18,9 +18,7 @@ public class User implements Parcelable {
     private String location;
     private String imei;
     private String dob;
-    private boolean ispaid;
-    private Map<String,String> sosContacts;
-
+    private boolean isPaid;
 
     public String getDob() {
         return dob;
@@ -34,13 +32,13 @@ public class User implements Parcelable {
     public User(){}
 
     protected User(Parcel in) {
-        //id = in.readInt();
+        id = in.readInt();
         name = in.readString();
         email = in.readString();
         password = in.readString();
         gender = in.readString();
         mobile = in.readString();
-        //aadhar = in.readString();
+//        aadhar = in.readString();
         location = in.readString();
         imei = in.readString();
         dob = in.readString();
@@ -57,6 +55,14 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -98,6 +104,14 @@ public class User implements Parcelable {
         this.mobile = mobile;
     }
 
+  /*  public String getAadhar() {
+        return aadhar;
+    }
+
+    public void setAadhar(String aadhar) {
+        this.aadhar = aadhar;
+    }
+*/
     public String getLocation() {
         return location;
     }
@@ -114,19 +128,6 @@ public class User implements Parcelable {
         this.imei = imei;
     }
 
-    public boolean getIsPaid(){ return ispaid; }
-
-    public void setIsPaid(boolean isPaid){ this.ispaid = isPaid; }
-
-    public void setSosContacts(Map<String,String> sosContacts){
-        this.sosContacts = sosContacts;
-    }
-
-    public Map<String,String> getSosContacts(){
-        return sosContacts;
-    }
-
-
     @Override
     public int describeContents() {
         return 0;
@@ -134,15 +135,19 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        //dest.writeInt(id);
+        dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(email);
         dest.writeString(password);
         dest.writeString(gender);
         dest.writeString(mobile);
-        //dest.writeString(aadhar);
+//        dest.writeString(aadhar);
         dest.writeString(location);
         dest.writeString(imei);
         dest.writeString(dob);
     }
+
+    public boolean getIsPaid(){ return isPaid; }
+
+    public void setIsPaid(boolean isPaid){ this.isPaid = isPaid; }
 }

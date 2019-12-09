@@ -63,7 +63,7 @@ public class Database_Helper extends SQLiteOpenHelper {
         return "";
     }
 
-    public Boolean insert_data(String fname, String gender, String dob, String Email, String password){
+    public Boolean insert_data(String Email, String password){
         try {
             String EncPass = EncodePass(password);
 
@@ -75,9 +75,9 @@ public class Database_Helper extends SQLiteOpenHelper {
             contentValues.put(Col_4, Email);
             contentValues.put(Col_5, EncPass);*/
             //setting user values
-            user.setName(fname);
+            /*user.setName(fname);
             user.setGender(gender);
-            user.setDob(dob);
+            user.setDob(dob);*/
             user.setEmail(Email);
             user.setPassword(password);
 
@@ -90,7 +90,7 @@ public class Database_Helper extends SQLiteOpenHelper {
                 Log.d("SignUp Activity","Data acquired fro signup1: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
                 return true;
             }*/
-            Log.d("SignUp Activity","Data acquired fro signup1: "+fname+" "+gender+" "+dob+" "+Email+" "+EncPass);
+            Log.d("SignUp Activity","Data acquired fro signup1: "+" "+Email+" "+EncPass);
             return true;
 
         }
@@ -102,7 +102,7 @@ public class Database_Helper extends SQLiteOpenHelper {
 
     public boolean CheckUserEmail(String UserEmail){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("Select Fname from "+Table_Name +" where Email = '"+UserEmail+"'" , null);
+        Cursor res = db.rawQuery("Select * from "+Table_Name +" where Email = '"+UserEmail+"'" , null);
         if(res.getCount()>0) {
             return true;
         } else {

@@ -167,7 +167,7 @@ public class SignUp2 extends AppCompatActivity {
                         if (DBHelper.addUser(user))
                         {   Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
                             ReturnIntent.putExtra("ResultIntent",user);
-                            Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
+                            Log.d("SignUp2 ","Returned Completed User Object mobile"+user.getMobile()+" Location"+user.getLocation());
                             setResult(10,ReturnIntent);//to finish sing up 1 activity
                             activity.finish();}
                         else

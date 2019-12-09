@@ -184,7 +184,7 @@ public class Validation {
         }
     }
     boolean EditvalidateName(EditText edit_Name) {
-        String Name=edit_Name.getText().toString();
+        String Name=edit_Name.getText().toString().trim();
         matcher = name_pattern.matcher(Name);
         if (Name.isEmpty()) {
             edit_Name.setError("Field can't be empty");

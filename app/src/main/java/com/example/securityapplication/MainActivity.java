@@ -67,9 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DatabaseReference mUsersDatabaseReference;
     private DatabaseReference mEmailDatabaseReference;
 
-    private Button mLinkAccountButton;
-    private Button mVerifyEmailButton;
-
     //GoogleFirebaseSignIn
     private SignInButton mGoogleSignInButton;
     private GoogleSignInClient mGoogleSignInClient;
@@ -406,28 +403,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
             Log.d(TAG,mAuth.getCurrentUser().toString());
         }
-    }
-
-    private void setUserForSignIn(String uid, final Hashtable<String,String> userData){
-        mUsersDatabaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                Log.d("User Data Snapshot:", userDataSnapshot.toString());
-                if (userDataSnapshot.exists()) {
-                    user = userDataSnapshot.getValue(User.class);
-                } else {
-                    user = null;
-                }
-                crossValidateUserData(userData);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Getting User failed, log a message
-                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-                Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        Log.d(TAG,"UI updated successfully");
     }
 
     private void crossValidateUserData(Hashtable<String,String> userData){
@@ -436,9 +412,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (SignInType) {
             case "email":
-                password = userData.get("password").toString();
+                password = userData.get("password");
             case "google":
-                email = userData.get("email").toString();
+                email = userData.get("email");
                 break;
             default:
                 Log.d(TAG, "Invalid SignInType");
@@ -545,8 +521,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void isEmailRegistered(final Hashtable<String,String> userData){
         Log.d(TAG,"Inside isEmailRegistered");
         if (uid.equals("null")){
-            // prompt user to signUp
             Log.d(TAG,"Email not registered");
+            // prompt user to signUp
             if (userData.get("SignInType").equals("google")){
                 Intent signUpIntent = new Intent(this,SignUp1Activity.class);
                 startActivityForResult(signUpIntent,1);
@@ -570,25 +546,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (userDataSnapshot.exists()) {
                         user = userDataSnapshot.getValue(User.class);
                         if (user.getImei().equals("null")){
-                            // unregistered user -> log in the user on this device after checking sign in type
-                            Log.d(TAG,"User not logged  in. Login the user after checking SignInType");
-                            String SignInType = userData.get("SignInType");
-                            Log.d(TAG,"SignInType:"+SignInType);
-                            switch (SignInType) {
-                                case "email":
-                                    setUserForSignIn(uid, userData);
-                                    //signIn(userData.get("email"),userData.get("password"));
-                                    break;
-                                case "google":
-                                    setUserForSignIn(uid, userData);
-                                    //initializeGoogleFirebaseSignIn();
-                                    //googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                    //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                    break;
-                                default:
-                                    Log.d(TAG, "Invalid SignInType");
-                                    return;
-                            }
+                            // user is logged out
+                            Log.d(TAG,"No user not logged  in. Login the user");
+                            crossValidateUserData(userData);
                         }
                         else {
                             mDevicesDatabaseReference.child(user.getImei()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -603,23 +563,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             */
                                             Log.d(TAG, "User is logged out from old device..Now user can login from new device");
                                             device.setUID(uid);
-
-                                            String SignInType = userData.get("SignInType");
-                                            Log.d(TAG, "SignInType:" + SignInType);
-                                            switch (SignInType) {
-                                                case "email":
-                                                    //signIn(userData.get("email"), userData.get("password"));
-                                                    setUserForSignIn(uid, userData);
-                                                    break;
-                                                case "google":
-                                                    setUserForSignIn(uid,userData);
-                                                    /*initializeGoogleFirebaseSignIn();
-                                                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));*/
-                                                    //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                                    break;
-                                                default:
-                                                    Log.d(TAG, "Invalid SignInType");
-                                            }
+                                            crossValidateUserData(userData);
 
                                         } else {
                                             /* User not logged out from old device
@@ -677,8 +621,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Check if registered user sign's in using old device or new device using imei number.
         if (device != null) {
-            // implies user tries to log in from same device as registered
-            // now check if email and password matches with credentials stored in db
             // first get uid from imei
             final String uid = device.getUID();
             if (uid.equals("null")) {
@@ -687,7 +629,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //to check if email is registered
                 setUidFromFirebaseForSignIn(userData);
             } else {
-                // user is signed in
+                // for this, either same user will be already signed in(so this will be the case if cache cleared)
+                // or other user may have formatted the mobile without logging out
+                Log.d(TAG,"Current user:"+mAuth.getCurrentUser());
+                updateUI(mAuth.getCurrentUser());
             }
         } else {
             Log.d(TAG, "Imei not registered");

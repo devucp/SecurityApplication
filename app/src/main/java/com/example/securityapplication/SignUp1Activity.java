@@ -83,7 +83,6 @@ public class SignUp1Activity extends AppCompatActivity {
         user=new User();
 
         // check if user is signed in to google or facebook
-
         if (GoogleSignIn.getLastSignedInAccount(this) != null){
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
@@ -134,7 +133,7 @@ public class SignUp1Activity extends AppCompatActivity {
         }
     }
 
-    public void verifyEmailId(){
+    public void verifyEmailId(View view){
 
         Hashtable<String,String> userData =  Validater("verifyEmailId");
         if (userData != null){
@@ -142,7 +141,7 @@ public class SignUp1Activity extends AppCompatActivity {
         }
     }
 
-    public void signUp(){
+    public void signUp(View view){
 
         // disable screen and show spinner
         //
@@ -211,7 +210,6 @@ public class SignUp1Activity extends AppCompatActivity {
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
-            Log.d(TAG, "User Verified");
             Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
             String emailId = firebaseUser.getEmail();
             signOut();
@@ -222,11 +220,12 @@ public class SignUp1Activity extends AppCompatActivity {
             }
         }
         else {
-            if (userSelected.equals("verifyEmail"))
+            Log.d(TAG,userSelected);
+            if (userSelected.equals("verifyEmailId"))
                 verifyEmail.sendVerificationEmail();
-            //signOut();
-            Log.d(TAG, "User not verified");
-            //Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
+            else
+                signOut();
+            Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -234,7 +233,7 @@ public class SignUp1Activity extends AppCompatActivity {
     private void signOut(){
         if (mAuth.getCurrentUser() != null) {
             mAuth.signOut();
-            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
     }
 

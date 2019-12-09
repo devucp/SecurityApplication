@@ -1,5 +1,7 @@
 package com.example.securityapplication;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -25,7 +27,7 @@ import java.io.Serializable;
 public class GoogleFirebaseSignIn implements Serializable {
 
     private FirebaseAuth mAuth;
-    private MainActivity activity;
+    private Context context;
     private FirebaseUser user;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
@@ -45,9 +47,9 @@ public class GoogleFirebaseSignIn implements Serializable {
         }
     }
 
-    public void init(MainActivity activity, FirebaseAuth mAuth, FirebaseDatabase firebaseDatabase, String imei){
+    public void init(Context context, FirebaseAuth mAuth, FirebaseDatabase firebaseDatabase, String imei){
 
-        this.activity = activity;
+        this.context = context;
         this.mAuth = mAuth;
         this.mFirebaseDatabase = firebaseDatabase;
         this.mImeiNumber = imei;
@@ -82,7 +84,7 @@ public class GoogleFirebaseSignIn implements Serializable {
         AuthCredential credential= GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         // [START link_credential]
         mAuth.getCurrentUser().linkWithCredential(credential)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -109,7 +111,7 @@ public class GoogleFirebaseSignIn implements Serializable {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getEmail());
         final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
@@ -171,7 +173,8 @@ public class GoogleFirebaseSignIn implements Serializable {
 
     private void setUser(FirebaseUser user){
         this.user = user;
-        activity.updateUI(user);
+        //(Activity)context.updateUI(user);
+        // start next activity
     }
 
     public boolean isLoggedIn(){

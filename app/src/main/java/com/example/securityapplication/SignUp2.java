@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -47,6 +48,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 
 public class SignUp2 extends AppCompatActivity {
@@ -62,7 +68,7 @@ public class SignUp2 extends AppCompatActivity {
     private Button btn_submit;
     private Intent ReturnIntent;
     private InputValidation inputValidation;
-    private Validation validation;
+    private Validation validation = new Validation();
     private SQLiteDBHelper DBHelper;
     private User user;
     private Device device;
@@ -82,6 +88,7 @@ public class SignUp2 extends AppCompatActivity {
     private String uid;
 
     private String TAG = "SignUp2";
+    private String imei;
 
     private TextView text_view;
     private RadioGroup gender_grp;
@@ -112,25 +119,26 @@ public class SignUp2 extends AppCompatActivity {
         input_location.setAdapter(adapter);
 //        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
-        //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
-        googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
-        //initialize user defined class GoogleFirebaseSignIn with Firebase user instance and TAG using user defined init method
-        //googleFirebaseSignIn.init(this, mAuth, mFirebaseDatabase);
-
-     /*   mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG,"Calling func sendVerificationEmail");
-                    sendVerificationEmail(user);
-                } else {
-                    // User is signed out
-                    Log.d(TAG,"User is signed out");
+        // check if user is signed in to google or facebook
+        if (GoogleSignIn.getLastSignedInAccount(this) != null){
+            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+            if (acct != null) {
+                String personName = acct.getDisplayName();
+                if (personName != null) {
+                    textinputName.setText(personName);
                 }
             }
-        };*/
+        }
+        else
+            Log.d("isLoggedinGoogle","Not logged in");
+
+        //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
+        googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
+    }
+
+    private void initializeGoogleFirebaseSignIn(){
+        //deviceId();
+        googleFirebaseSignIn.init(SignUp2.this, mAuth, mFirebaseDatabase, imei);
     }
 
     private void signOut(){
@@ -246,7 +254,7 @@ public class SignUp2 extends AppCompatActivity {
 
                 //NOTE: Allow database entry only if not empty AND valid
                 if(!empty && valid){
-                    String imei = null;
+                    imei = null;
                     TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
                     String permission = Manifest.permission.READ_PHONE_STATE;
                     int res = getApplicationContext().checkCallingOrSelfPermission(permission);
@@ -254,7 +262,6 @@ public class SignUp2 extends AppCompatActivity {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             imei = tm.getImei(0);
                             Log.d("IMEI", "IMEI Number of slot 1 is:" + imei);
-
                         } else {
                             imei=tm.getDeviceId();
                             Log.d("SignUp2", "SDK Version not of required level");
@@ -281,6 +288,7 @@ public class SignUp2 extends AppCompatActivity {
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
                         user.setIsPaid(false);
+                        user.setSosContacts(setSosContacts());
 
                         // check if mobile number exists
                         setUidFromFirebase(user.getMobile());
@@ -295,6 +303,13 @@ public class SignUp2 extends AppCompatActivity {
             }
 
         );
+    }
+
+    private HashMap<String,String> setSosContacts(){
+        HashMap<String,String> sosContacts = new HashMap<>();
+        for (int i=1;i<=5;i++)
+            sosContacts.put("c"+i,"null");
+        return sosContacts;
     }
 
     private void writeDataToFirebase(FirebaseUser firebaseUser){
@@ -390,6 +405,8 @@ public class SignUp2 extends AppCompatActivity {
         if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
             if (acct != null) {
+                //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
+                initializeGoogleFirebaseSignIn();
                 //link google acc to email acc
                 googleFirebaseSignIn.linkGoogleAccount(acct);
                 Log.d(TAG,"Logged in to google");
@@ -398,8 +415,10 @@ public class SignUp2 extends AppCompatActivity {
         else
             Log.d("isLoggedinGoogle:","Not logged in");
 
-        Intent homeFragement = new Intent(SignUp2.this,home_fragment.class);
-        startActivity(homeFragement);
+        /*user=data.getParcelableExtra("ResultIntent");
+        Intent profileActivity = new Intent(SignUp2.this,ProfileActivity.class);
+        profileActivity.putExtra("User",user);
+        startActivity(profileActivity);*/
     }
 
     private void setUidFromFirebase(final String mobile){

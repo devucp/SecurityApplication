@@ -3,6 +3,9 @@ package com.example.securityapplication.model;
 
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -19,6 +22,7 @@ public class User implements Parcelable {
     private String imei;
     private String dob;
     private boolean isPaid;
+    private HashMap<String,String> sosContacts;
 
     public String getDob() {
         return dob;
@@ -150,4 +154,10 @@ public class User implements Parcelable {
     public boolean getIsPaid(){ return isPaid; }
 
     public void setIsPaid(boolean isPaid){ this.isPaid = isPaid; }
+
+    public HashMap<String,String> getSosContacts(){ return sosContacts; }
+
+    public void setSosContacts(HashMap<String,String> sosContacts){
+        this.sosContacts = sosContacts;
+    }
 }

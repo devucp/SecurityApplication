@@ -38,6 +38,7 @@ public class VerifyEmail {
     }
 
     public void sendVerificationEmail(){
+        Log.d(TAG,"Inside sendEmailVerification");
         if (firebaseUser == null){
             Log.d(TAG,"User is null inside sendVerificationEmail");
             return;
@@ -73,7 +74,7 @@ public class VerifyEmail {
     private void signOut(){
         if (firebaseUser != null) {
             firebaseAuth.signOut();
-            Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
     }
 }

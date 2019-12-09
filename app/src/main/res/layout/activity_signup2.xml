@@ -62,7 +62,6 @@
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/textlayout_Name"
                     android:layout_width="match_parent"
-
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:ems="10"
@@ -213,26 +212,28 @@
                 app:errorEnabled="true"
                 app:hintEnabled="false"
                 app:passwordToggleEnabled="true"
-                app:passwordToggleTint="#FFF">
+                app:passwordToggleTint="#FFF"/>
 
-                <android.support.design.widget.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/AutoCompleteTextView"
-                    android:hint="Locality"
-                    android:maxLength="40"
-                    android:background="@drawable/ed_cus"
-                    android:paddingBottom="9dp"
-                    android:paddingEnd="5dp"
-                    android:paddingStart="20dp"
-                    android:paddingTop="9dp"
-                    android:textColor="#ffffff"
-                    android:textColorHighlight="#F8FA0707"
-                    android:textColorHint="#ffffff"
-                    android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/holo_red_dark"
-                    android:textSize="18sp" />
-            </android.support.design.widget.TextInputLayout>
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/AutoCompleteTextView"
+                android:hint="Locality"
+                android:maxLength="40"
+                android:background="@drawable/ed_cus"
+                android:paddingBottom="9dp"
+                android:paddingEnd="5dp"
+                android:paddingStart="20dp"
+                android:paddingTop="9dp"
+                android:textColor="#ffffff"
+                android:textColorHighlight="#F8FA0707"
+                android:textColorHint="#ffffff"
+                android:textColorLink="#00F30707"
+                android:textCursorDrawable="@android:color/holo_red_dark"
+                android:textSize="18sp"
+
+                >
+            </android.support.v7.widget.AppCompatAutoCompleteTextView>
 
             <Button
                 android:id="@+id/btn_submit"

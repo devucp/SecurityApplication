@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application
         android:allowBackup="true"
         android:appComponentFactory="android.support.v7.app.CoreComponentFactory"
@@ -48,6 +47,15 @@
             android:value="@string/facebook_app_id" />
 
         <receiver
+            android:name=".deliveryReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
+        <receiver
+            android:name=".sentReceiver"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
             android:name=".RestartServiceBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
@@ -56,7 +64,7 @@
         <service
             android:name=".GetGPSCoordinates"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
         <!--
 <activity
 
@@ -90,17 +98,18 @@
             android:name=".RestartJobService"
             android:enabled="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service android:name=".GetGPSCoordinates"
+        <service
+            android:name=".GetGPSCoordinates"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
     </application>
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
 </manifest>

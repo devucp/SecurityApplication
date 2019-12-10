@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.SnackbarContentLayout;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -172,7 +174,8 @@ public class SignUp1Activity extends AppCompatActivity {
                                 signIn(userData);
                             } catch (FirebaseAuthInvalidCredentialsException e){
                                 Log.d(TAG,e.getMessage());
-                                Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignUp1Activity.this,
+                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
                             } catch (Exception e){
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
@@ -203,7 +206,8 @@ public class SignUp1Activity extends AppCompatActivity {
                                 throw task.getException();
                             }catch (FirebaseAuthInvalidCredentialsException e){
                                 Log.d(TAG,e.getMessage());
-                                Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignUp1Activity.this,
+                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
                             }catch (Exception e){
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();

@@ -20,43 +20,26 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="top"
                 android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/gradientbackground"
-            android:orientation="vertical"
-            >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="202dp"
+                    android:background="@drawable/gradientbackground"
+                    android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_account_circle_cyan_24dp"
-                android:layout_marginTop="15dp"
-                />
+                    <ImageView
 
-            <TextView
-                android:id="@+id/text_Name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="15dp"
-                android:text="user"
-                android:textColor="#fff"
-                android:textSize="35sp"
-                android:textStyle="bold" />
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="15dp"
+                        android:src="@drawable/ic_account_circle_cyan_24dp" />
 
 
                 </LinearLayout>
-
 
 
                 <LinearLayout
@@ -70,17 +53,50 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
+                        android:layout_gravity="center"
+
+                        android:src="@drawable/ic_person_black_24dp" />
+
+                    <EditText
+
+                        android:id="@+id/edit_Name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:hint="Name"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:paddingStart="20dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="0dp"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:orientation="horizontal"
+                    android:paddingStart="25dp"
+                    android:paddingLeft="25dp">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:src="@drawable/ic_email_black_24dp" />
 
-                    <TextView
-                        android:id="@+id/text_Email"
-                        android:layout_width="257dp"
+                    <EditText
+                        android:id="@+id/edit_Email"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:hint="useraccountmail.com"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
-                        android:text="UserAccountmail.com"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -95,18 +111,23 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
+                        android:layout_gravity="center"
                         android:src="@drawable/ic_local_phone_black_24dp" />
 
-                    <TextView
-                        android:id="@+id/text_Phone"
-                        android:layout_width="209dp"
+                    <EditText
+                        android:id="@+id/edit_Phone"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:hint="Mobile Number"
+                        android:inputType="number"
+                        android:maxLength="10"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
-                        android:text="Phone Number"
                         android:textSize="20sp"
                         android:textStyle="bold" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -120,114 +141,43 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_home_black_24dp" />
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_home_cyan_24dp" />
 
-                    <TextView
-                        android:id="@+id/text_Address"
-                        android:layout_width="155dp"
+                    <EditText
+                        android:id="@+id/edit_Address"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:hint="Address"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:text="Address"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
-                    android:orientation="horizontal"
-                    android:paddingStart="25dp"
-                    android:paddingLeft="25dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_wc_black_24dp" />
-
-                    <TextView
-                        android:id="@+id/text_Gender"
-                        android:layout_width="241dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingStart="20dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="0dp"
-                        android:text="Gender"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
-                    android:orientation="horizontal"
-                    android:paddingStart="25dp"
-                    android:paddingLeft="25dp">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_date_range_black_24dp" />
-
-                    <TextView
-                        android:id="@+id/text_DOB"
-                        android:layout_width="262dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingStart="20dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="0dp"
-                        android:text="Date Of Birth"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
                     android:gravity="center_horizontal"
-                    >
+                    android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/btn_Edit"
+                        android:id="@+id/btn_Submit_Changes"
                         android:layout_width="125dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginBottom="30dp"
-                        android:background="@drawable/buttonstylegradient"
-                        android:drawableLeft="@drawable/ic_edit_black_24dp"
-                        android:drawablePadding="5dp"
-                        android:text="edit"
-                        android:textColor="#fff"
-                        android:textSize="22sp" />
-
-                    <Button
-                        android:id="@+id/btn_Logout"
                         android:layout_marginLeft="25dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
                         android:background="@drawable/buttonstylegradient"
                         android:drawablePadding="5dp"
-                        android:text="logout"
+                        android:text="submit"
                         android:textColor="#fff"
                         android:textSize="22sp" />
                 </LinearLayout>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="change password ?"
-                    android:textSize="16sp"
-                    android:textColor="@color/cyan"
-                    android:gravity="center"/>
             </LinearLayout>
 
         </ScrollView>

@@ -217,7 +217,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
-            Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
+            Toast.makeText(SignUp1Activity.this, "EmailId is verified, You can proceed", Toast.LENGTH_LONG).show();
             String emailId = firebaseUser.getEmail();
             signOut();
             // set uid from firebase

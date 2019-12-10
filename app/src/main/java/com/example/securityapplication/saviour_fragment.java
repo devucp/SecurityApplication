@@ -1,7 +1,9 @@
 package com.example.securityapplication;
 
+import android.content.Intent;
 import android.graphics.drawable.AnimatedStateListDrawable;
 import android.os.Bundle;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -30,8 +32,18 @@ public class saviour_fragment extends Fragment {
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent i = new Intent(v.getContext(), recent_cards.class);
 
-                Toast.makeText(getContext(), "CardView clicked event ", Toast.LENGTH_LONG).show();
+                startActivity(i);
+
+
+
+
+
+
+                //((saviour_fragment)context).overridePendingTransition(R.anim.fade_entry, R.anim.hold);
+
+                //Toast.makeText(getContext(), "CardView clicked event ", Toast.LENGTH_LONG).show();
             }
         });
 

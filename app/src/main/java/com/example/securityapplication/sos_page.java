@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -34,10 +36,13 @@ public class sos_page extends AppCompatActivity {
     String n4 = "";
     String n5 = "";
 
-    TextInputEditText c1, c2, c3, c4, c5,current;
-    TextInputLayout cc1,cc2,cc3,cc4,cc5;
-    private final static int CONTACT_PICKER_RESULT = 1001;
 
+    private SQLiteDBHelper mydb;
+    private Button btn_Edit,btn_Save;
+    private TextInputEditText c1, c2, c3, c4, c5,current;
+  TextInputLayout cc1,cc2,cc3,cc4,cc5;
+  private final static int CONTACT_PICKER_RESULT = 1001;
+    boolean c1added,c2added,c3added,c4added,c5added;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,19 +165,21 @@ public class sos_page extends AppCompatActivity {
                     }
                 }
                 return false;
-            }
         });
+
 
 
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(c1.getText().length()==10)
+
+                /*if(c1.getText().length()==10)
                 {
                     if((c2.getText().length()==0||c2.getText().length()==10)&&(c3.getText().length()==0||
-                    c3.getText().length()==10)&&(c4.getText().length()==0||c4.getText().length()==10)&&(c5.getText().length()==0||
-                    c5.getText().length()==10)) {
+                            c3.getText().length()==10)&&(c4.getText().length()==0||c4.getText().length()==10)&&(c5.getText().length()==0||
+                            c5.getText().length()==10)) {
+
                         c1.setEnabled(false);
                         c2.setEnabled(false);
                         c3.setEnabled(false);
@@ -191,10 +198,28 @@ public class sos_page extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(sos_page.this, "Emergency Contact 1 is mandodary", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(sos_page.this, "Emergency Contact 1 is mandatory", Toast.LENGTH_SHORT).show();
+                }*/
+
+                if (c2added){
+                    //check if c2,c3,c4 or c5 are added or not
+                    if (c2added||c3added){
+
+                    }
+                    else{
+                        //other contacts are not added save c1
+//                        addSos
+                    }
+                }
+                else {
+                    Toast.makeText(sos_page.this,"Please Enter atleast 1 Sos contact",Toast.LENGTH_LONG).show();
+                    //if no contacts are added , do not proceed.
+                    return;
                 }
 
             }
         });
+
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -214,7 +239,6 @@ public class sos_page extends AppCompatActivity {
 
             }
         });
-
     }
     public void EnableRuntimePermission(){
 
@@ -303,5 +327,15 @@ public class sos_page extends AppCompatActivity {
         }
     }
 
+    private void initViews() {
 
+        btn_Save = (Button) findViewById(R.id.sossave);
+        btn_Edit = (Button) findViewById(R.id.sosedit);
+
+        c1 = (TextInputEditText) findViewById(R.id.sose1);
+        c2 = (TextInputEditText) findViewById(R.id.sose2);
+        c3 = (TextInputEditText) findViewById(R.id.sose3);
+        c4 = (TextInputEditText) findViewById(R.id.sose4);
+        c5 = (TextInputEditText) findViewById(R.id.sose5);
+    }
 }

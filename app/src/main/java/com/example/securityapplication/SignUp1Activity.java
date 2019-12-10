@@ -281,9 +281,9 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==10 && requestCode==1){
-            user=data.getParcelableExtra("ResultIntent");
+//            user=data.getParcelableExtra("ResultIntent");
             Intent i = new Intent(this,ProfileActivity.class);
-            i.putExtra("User",user);
+//            i.putExtra("User",user);
             startActivity(i);
             finish();
         }

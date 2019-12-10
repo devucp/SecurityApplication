@@ -31,7 +31,7 @@
                 android:layout_marginTop="15dp"
                 android:background="@drawable/buttonstylegradient"
 
-                android:src="@drawable/ic_account_circle_black_24dp" />
+                android:src="@drawable/ic_account_circle_cyan_24dp" />
 
             <TextView
                 android:id="@+id/text_Name"
@@ -122,7 +122,7 @@
                 <ImageView
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:src="@drawable/ic_home_black_24dp" />
+                    android:src="@drawable/ic_home_cyan_24dp" />
 
                 <TextView
                     android:id="@+id/text_Address"

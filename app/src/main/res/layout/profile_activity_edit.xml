@@ -36,7 +36,7 @@
                         android:layout_height="120dp"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="15dp"
-                        android:src="@drawable/ic_account_circle_black_24dp" />
+                        android:src="@drawable/ic_account_circle_cyan_24dp" />
 
 
                 </LinearLayout>
@@ -142,7 +142,7 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_home_black_24dp" />
+                        android:src="@drawable/ic_home_cyan_24dp" />
 
                     <EditText
                         android:id="@+id/edit_Address"

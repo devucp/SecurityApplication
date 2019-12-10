@@ -214,6 +214,7 @@
                         android:background="@drawable/buttonstylegradient"
                         android:drawablePadding="5dp"
                         android:text="logout"
+                        android:onClick="signOut"
                         android:textColor="#fff"
                         android:textSize="20sp" />
                 </LinearLayout>

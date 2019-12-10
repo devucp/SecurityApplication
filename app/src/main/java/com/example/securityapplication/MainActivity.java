@@ -2,26 +2,32 @@ package com.example.securityapplication;
 
 
 import android.Manifest;
-import android.app.Activity;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager;
-
+import android.net.NetworkInfo.State;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.support.annotation.NonNull;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.CircularProgressButton;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -42,7 +48,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
-import java.util.concurrent.Executor;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 //import androidx.annotation.NonNull;
 
@@ -54,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mEmail;
     private EditText mPassword;
     private Button mSignInButton;
+    ProgressBar pgsBar;
+    ViewGroup.LayoutParams LayoutParams;
 
     //FaceBookLogin
     private LoginButton mFaceBookLoginButton;
@@ -72,13 +82,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Permissions request code
     int RC;
+    private int height;
 
     @Override
     public void onClick(View v) {
         int i = v.getId();
         if(i== R.id.signInButton){
+
+            //startAnimation();
+
             if(mAuth.getCurrentUser()==null)
                 signIn(mEmail.getText().toString(),mPassword.getText().toString());
+
             else {
                 signOut();
                 updateUI(null);
@@ -102,6 +117,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+         pgsBar = (ProgressBar)findViewById(R.id.pBar);
+
+        pgsBar.setVisibility(GONE);
+
+
+
+
 
         mEmail=findViewById(R.id.editEmail);
         mPassword=findViewById(R.id.editPassword);
@@ -273,14 +297,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         else {
+            String mButtonText = (String) mSignInButton.getText();
+
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(
                             this, new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+                                        mSignInButton.setText("");
+                                        mSignInButton.setEnabled(false);
+
+                                        Intent circularbttn= new Intent(MainActivity.this, CircularProgressButton.class);
+                                        startService(circularbttn);
+
+
+
+                                        pgsBar.setVisibility(VISIBLE);
+
+                                        
                                         FirebaseUser user = mAuth.getCurrentUser();
                                         updateUI(user);
+
+
                                     } else {
                                         updateUI(null);
                                     }
@@ -318,21 +357,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(user==null){
             mStatus.setText(R.string.not_logged);
             mSignInButton.setText(R.string.sign_in_text);
-            mEmail.setVisibility(View.VISIBLE);
-            mPassword.setVisibility(View.VISIBLE);
-            mGoogleSignInButton.setVisibility(View.VISIBLE);
-            mFaceBookLoginButton.setVisibility(View.VISIBLE);
+            mEmail.setVisibility(VISIBLE);
+            mPassword.setVisibility(VISIBLE);
+            mGoogleSignInButton.setVisibility(VISIBLE);
+            mFaceBookLoginButton.setVisibility(VISIBLE);
         }
         else if(user!=null){
-            mStatus.setText(R.string.logged);
-            mSignInButton.setText(R.string.sign_out_text);
-            mEmail.setVisibility(View.GONE);
-            mPassword.setVisibility(View.GONE);
-            mGoogleSignInButton.setVisibility(View.GONE);
-            mFaceBookLoginButton.setVisibility(View.GONE);
-
+            //mStatus.setText(R.string.logged);
+           // mSignInButton.setText(R.string.sign_out_text);
+            //mEmail.setVisibility(GONE);
+            ///mPassword.setVisibility(GONE);
+            //mGoogleSignInButton.setVisibility(GONE);
+            //mFaceBookLoginButton.setVisibility(GONE);
             Intent i = new Intent(MainActivity.this, navigation.class);
+            pgsBar.setVisibility(GONE);
+
             startActivity(i);
+            pgsBar.setVisibility(GONE);
+
 
         }
     }
@@ -357,5 +399,109 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
 
     }
+    
+    
+    // Method called to start the animation. Morphs in to a ball and then starts a loading spinner.
+ 
+    /**public void startAnimation(){
+        Object mState = null;
+        if(mState != State.DISCONNECTED){
+            return;
+        }
+        ViewGroup.LayoutParams layoutParams = null;
+        int initialWidth = getWidth();
+        int initialHeight = getHeight();
+
+        int initialCornerRadius = 0;
+        int finalCornerRadius = 1000;
+
+        mState = State.CONNECTING;
+        final boolean[] mIsMorphingInProgress = {true};
+        //this.setText(null);
+        //setClickable(false);
+
+        int toWidth = 300; //some random value...
+        int toHeight = toWidth; //make it a perfect circle
+
+        Object mGradientDrawable = null;
+        ObjectAnimator cornerAnimation =
+                ObjectAnimator.ofFloat(mGradientDrawable,
+                        "cornerRadius",
+                        initialCornerRadius,
+                        finalCornerRadius);
+
+        ValueAnimator widthAnimation = ValueAnimator.ofInt(initialWidth, toWidth);
+        final ViewGroup.LayoutParams finalLayoutParams = layoutParams;
+        //final ViewGroup.LayoutParams layoutParams = null;
+
+
+
+        widthAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            public void setLayoutParams(ViewGroup.LayoutParams layoutParams) {
+                this.layoutParams = layoutParams;
+            }
+
+            public ViewGroup.LayoutParams getLayoutParams() {
+                return finalLayoutParams;
+            }
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = getLayoutParams();
+                layoutParams.width = val;
+                setLayoutParams(layoutParams);
+            }
+        });
+
+        ValueAnimator heightAnimation = ValueAnimator.ofInt(initialHeight, toHeight);
+        heightAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+
+            private ViewGroup.LayoutParams layoutParams;
+
+            public void setLayoutParams(ViewGroup.LayoutParams layoutParams) {
+                this.layoutParams = layoutParams;
+            }
+
+            public ViewGroup.LayoutParams getLayoutParams() {
+                return layoutParams;
+            }
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = getLayoutParams();
+                layoutParams.height = val;
+                setLayoutParams(layoutParams);
+            }
+        });
+
+        AnimatorSet mMorphingAnimatorSet = new AnimatorSet();
+        mMorphingAnimatorSet.setDuration(300);
+        mMorphingAnimatorSet.playTogether(cornerAnimation, widthAnimation, heightAnimation);
+        mMorphingAnimatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mIsMorphingInProgress[0] = false;
+            }
+        });
+        mMorphingAnimatorSet.start();
+    }
+
+
+
+    private int getWidth() {
+        return getWidth();
+    }
+
+    public int getHeight() {
+        return getHeight();
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+**/
 
 }

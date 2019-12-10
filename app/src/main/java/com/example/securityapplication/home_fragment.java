@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.Objects;
@@ -34,6 +35,7 @@ public class home_fragment extends Fragment {
     public Button emergency;
     public Button informsafety;
     int RC;
+    private Object ProgressBar;
 
     @Nullable
     @Override
@@ -51,6 +53,7 @@ public class home_fragment extends Fragment {
         alert = Objects.requireNonNull(getActivity()).findViewById(R.id.alert);
         emergency = getActivity().findViewById(R.id.emergency);
         informsafety = getActivity().findViewById(R.id.inform);
+
 
         alert.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ShowToast")

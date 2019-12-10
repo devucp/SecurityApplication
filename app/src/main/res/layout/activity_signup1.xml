@@ -199,7 +199,6 @@
                     android:textColorHighlight="#264FA3"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/holo_red_dark"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 

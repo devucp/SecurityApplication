@@ -174,13 +174,14 @@
 
         <Button
             android:layout_width="match_parent"
+            android:id="@+id/rate_us"
             android:layout_height="wrap_content"
             android:background="@color/graylight"
             android:drawablePadding="150dp"
             android:paddingLeft="42dp"
             android:text="Rate us"
-            android:id="@+id/rate_us"
             android:textAlignment="textStart"
+
             android:textColor="@color/cyan"
             android:textSize="20sp" />
     </LinearLayout>

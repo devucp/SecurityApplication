@@ -1,15 +1,9 @@
 package com.example.securityapplication;
 
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -64,12 +57,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
     private static final int RC_SIGN_IN = 9001;
-
-    //persistent service
-    private Intent mSosPlayerIntent;
-
-    //Permissions request code
-    int RC;
 
     @Override
     public void onClick(View v) {
@@ -171,26 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         /**  END FACEBOOK LOGIN  **/
 
         /** SosPlayer Service intent**/
-        mSosPlayerIntent=new Intent(this, SosPlayer .class);
-        //checks if service is running and if not running then starts it
-        if (!isMyServiceRunning(SosPlayer.class)){
-            startService(mSosPlayerIntent);
-        }
-
-        //Log.d("MAinActivity","SMS intent");
-        //check permissions
-
-        while(!checkSMSPermission());
-    }
-
-    public  boolean checkSMSPermission(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
-            Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SEND_SMS}, RC);
-        }
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
+        startService(new Intent(this, SosPlayer.class));
     }
 
     public void onStart(){
@@ -303,24 +271,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**Checks whether service is running or not**/
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("isMyServiceRunning?", true+"");
-                return true;
-            }
-        }
-        Log.i ("isMyServiceRunning?", false+"");
-        return false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        stopService(mSosPlayerIntent);
-        Log.i("Mainactivity destroyed", "onDestroy!");
-        super.onDestroy();
-
-    }
 }

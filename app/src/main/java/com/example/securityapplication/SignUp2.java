@@ -2,9 +2,7 @@ package com.example.securityapplication;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -19,8 +17,6 @@ import android.text.Spanned;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,15 +30,17 @@ import java.util.regex.Pattern;
 public class SignUp2 extends AppCompatActivity {
     private final AppCompatActivity activity = SignUp2.this;
 
+    private TextInputLayout mobile;
+    private TextInputLayout aadhar;
+    private TextInputLayout location;
+
 
     private TextInputEditText input_mobile;
-//    private TextInputEditText input_aadhar;
-    private AutoCompleteTextView input_location;
-//    private TextView error_message;
-
-
+    private TextInputEditText input_aadhar;
+    private TextInputEditText input_location;
+    private TextView error_message;
     private Button btn_submit;
-    private Intent ReturnIntent;
+
     private InputValidation inputValidation;
     private  SQLiteDBHelper DBHelper;
     private User user;
@@ -60,22 +58,24 @@ public class SignUp2 extends AppCompatActivity {
         initListeners();
         initObjects();
 
-        Resources res = getResources();
-        String[] Locality = res.getStringArray(R.array.Locality);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Locality);
-        input_location.setAdapter(adapter);
-//        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
+        //mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
+
 
     }
 
     /**Initialize Views*/
     private void initViews(){
+       // mobile = findViewById(R.id.mobile);
+       // aadhar = findViewById(R.id.aadhar);
+       // location = findViewById(R.id.location);
+
         input_mobile = findViewById(R.id.input_mobile);
-//        input_aadhar = findViewById(R.id.input_aadhar);
-        input_location = findViewById(R.id.AutoCompleteTextView);
-//        input_actv = findViewById(R.id.AutoCompleteTextView);
+        input_aadhar = findViewById(R.id.input_aadhar);
+        input_location = findViewById(R.id.input_location);
+
        // error_message = findViewById(R.id.error_message);
         btn_submit = findViewById(R.id.btn_submit);
+
     }
 
     private void initListeners(){
@@ -84,7 +84,7 @@ public class SignUp2 extends AppCompatActivity {
             public void onClick(View view) {
                 //Call the method to validate the fields
                 boolean valid_mobile = false;
-//                boolean valid_aadhar = false;
+                boolean valid_aadhar = false;
                 boolean valid_location = false;
                 boolean empty_mobile = inputValidation.is_Empty(input_mobile, "PLEASE ENTER MOBILE NO. ");
                 if (!empty_mobile) {
@@ -99,7 +99,7 @@ public class SignUp2 extends AppCompatActivity {
                     }
                 }
 
-            /*    boolean empty_aadhar = inputValidation.is_Empty(input_aadhar, getString(R.string.no_aadhar));
+                boolean empty_aadhar = inputValidation.is_Empty(input_aadhar, getString(R.string.no_aadhar));
                 if (!empty_aadhar) {
                     if (!inputValidation.isMinLength(input_aadhar, 12, getString(R.string.no_aadhar)) ||
                             !inputValidation.is_numeric(input_aadhar)) {
@@ -111,7 +111,7 @@ public class SignUp2 extends AppCompatActivity {
                         valid_aadhar = true;
                         input_aadhar.setError(null);
                     }
-                }*/
+                }
 
                 if (input_location.getText().toString().isEmpty()) {
                     input_location.setError(getString(R.string.no_location));
@@ -127,10 +127,10 @@ public class SignUp2 extends AppCompatActivity {
                  }*/
 
                 //Moved IMEI reading code to this place so IMEI can be stored for user object
-                boolean empty = inputValidation.all_Empty(input_mobile,input_location,getString(R.string.message));
+                boolean empty = inputValidation.all_Empty(input_mobile,input_aadhar,input_location,getString(R.string.message));
 
-                Log.d("SIgnUP2","Valid Mobile:"+valid_mobile+" Valid Location:"+valid_location);
-                boolean valid = valid_mobile && valid_location;
+                Log.d("SIgnUP2"," Valid Aadhar:"+valid_aadhar+" Valid Mobile:"+valid_mobile+" Valid Location:"+valid_location);
+                boolean valid = valid_mobile && valid_aadhar && valid_location;
 
                 Log.d("SIgnUP2","Empty:"+empty+" Valid"+valid);
 
@@ -157,28 +157,29 @@ public class SignUp2 extends AppCompatActivity {
                                 new String[]{Manifest.permission.READ_PHONE_STATE}, RC);
                     }
 
-                    if (DBHelper.checkUser(input_mobile.getText().toString().trim()) ){
+
+                    if (DBHelper.checkUser(input_aadhar.getText().toString().trim()) ){
 
                         user.setMobile(input_mobile.getText().toString().trim());
-//                        user.setAadhar(input_aadhar.getText().toString().trim());
+                        user.setAadhar(input_aadhar.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
                         //added conditional checking and showing respective Toast message
                         if (DBHelper.addUser(user))
                         {   Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                            ReturnIntent.putExtra("ResultIntent",user);
-                            Log.d("SignUp2 ","Returned Completed User Object mobile"+user.getMobile()+" Location"+user.getLocation());
-                            setResult(10,ReturnIntent);//to finish sing up 1 activity
+                            setResult(10,null);//to finish sing up 1 activity
                             activity.finish();}
                         else
                             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
 
                     } else {
-                        Log.d("SignUp2", "User exists ");
-                        Toast.makeText(getApplicationContext(), "EMAIL ID ALREADY EXISTS", Toast.LENGTH_LONG).show();
+                        Log.d("SIgnUp2", "User exists ");
+                        Toast.makeText(getApplicationContext(), "AADHAR NO ALREADY EXISTS", Toast.LENGTH_LONG).show();
                     }
+                }//
+
                 }
-                }
+            //
             }
 
         );
@@ -187,7 +188,6 @@ public class SignUp2 extends AppCompatActivity {
     private void initObjects(){
         inputValidation = new InputValidation(activity);
         DBHelper = new SQLiteDBHelper(activity);
-        ReturnIntent = new Intent();
         user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
     }
 }

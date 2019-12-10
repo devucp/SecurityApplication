@@ -19,67 +19,39 @@
         tools:replace="android:appComponentFactory">
         <activity android:name=".sos_page"
             android:windowSoftInputMode="stateAlwaysHidden">
-
-        </activity>
-        <activity android:name=".navigation"/>
-          <activity android:name=".recent_cards"></activity>
-        <activity android:name=".EditProfileActivity">
-
-        </activity>
-        <activity
-            android:name=".ResetPasswordActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".SignUp2"
-            android:screenOrientation="portrait">
-
-        </activity>
-        <activity
-            android:name=".SignUp1Activity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait">
-
-<!--             <intent-filter>-->
-
-<!--             <action android:name="android.intent.action.MAIN"/>-->
-<!--             <category android:name="android.intent.category.LAUNCHER" />-->
-
-<!--             </intent-filter>-->
-        </activity>
-        <activity
-            android:name=".ProfileActivity"
-            android:screenOrientation="portrait">
-
-            <!-- <intent-filter> -->
-
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <action android:name="android.intent.action.MAIN"/> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-
-
-            <!-- </intent-filter> -->
-        </activity>
-        <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+        <activity android:name=".navigation">
 
-        <receiver
-            android:name=".RestartServiceBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:label="RestartServiceWhenStopped" />
+
+        </activity>
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SignUp2"
+            android:screenOrientation="portrait">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".SignUp1Activity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+
+        </activity>
         <!--
 <activity
 
@@ -109,24 +81,6 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-        <service
-            android:name=".SendSMSService"
-            android:enabled="true"
-            android:exported="true"></service>
-
-        <service
-            android:name=".SosPlayer"
-            android:enabled="true"
-            android:exported="true" />
-        <service android:name=".BackgroundSosPlayerService" />
-        <service
-            android:name=".RestartJobService"
-            android:enabled="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

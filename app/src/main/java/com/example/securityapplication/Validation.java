@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.util.Patterns;
-import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -20,12 +19,11 @@ import java.util.regex.Pattern;
 public class Validation {
 
 
-    private Pattern date_pattern,name_pattern,phone_pattern;
+    private Pattern date_pattern,name_pattern;
     private Matcher matcher;
-    private static final String NAME_PATTERN ="^[A-Za-z\\s]{1,}[\\']{0,1}[A-Za-z\\s]{0,}$";
+    private static final String NAME_PATTERN ="^[\\p{L} .'-]+$";
     private static final String DATE_PATTERN =
             "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)";
-    private static final String PHONE_PATTERN = "^[0-9]+$";
 
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
@@ -40,7 +38,6 @@ public class Validation {
     public Validation(){
         date_pattern = Pattern.compile(DATE_PATTERN);
         name_pattern = Pattern.compile(NAME_PATTERN,Pattern.CASE_INSENSITIVE);
-        phone_pattern = Pattern.compile(PHONE_PATTERN);
     }
 
     boolean validateEmail(TextInputEditText textInputEmail) {
@@ -142,7 +139,7 @@ public class Validation {
         if (nameinput.isEmpty()) {
             textInputName.setError("Field can't be empty");
             return false;
-        } else if (nameinput.length() > 20) {
+        } else if (nameinput.length() > 40) {
             textInputName.setError("Name too long");
             return false;
         }else if(!matcher.find()){
@@ -181,79 +178,6 @@ public class Validation {
             return false;
         }else{
             SignUp1Activity.setError(null,t2);
-            return true;
-        }
-    }
-    boolean EditvalidateName(EditText edit_Name) {
-        String Name=edit_Name.getText().toString().trim();
-        matcher = name_pattern.matcher(Name);
-        if (Name.isEmpty()) {
-            edit_Name.setError("Field can't be empty");
-            return false;
-        } else if (Name.length() > 40) {
-            edit_Name.setError("Name too long");
-            return false;
-        }else if(!matcher.find()){
-            edit_Name.setError("Enter a Valid Name");
-            return false;
-        }
-        else {
-            edit_Name.setError(null);
-            return true;
-        }
-    }
-
-    Boolean EditvalidateEmail(EditText edit_email) {
-        String emailInput = edit_email.getText().toString().trim();
-
-        if (emailInput.isEmpty()) {
-            edit_email.setError("Field can't be empty");
-            return false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) {
-            edit_email.setError("Please enter a valid email address");
-            return false;
-        } else {
-            edit_email.setError(null);
-            return true;
-        }
-    }
-
-    Boolean EditvalidatePhone(EditText edit_Phone) {
-        String phoneInput = edit_Phone.getText().toString().trim();
-        matcher = phone_pattern.matcher(phoneInput);
-        if (phoneInput.isEmpty()){
-            edit_Phone.setError("Please Enter a valid Mobile Number");
-            return false;
-        }
-        else if (!matcher.find()){
-            edit_Phone.setError("Please Enter a valid Mobile Number");
-            return false;
-        }
-        else if (phoneInput.length()!=10){
-            edit_Phone.setError("Please Enter a valid Mobile Number");
-            return false;
-        }
-        else {
-            edit_Phone.setError(null);
-            return true;
-        }
-
-    }
-
-    Boolean EditvalidateAddress(EditText edit_address) {
-        String addressInput = edit_address.getText().toString().trim();
-        matcher = name_pattern.matcher(addressInput);
-
-        if (addressInput.isEmpty()){
-            edit_address.setError("Please enter an Address");
-            return false;
-        }
-        else if(!matcher.find()){
-            edit_address.setError("Please Enter a valid Address");
-            return false;
-        }
-        else{
-            edit_address.setError(null);
             return true;
         }
     }

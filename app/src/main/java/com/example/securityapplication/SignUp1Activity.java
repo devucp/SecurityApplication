@@ -56,8 +56,6 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
-
-
        myDb = new Database_Helper(this);
        java.util.Calendar calendar=Calendar.getInstance();
       final int year=calendar.get(Calendar.YEAR);
@@ -78,11 +76,10 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 
         gender_grp = findViewById(R.id.radiogrp);
         Btn_Submit = findViewById(R.id.btn_sub);
-
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Calendar c= Calendar.getInstance();
+                final Calendar c= java.util.Calendar.getInstance();
                 int mYear = c.get(Calendar.YEAR); // current year
                 int mMonth = c.get(Calendar.MONTH); // current month
                 int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
@@ -99,7 +96,6 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
 
                             }
                         }, mYear, mMonth, mDay);
-                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });
@@ -132,22 +128,21 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
         String gender = Radio_Gender.getText().toString().trim(); //function .getEditText() have been removed as TextInputEditText doesn't require it.
         //Sending the user object
         myDb.setUser(user);
-
-       Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
+        Boolean isInserted = myDb.insert_data(textinputName.getText().toString().trim(),
                 gender,
                 textinputDOB.getText().toString().trim(),
                 textinputEmail.getText().toString().trim(),
                 textinputPass.getText().toString().trim());
         if (isInserted) {
-         /*   textinputName.setText(null);
-            gender_grp.clearCheck();
-            textinputDOB.setText(null);
-            textinputEmail.setText(null);
-            textinputPass.setText(null);
-            textinputCnfPass.setText(null);
-           // updates the Usr object with filled fields*/
+//            textinputName.setText(null);
+//            gender_grp.clearCheck();
+//            textinputDOB.setText(null);
+//            textinputEmail.setText(null);
+//            textinputPass.setText(null);
+//            textinputCnfPass.setText(null);
+            //updates the Usr object with filled fields
             user=myDb.getUser();
-          //  starting signup activity
+            //starting signup activity
             Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
             intent.putExtra("User",user);
             startActivityForResult(intent,1);
@@ -168,13 +163,9 @@ private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPas
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==10 && requestCode==1){
-//            user=data.getParcelableExtra("ResultIntent");
-            Intent i = new Intent(this,ProfileActivity.class);
-//            i.putExtra("User",user);
-            startActivity(i);
+        if(resultCode==10 && requestCode==1)
             finish();
-        }
+
     }
 
    public static void setError(String s,TextView t1)

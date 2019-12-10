@@ -13,14 +13,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 public class setting_fragment extends Fragment {
-    Button sos,rate_us;
+    Button sos;
+    Button rate_us;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_setting,container,false);
 
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rate_us=getActivity().findViewById(R.id.rate_us);

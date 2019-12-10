@@ -11,7 +11,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class User implements Parcelable {
-    private int id;
+    //private int id;
     private String name;
     private String email;
     private String password;
@@ -23,6 +23,7 @@ public class User implements Parcelable {
     private String dob;
     private boolean isPaid;
     private HashMap<String,String> sosContacts;
+    private boolean isGoogleAccountLinked;
 
     public String getDob() {
         return dob;
@@ -36,7 +37,7 @@ public class User implements Parcelable {
     public User(){}
 
     protected User(Parcel in) {
-        id = in.readInt();
+        //id = in.readInt();
         name = in.readString();
         email = in.readString();
         password = in.readString();
@@ -60,13 +61,13 @@ public class User implements Parcelable {
         }
     };
 
-    public int getId() {
+    /*public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
+    }*/
 
     public String getName() {
         return name;
@@ -139,7 +140,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        //dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(email);
         dest.writeString(password);
@@ -151,13 +152,17 @@ public class User implements Parcelable {
         dest.writeString(dob);
     }
 
-    public boolean getIsPaid(){ return isPaid; }
+    public boolean IsPaid(){ return isPaid; }
 
-    public void setIsPaid(boolean isPaid){ this.isPaid = isPaid; }
+    public void setPaid(boolean isPaid){ this.isPaid = isPaid; }
 
     public HashMap<String,String> getSosContacts(){ return sosContacts; }
 
     public void setSosContacts(HashMap<String,String> sosContacts){
         this.sosContacts = sosContacts;
     }
+
+    public boolean isGoogleAccountLinked(){ return isGoogleAccountLinked; }
+
+    public void setGoogleAccountLinked(boolean isGoogleAccountLinked){ this.isGoogleAccountLinked = isGoogleAccountLinked; }
 }

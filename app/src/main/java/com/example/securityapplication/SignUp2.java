@@ -287,8 +287,9 @@ public class SignUp2 extends AppCompatActivity {
                         user.setMobile(input_mobile.getText().toString().trim());
                         user.setLocation(input_location.getText().toString().trim());
                         user.setImei(imei);//setting IMEI
-                        user.setIsPaid(false);
+                        user.setPaid(false);
                         user.setSosContacts(setSosContacts());
+                        user.setGoogleAccountLinked(false);
 
                         // check if mobile number exists
                         setUidFromFirebase(user.getMobile());
@@ -313,20 +314,65 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void writeDataToFirebase(FirebaseUser firebaseUser){
+        //check internet connection
+
         //push user to firebase database 'Users' node
-        mUsersDatabaseReference.child(firebaseUser.getUid()).setValue(user);
+        mUsersDatabaseReference.child(firebaseUser.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null){
+                    Log.d(TAG,"User Data could not be saved " + databaseError.getMessage());
+                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
         //push device to firebase database 'Devices' node
-        mDevicesDatabaseReference.child(user.getImei()).setValue(device);
+        mDevicesDatabaseReference.child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null){
+                    Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
+                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
         //push email and mobile no. on root node
         String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
-        mEmailDatabaseReference.child(emailKey).setValue(firebaseUser.getUid());
-        mMobileDatabaseReference.child(user.getMobile()).setValue(firebaseUser.getUid());
+        mEmailDatabaseReference.child(emailKey).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null){
+                    Log.d(TAG,"Email Data could not be saved " + databaseError.getMessage());
+                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
+        mMobileDatabaseReference.child(user.getMobile()).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null){
+                    Log.d(TAG,"Mobile Data could not be saved " + databaseError.getMessage());
+                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    System.out.println("Data saved successfully.");
+                }
+            }
+        });
 
         Log.d("Pushed to db",mUsersDatabaseReference.getDatabase().toString());
         Log.d("Pushed to db",mDevicesDatabaseReference.getDatabase().toString());
         Log.d("Pushed to db",mEmailDatabaseReference.getDatabase().toString());
         Log.d("Pushed to db",mMobileDatabaseReference.getDatabase().toString());
-
     }
 
     private void AddUser(){
@@ -414,6 +460,9 @@ public class SignUp2 extends AppCompatActivity {
         }
         else
             Log.d("isLoggedinGoogle:","Not logged in");
+
+        Intent sosPage = new Intent(SignUp2.this, sos_page.class);
+        startActivity(sosPage);
 
         /*user=data.getParcelableExtra("ResultIntent");
         Intent profileActivity = new Intent(SignUp2.this,ProfileActivity.class);

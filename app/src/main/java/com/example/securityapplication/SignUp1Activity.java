@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -169,6 +170,9 @@ public class SignUp1Activity extends AppCompatActivity {
                             } catch (FirebaseAuthUserCollisionException e){
                                 //signIn the user
                                 signIn(userData);
+                            } catch (FirebaseAuthInvalidCredentialsException e){
+                                Log.d(TAG,e.getMessage());
+                                Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
                             } catch (Exception e){
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
@@ -197,6 +201,9 @@ public class SignUp1Activity extends AppCompatActivity {
                         } else {
                             try {
                                 throw task.getException();
+                            }catch (FirebaseAuthInvalidCredentialsException e){
+                                Log.d(TAG,e.getMessage());
+                                Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
                             }catch (Exception e){
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();

@@ -137,7 +137,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                             //Log.d(TAG,(mAuth.getCurrentUser().getPhoneNumber().isEmpty())?mAuth.getCurrentUser().getPhoneNumber():"No number");
                             Log.d(TAG,mAuth.getCurrentUser().getProviderId());
                             Log.d(TAG,mAuth.getCurrentUser().getProviderData().toString());*/
-                            setUser(user);
+                            //setUser(user);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());

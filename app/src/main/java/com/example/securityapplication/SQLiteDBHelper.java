@@ -20,7 +20,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_NAME = "user";
 
-    public static final String COLUMN_ID = "id";
+    //public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_GENDER = "gender";
@@ -33,7 +33,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
-                    COLUMN_ID + " INTEGER, " +
+                    //COLUMN_ID + " INTEGER, " +
                     COLUMN_NAME + " TEXT, "+
                     COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
                     COLUMN_GENDER + " TEXT, " +

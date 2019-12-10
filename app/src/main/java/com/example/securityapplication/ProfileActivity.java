@@ -18,24 +18,26 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
     private Button btn_edit;
     SQLiteDBHelper mydb ;
+    Database_Helper dbHelper;
     User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_profile);
 
+        user = new User();
 
         initObjects();
         initviews();
-//        FetchAllData();
+        FetchAllData();
         DisplayData();
         initListeners();
-
 
     }
 
     private void initObjects() {
-        user = getIntent().getParcelableExtra("User");
+
+//        user = getIntent().getParcelableExtra("User");
         mydb = new SQLiteDBHelper(this);
     }
 
@@ -56,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void FetchAllData(){
+        int i =0;
         Cursor res;
         res = mydb.getAllData();
         if (res.getCount() == 0){
@@ -74,9 +77,11 @@ public class ProfileActivity extends AppCompatActivity {
 //            ansAadhaar = res.getString(6);
             user.setLocation(res.getString(6));
             user.setDob(res.getString(7));
-            Log.d("User Object","User Object set in Profile activity successfully");
+            i++;
+            Log.d("Profile Activity","User Object set in Profile activity successfully" +i);
         }
     }
+
     private void DisplayData() {
 
         textName.setText(user.getName());
@@ -87,7 +92,7 @@ public class ProfileActivity extends AppCompatActivity {
         textEmail.setText(user.getEmail());
         textPhone.setText(user.getMobile());
 
-        Log.d("Profile","Message displayed on profile Successfully");
+        Log.d("Profile","DATA displayed on profile Successfully");
     }
 
     private void initviews() {

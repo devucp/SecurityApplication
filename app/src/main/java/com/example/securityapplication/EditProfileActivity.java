@@ -21,7 +21,6 @@ public class EditProfileActivity extends AppCompatActivity {
     private String Name,Email,Phone,Address,FinName,FinEmail,FinPhone,FinAddress;
     private boolean Namechanged,Emailchanged,Phonechanged,Addresschanged;
     private boolean NameVal,AddressVal,EmailVal,PhoneVal;
-    int changecount;
     Validation val;
     User user;
     SQLiteDBHelper mydb;
@@ -35,7 +34,6 @@ public class EditProfileActivity extends AppCompatActivity {
         mydb = new SQLiteDBHelper(this);
         val = new Validation();
         user = getIntent().getParcelableExtra("User");
-        changecount = 0;
 
         initialData();
         initViews();
@@ -47,10 +45,6 @@ public class EditProfileActivity extends AppCompatActivity {
         Email= user.getEmail();
         Phone=user.getMobile();
         Address= user.getLocation();
-
-//        Name= edit_Name.getText().toString().trim();
-//        Email = edit_Email.getText().toString().trim();
-//        Phone = edit_Phone.getText().toString().trim();
     }
 
     private void initListeners() {

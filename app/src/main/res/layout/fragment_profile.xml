@@ -26,20 +26,19 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="230dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:background="@color/cyan"
+            android:background="@drawable/gradientbackground"
             android:orientation="vertical"
             >
 
             <ImageView
-
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_account_circle_black_24dp"
+                android:src="@drawable/ic_account_circle_cyan_24dp"
                 android:layout_marginTop="15dp"
                 />
 
@@ -50,13 +49,13 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="15dp"
-                android:text="USER"
+                android:text="user"
                 android:textColor="#fff"
                 android:textSize="35sp"
                 android:textStyle="bold" />
 
 
-        </LinearLayout>
+                </LinearLayout>
 
 
 
@@ -125,7 +124,6 @@
 
                     <TextView
                         android:id="@+id/text_Address"
-
                         android:layout_width="155dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -196,39 +194,40 @@
                     android:orientation="horizontal"
                     android:gravity="center_horizontal"
                     >
-                <Button
-                    android:id="@+id/btn_Edit"
-                    android:layout_width="125dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="30dp"
-                    android:background="@drawable/buttonstylegradient"
-                    android:drawableLeft="@drawable/ic_edit_black_24dp"
-                    android:drawablePadding="5dp"
-                    android:text="edit"
-                    android:textColor="#fff"
-                    android:textSize="22sp" />
 
-                <Button
-                    android:id="@+id/btn_Logout"
-                    android:layout_marginLeft="25dp"
-                    android:layout_width="125dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="30dp"
-                    android:background="@drawable/buttonstylegradient"
-                    android:drawablePadding="5dp"
-                    android:text="logout"
-                    android:textColor="#fff"
-                    android:textSize="22sp" />
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/btn_Edit"
+                        android:layout_width="125dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="30dp"
+                        android:background="@drawable/buttonstylegradient"
+                        android:drawableLeft="@drawable/ic_edit_black_24dp"
+                        android:drawablePadding="5dp"
+                        android:text="edit"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+
+                    <Button
+                        android:id="@+id/btn_Logout"
+                        android:layout_marginLeft="25dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="30dp"
+                        android:background="@drawable/buttonstylegradient"
+                        android:drawablePadding="5dp"
+                        android:text="logout"
+                        android:textColor="#fff"
+                        android:textSize="22sp" />
+                </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="change password ?"
                     android:textSize="16sp"
                     android:textColor="@color/cyan"
-                    android:gravity="end"/>
+                    android:gravity="center"/>
             </LinearLayout>
 
         </ScrollView>

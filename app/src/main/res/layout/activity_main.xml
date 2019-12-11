@@ -117,6 +117,20 @@
             android:textColor="@color/white"
             android:layout_below="@+id/signInButton"/>
 
+        <ProgressBar
+            android:id="@+id/pBar"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="110dp"
+            android:layout_marginTop="15dp"
+            android:indeterminateDrawable="@drawable/cpb"
+            android:indeterminateTintMode="src_atop"
+
+            android:foregroundGravity="center">
+
+        </ProgressBar>
+
         <LinearLayout
             android:id="@+id/googleFbButtons"
             android:layout_width="match_parent"
@@ -157,6 +171,19 @@
             android:text="@string/not_logged"
             android:paddingTop="10dp"
             android:layout_below="@+id/googleFbButtons"/>
+        <com.agrawalsuneet.dotsloader.loaders.TashieLoader
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:tashieloader_animDelay="200"
+            app:tashieloader_animDur="1000"
+            android:layout_marginTop="120dp"
+            android:layout_marginLeft="120dp"
+            app:tashieloader_dotsColor="@color/colorPrimary"
+            app:tashieloader_dotsDist="5dp"
+            app:tashieloader_dotsRadius="20dp"
+            app:tashieloader_interpolator="@android:anim/accelerate_interpolator"
+            app:tashieloader_noOfDots="6" />
+
 
     </RelativeLayout>
 

@@ -16,14 +16,22 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+
+import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RemoteViews;
+
 import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -61,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mPassword;
     private Button mSignInButton;
     private String TAG = "MainActivity";
+    ProgressBar pgsBar;
+
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDevicesDatabaseReference;
@@ -133,6 +143,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initViews();
         initOnClickListeners();
 
+
+        TashieLoader tashie = new TashieLoader(
+                this, 5,
+                30, 10,
+                ContextCompat.getColor(this, R.color.colorPrimary));
+
+        tashie.setAnimDuration(500);
+        tashie.setAnimDelay(100);
+        tashie.setInterpolator(new LinearInterpolator());
+
+
+
+
+        mEmail=findViewById(R.id.editEmail);
+        mPassword=findViewById(R.id.editPassword);
+        mStatus= findViewById(R.id.status);
+        mSignInButton=findViewById(R.id.signInButton);
+        mGoogleSignInButton=findViewById(R.id.googleSignInButton);
         FirebaseApp.initializeApp(this);
         mAuth=FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -300,7 +328,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 updateUI(null);
             }
         }
-
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",true);
@@ -390,23 +417,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGoogleSignInButton.setVisibility(View.VISIBLE);
         }
         else if(user!=null){
-            mStatus.setText(R.string.logged);
-            mSignInButton.setText(R.string.sign_out_text);
-            mEmail.setVisibility(View.GONE);
-            mPassword.setVisibility(View.GONE);
-            mGoogleSignInButton.setVisibility(View.GONE);
-            Toast.makeText(this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
-            Log.d(TAG,mAuth.getCurrentUser().toString());
+            //mStatus.setText(R.string.logged);
+           // mSignInButton.setText(R.string.sign_out_text);
+            //mEmail.setVisibility(GONE);
+            ///mPassword.setVisibility(GONE);
+            //mGoogleSignInButton.setVisibility(GONE);
+            //mFaceBookLoginButton.setVisibility(GONE);
 
-            /** SosPlayer Service intent**/
-            /*mSosPlayerIntent=new Intent(this, SosPlayer .class);
-            //checks if service is running and if not running then starts it
-            if (!isMyServiceRunning(SosPlayer.class)){
-                startService(mSosPlayerIntent);
-            }*/
-            Intent mHomeIntent = new Intent(this,navigation.class);
-            startActivity(mHomeIntent);
-            finish();
+            Intent i = new Intent(MainActivity.this, navigation.class);
+            startService(i);
+
         }
         Log.d(TAG,"UI updated successfully");
     }

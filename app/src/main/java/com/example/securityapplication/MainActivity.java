@@ -7,10 +7,12 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -20,50 +22,60 @@ import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
+import com.example.securityapplication.model.Device;
+import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.Arrays;
-import java.util.concurrent.Executor;
+import java.util.Hashtable;
 
 //import androidx.annotation.NonNull;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
+    private TelephonyManager telephonyManager;
+    private String mImeiNumber;
     private FirebaseAuth mAuth;
     private TextView mStatus;
     private EditText mEmail;
     private EditText mPassword;
     private Button mSignInButton;
+    private String TAG = "MainActivity";
 
-    //FaceBookLogin
-    private LoginButton mFaceBookLoginButton;
-    private CallbackManager callbackManager;
-    private static final String EMAIL = "email";
-    private FaceBookLoginIn faceBookLoginIn;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDevicesDatabaseReference;
+    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mEmailDatabaseReference;
 
     //GoogleFirebaseSignIn
     private SignInButton mGoogleSignInButton;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
     private static final int RC_SIGN_IN = 9001;
+
+    private User user;
+    private Device device;
+    private String uid;
 
     //persistent service
     private Intent mSosPlayerIntent;
@@ -75,8 +87,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         int i = v.getId();
         if(i== R.id.signInButton){
-            if(mAuth.getCurrentUser()==null)
-                signIn(mEmail.getText().toString(),mPassword.getText().toString());
+            if(mAuth.getCurrentUser()==null) {
+                if(validateForm()){
+                    Hashtable<String,String> userData = new Hashtable<>();
+                    userData.put("email",mEmail.getText().toString());
+                    userData.put("password",mPassword.getText().toString());
+                    userData.put("SignInType", "email");
+                    // Check if registered user sign's in using old device or new device using imei number.
+                    setDeviceForSignIn(mImeiNumber, userData);
+                }
+                else {
+                    Log.d(TAG,"Invalid credentials");
+                    Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
+                }
+            }
             else {
                 signOut();
                 updateUI(null);
@@ -87,8 +111,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
         else if (i==R.id.signUpButton){
-            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-            startActivity(signUpIntent);
+            // check if imei is registered
+            setDeviceForSignUp(mImeiNumber);
         }
         //Added Reset Passowrd Activity
         else if (i==R.id.ForgetPassword){
@@ -96,20 +120,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(forgetPasswordIntent);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mEmail=findViewById(R.id.editEmail);
-        mPassword=findViewById(R.id.editPassword);
-        mStatus= findViewById(R.id.status);
-        mSignInButton=findViewById(R.id.signInButton);
-        mGoogleSignInButton=findViewById(R.id.googleSignInButton);
+        //Grant Device read Permissions
+        deviceId();
+
+        //initialize Activity
+        initViews();
+        initOnClickListeners();
+
         FirebaseApp.initializeApp(this);
         mAuth=FirebaseAuth.getInstance();
-
-        findViewById(R.id.signInButton).setOnClickListener(this);
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        initDataBaseReferences();
 
         /**  GOOGLE LOGIN  **/
 
@@ -117,58 +144,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
-        //initialize user defined class GoogleFirebaseSignIn with Firebase user instance and MainActivity using user defined init method
-        googleFirebaseSignIn.init(this, mAuth);
+        //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
+        initializeGoogleFirebaseSignIn();
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
+                .requestProfile()
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         /**  END GOOGLE LOGIN  **/
 
+        /** SosPlayer Service intent**/
+        startService(new Intent(this, SosPlayer.class));
+    }
 
-        /**   FACEBOOK LOGIN   **/
+    public void onStart(){
+        super.onStart();
 
-        //get single instance of user if logged in through facebook from user defined class FaceBookLoginIn
-        faceBookLoginIn = FaceBookLoginIn.getInstance();
-        //initialize user defined class FaceBookLoginIn with Firebase user instance and MainActivity using user defined init method
-        faceBookLoginIn.init(MainActivity.this, mAuth);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
+    }
 
-        callbackManager = CallbackManager.Factory.create();
-        mFaceBookLoginButton = findViewById(R.id.facebook_login_button);
-        mFaceBookLoginButton.setPermissions(Arrays.asList(EMAIL));
+    private void initializeGoogleFirebaseSignIn(){
+        deviceId();
+        googleFirebaseSignIn.init(this, mAuth, mFirebaseDatabase, mImeiNumber);
+    }
 
-        // Callback registration
-        mFaceBookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("FB", "facebook:onSuccess:" + loginResult);
-                faceBookLoginIn.handleFacebookAccessToken(loginResult.getAccessToken());
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                if(faceBookLoginIn.isLoggedIn())
-                    updateUI(currentUser);
-                else
-                    updateUI(null);
+    public void initViews(){
+        mEmail=findViewById(R.id.editEmail);
+        mPassword=findViewById(R.id.editPassword);
+        mStatus= findViewById(R.id.status);
+        mSignInButton=findViewById(R.id.signInButton);
+        mGoogleSignInButton=findViewById(R.id.googleSignInButton);
+    }
+
+    public void initOnClickListeners(){
+        findViewById(R.id.signInButton).setOnClickListener(this);
+    }
+
+    private void initDataBaseReferences(){
+        //Initialize Database
+        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
+        mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
+    }
+
+    private void deviceId() {
+        telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+            return;
+        }
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mImeiNumber = telephonyManager.getImei(0);
+                Log.d("IMEI", "IMEI Number of slot 1 is:" + mImeiNumber);
             }
-
-            @Override
-            public void onCancel() {
-                Log.d("FB", "facebook:onCancel");
-                updateUI(null);
+            else {
+                mImeiNumber = telephonyManager.getDeviceId();
             }
-
-            @Override
-            public void onError(FacebookException exception) {
-                Log.d("FB", "facebook:onError", exception);
-                updateUI(null);
-            }
-        });
-        /**  END FACEBOOK LOGIN  **/
+        }
 
         /** SosPlayer Service intent**/
         mSosPlayerIntent=new Intent(this, SosPlayer .class);
@@ -193,11 +233,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
     }
 
-    public void onStart(){
-        super.onStart();
+    private void closeNow(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            finishAffinity();
+        }
+        else{
+            finish();
+        }
+    }
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    deviceId();
+                } else {
+                    closeNow();
+                    Toast.makeText(this, "Without permission we check", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
     private boolean validateForm() {
         boolean valid = true;
@@ -230,58 +288,102 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            googleFirebaseSignIn.handleSignInResult(task);
+
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+
+                Hashtable<String,String> userData = new Hashtable<String,String>();
+                userData.put("email",account.getEmail());
+                userData.put("SignInType","google");
+                setDeviceForSignIn(mImeiNumber, userData);
+
+            } catch (ApiException e) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                Toast.makeText(MainActivity.this, "Authentication failed. Try Again",Toast.LENGTH_SHORT).show();
+                updateUI(null);
+            }
         }
 
-        // Pass the activity result back to the Facebook SDK
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",true);
+                Log.d(TAG,"hasBackPressed:"+hasBackPressed);
+                if (hasBackPressed){
+                    signOut();
+                }
+            }
+            else if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
     }
 
-    public void signIn(String email, String password){
+    public void signIn(final String email, final String password){
+         Log.d(TAG,"Signing IN user with email "+email+" and password "+password);
 
-        if(!validateForm()){
-            return;
-        }
-        else {
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(
-                            this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        updateUI(user);
-                                    } else {
-                                        updateUI(null);
-                                    }
-                                }
+         mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
+                            Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Log.d(TAG, mDevicesDatabaseReference.toString());
+
+                            // set imei and uid in firebase
+                            deviceId();
+                            device = new Device();
+                            device.setUID(user.getUid());
+                            mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+                            mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
+                            //verifyEmailId();
+                            updateUI(user);
+                        } else {
+                            try{
+                                throw task.getException();
                             }
-                    );
-        }
+                            catch (FirebaseAuthInvalidCredentialsException e){
+                                Log.d(TAG,"Exception:"+e.getMessage());
+                                Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
+                            }
+                            catch (Exception e){
+                                Log.d(TAG,"Exception:"+e.getMessage());
+                            }
+                            updateUI(null);
+                        }
+                    }
+                });
     }
 
     private void signOut(){
-        //Firebase signOut
-        mAuth.signOut();
 
+        // first make uid under imei null in Devices and imei under uid null in Users
+        deviceId();
+        device = new Device();
+        device.setUID("null");
+        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+
+        //Firebase signOut
+        if (mAuth.getCurrentUser() != null) {
+            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
+            mAuth.signOut();
+            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+        }
         //Google signOut
         if(GoogleSignIn.getLastSignedInAccount(this) != null) {
             mGoogleSignInClient.signOut()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            // [START_EXCLUDE]
                             //updateUI(null);
-                            // [END_EXCLUDE]
+                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
                         }
                     });
         }
-
-        //Facebook signOut
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedInFaceBook = accessToken != null && !accessToken.isExpired();
-        if(isLoggedInFaceBook)
-            LoginManager.getInstance().logOut();
     }
 
     public void updateUI(FirebaseUser user){
@@ -291,7 +393,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mEmail.setVisibility(View.VISIBLE);
             mPassword.setVisibility(View.VISIBLE);
             mGoogleSignInButton.setVisibility(View.VISIBLE);
-            mFaceBookLoginButton.setVisibility(View.VISIBLE);
         }
         else if(user!=null){
             mStatus.setText(R.string.logged);
@@ -299,7 +400,265 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mEmail.setVisibility(View.GONE);
             mPassword.setVisibility(View.GONE);
             mGoogleSignInButton.setVisibility(View.GONE);
-            mFaceBookLoginButton.setVisibility(View.GONE);
+            Toast.makeText(this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,mAuth.getCurrentUser().toString());
+        }
+        Log.d(TAG,"UI updated successfully");
+    }
+
+    private void crossValidateUserData(Hashtable<String,String> userData){
+        String email=null, password = null;
+        String SignInType = userData.get("SignInType");
+
+        switch (SignInType) {
+            case "email":
+                password = userData.get("password");
+            case "google":
+                email = userData.get("email");
+                break;
+            default:
+                Log.d(TAG, "Invalid SignInType");
+                return;
+        }
+
+        if (user != null) {
+            //Log.d("password:", user.getPassword());
+            if (!user.getEmail().equals(email)) {
+                // Case1:Either email entered is invalid or different
+                // Case2:prompt user that this device is stored under other user ...ask previous user to logout
+
+                if (SignInType.equals("google")){
+                    // logout from google
+                    signOut();
+                }
+
+            } else {
+                if (SignInType.equals("email")) {
+                    // Login the User through email
+                    signIn(email, password);
+                }
+                else if (SignInType.equals("google")){
+                    // login the user through google
+                    initializeGoogleFirebaseSignIn();
+                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                    //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                }
+            }
+        } else {
+            Log.d(TAG, user.toString());
+        }
+    }
+
+    private void setDeviceForSignIn(String imei, final Hashtable<String,String> userData){
+        Log.d(TAG,"Inside setDeviceForSignIn method-Imei no.:"+imei);
+        mDevicesDatabaseReference.child(imei).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
+                Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
+                if (deviceDataSnapshot.exists()) {
+                    device = deviceDataSnapshot.getValue(Device.class);
+                } else {
+                    device = null;
+                }
+
+                validateBeforeSignIn(userData);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setDeviceForSignUp(String imei){
+        mDevicesDatabaseReference.child(imei).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
+                Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
+                if (deviceDataSnapshot.exists()) {
+                    device = deviceDataSnapshot.getValue(Device.class);
+                } else {
+                    device = null;
+                }
+                validateBeforeSignUp1();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void setUidFromFirebaseForSignIn(final Hashtable<String ,String> userData){
+        String email = userData.get("email");
+        // replace "." with "," in email id to store in firebase db as key
+        String commaSeperatedEmail = TextUtils.join(",", Arrays.asList(email.split("\\.")));
+        Log.d(TAG,commaSeperatedEmail);
+        Log.d(TAG,mEmailDatabaseReference.toString());
+        mEmailDatabaseReference.child(commaSeperatedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
+                Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());
+                if (emailNodeDataSnapshot.exists()) {
+                    //emailNode = emailNodeDataSnapshot.getValue(Email.class);
+                    uid = emailNodeDataSnapshot.getValue().toString();
+                    Log.d(TAG,uid);
+                } else {
+                    uid = "null";
+                }
+                isEmailRegistered(userData);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void isEmailRegistered(final Hashtable<String,String> userData){
+        Log.d(TAG,"Inside isEmailRegistered");
+        if (uid.equals("null")){
+            Log.d(TAG,"Email not registered");
+            // prompt user to signUp
+            if (userData.get("SignInType").equals("google")){
+                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+                startActivityForResult(signUpIntent,1);
+            }
+            else
+                Toast.makeText(MainActivity.this,"Email Id not registered",Toast.LENGTH_LONG).show();
+        }
+        else {
+            /*  case1: user tries to sign in from same device
+                case2:user tries to sign in from other device and maybe registered or not
+                Solution for both is same:
+               check if user logged out from previous device
+               find imei of previous device: Email node->email->uid->imei
+               if uid under Devices node of previous device is null then logged out..else prompt user to log out
+             */
+            Log.d(TAG, uid);
+            mUsersDatabaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                    Log.d("User Data Snapshot:", userDataSnapshot.toString());
+                    if (userDataSnapshot.exists()) {
+                        user = userDataSnapshot.getValue(User.class);
+                        if (user.getImei().equals("null")){
+                            // user is logged out
+                            Log.d(TAG,"No user not logged  in. Login the user");
+                            crossValidateUserData(userData);
+                        }
+                        else {
+                            mDevicesDatabaseReference.child(user.getImei()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
+                                    Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
+                                    if (deviceDataSnapshot.exists()) {
+                                        device = deviceDataSnapshot.getValue(Device.class);
+                                        if (device.getUID().equals("null")) {
+                                            /* implies user logged out from old device
+                                               Now login the user and set uid under imei of device node
+                                            */
+                                            Log.d(TAG, "User is logged out from old device..Now user can login from new device");
+                                            device.setUID(uid);
+                                            crossValidateUserData(userData);
+
+                                        } else {
+                                            /* User not logged out from old device
+                                            prompt user to log out from old device
+                                            */
+                                            Log.d(TAG, "User is LoggedIn in other device");
+                                            Toast.makeText(MainActivity.this,
+                                                    "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                                            signOut();
+                                        }
+                                    } else {
+                                        //user can login
+
+                                        String SignInType = userData.get("SignInType");
+                                        Log.d(TAG, "SignInType:" + SignInType);
+                                        switch (SignInType) {
+                                            case "email":
+                                                signIn(userData.get("email"), userData.get("password"));
+                                                break;
+                                            case "google":
+                                                initializeGoogleFirebaseSignIn();
+                                                googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                                //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                                break;
+                                            default:
+                                                Log.d(TAG, "Invalid SignInType");
+                                                return;
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    } else {
+                        user = null;
+                        Log.d(TAG,"User is null");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Getting User failed, log a message
+                    Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
+                    Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void validateBeforeSignIn(Hashtable<String,String> userData) {
+
+        // Check if registered user sign's in using old device or new device using imei number.
+        if (device != null) {
+            // first get uid from imei
+            final String uid = device.getUID();
+            if (uid.equals("null")) {
+                Log.d(TAG, uid);
+                //setUserForSignIn(uid, userData);
+                //to check if email is registered
+                setUidFromFirebaseForSignIn(userData);
+            } else {
+                // for this, either same user will be already signed in(so this will be the case if cache cleared)
+                // or other user may have formatted the mobile without logging out
+                Log.d(TAG,"Current user:"+mAuth.getCurrentUser());
+                updateUI(mAuth.getCurrentUser());
+            }
+        } else {
+            Log.d(TAG, "Imei not registered");
+            //to check if email is registered
+            setUidFromFirebaseForSignIn(userData);
+        }
+    }
+
+    private void validateBeforeSignUp1(){
+
+        if (device == null){
+            // go for signUp1
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+            startActivityForResult(signUpIntent,1);
+        }
+        else {
+            final String uid = device.getUID();
+            if (uid.equals("null")){
+                // go for signUp1
+                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+                startActivityForResult(signUpIntent,1);
+            }
+            else {
+                // user cannot register or
+                Toast.makeText(MainActivity.this,"User is already registered",Toast.LENGTH_LONG).show();
+            }
         }
     }
 

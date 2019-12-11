@@ -34,11 +34,12 @@
     <string name="head">Save Me</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
-    <string name="submit">Sign-up</string>
     <string name="enter_your_registered_email">Enter your registered email...</string>
     <string name="reset_password">RESET PASSWORD</string>
     <string name="reset_password_desc">By clicking RESET PASSWORD an email will be sent to your registered email address to reset the password</string>
     <string name="dbname">Security_app2.db</string>
+    <string name="verify_email">verify email</string>
+    <string name="proceed">proceed</string>
 
     <!-- TODO: Add AutoComplete Functionality -->
     <string-array name="Locality">

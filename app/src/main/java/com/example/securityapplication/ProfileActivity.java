@@ -114,7 +114,7 @@ public class ProfileActivity extends AppCompatActivity {
             if (resultCode == 110){
                 user = data.getParcelableExtra("ResultUser");
                 Log.d("Profile","User object returned"+user.getEmail());
-                mydb.updateUser(user);
+                //mydb.updateUser(user);
                 DisplayData();
             }
         }

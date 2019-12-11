@@ -142,7 +142,7 @@ public class SignUp2 extends AppCompatActivity {
 
     private void initializeGoogleFirebaseSignIn(){
         //deviceId();
-        googleFirebaseSignIn.init(SignUp2.this, mAuth, mFirebaseDatabase, imei);
+        //googleFirebaseSignIn.init(SignUp2.this, mAuth, mFirebaseDatabase, imei);
     }
 
     private void signOut(){

@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +32,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.ActionCodeSettings;
@@ -321,6 +324,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /*private void recheckUserAuthentication(final FirebaseUser firebaseUser){
+
+        Log.d(TAG,"Inside recheckUserAuthentication");
+        mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                Log.d("User Data Snapshot:", userDataSnapshot.toString());
+                if (userDataSnapshot.exists()) {
+                    user = userDataSnapshot.getValue(User.class);
+                    if (user.getImei().equals(mImeiNumber)){
+                        updateUI(firebaseUser);
+                    }
+                    else {
+                        // same user trying to login from multiple devices -> logout the user
+                        Log.d(TAG, "User is LoggedIn in other device");
+                        Toast.makeText(MainActivity.this,
+                                "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                        signOut();
+                    }
+                } else {
+                    // this should not be the case
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }*/
+
     public void signIn(final String email, final String password){
          Log.d(TAG,"Signing IN user with email "+email+" and password "+password);
 
@@ -335,39 +369,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             final FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             Log.d(TAG, mDevicesDatabaseReference.toString());
 
-                            mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            deviceId();
+                            device = new Device();
+                            device.setUID(firebaseUser.getUid());
+                            mDevicesDatabaseReference.child(mImeiNumber).setValue(device).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
-                                public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                                    Log.d("User Data Snapshot:", userDataSnapshot.toString());
-                                    if (userDataSnapshot.exists()) {
-                                        user = userDataSnapshot.getValue(User.class);
-                                        if (user.getImei().equals("null")){
-                                            // set imei and uid in firebase
-                                            deviceId();
-                                            device = new Device();
-                                            device.setUID(firebaseUser.getUid());
-                                            mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-                                            mUsersDatabaseReference.child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber);
-                                            //verifyEmailId();
-                                            updateUI(firebaseUser);
-                                        }
-                                        else {
-                                            // same user trying to login from multiple devices -> logout the user
-                                            Log.d(TAG, "User is LoggedIn in other device");
-                                            Toast.makeText(MainActivity.this,
-                                                    "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                            signOut();
-                                        }
-                                    } else {
-                                        // this should not be the case
-                                    }
-                                }
+                                public void onSuccess(Void aVoid) {
+                                    mUsersDatabaseReference.child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
 
+                                            //recheckUserAuthentication(firebaseUser);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                public void onFailure(@NonNull Exception e) {
 
                                 }
                             });
+
+                            //mUsersDatabaseReference.child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber);
+
+                            // to check if user simultaneously tries to login from multiple devices
+                            //recheckUserAuthentication(firebaseUser);
                         } else {
                             try{
                                 throw task.getException();
@@ -459,8 +490,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else if (SignInType.equals("google")){
                     // login the user through google
                     initializeGoogleFirebaseSignIn();
-                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                    //googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                    if (user.isGoogleAccountLinked())
+                        googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                    else
+                        googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                 }
             }
         } else {

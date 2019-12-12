@@ -131,6 +131,7 @@
 
         <Button
             android:layout_width="match_parent"
+            android:id="@+id/rate_us"
             android:layout_height="wrap_content"
             android:background="@color/graylight"
             android:drawablePadding="150dp"

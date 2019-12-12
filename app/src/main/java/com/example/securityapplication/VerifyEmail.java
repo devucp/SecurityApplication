@@ -1,5 +1,6 @@
 package com.example.securityapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -37,7 +38,7 @@ public class VerifyEmail {
         }
     }
 
-    public void sendVerificationEmail(){
+    public void sendVerificationEmail(Activity activity){
         Log.d(TAG,"Inside sendEmailVerification");
         if (firebaseUser == null){
             Log.d(TAG,"User is null inside sendVerificationEmail");

@@ -233,7 +233,7 @@ public class SignUp1Activity extends AppCompatActivity {
         else {
             Log.d(TAG,userSelected);
             if (userSelected.equals("verifyEmailId"))
-                verifyEmail.sendVerificationEmail();
+                verifyEmail.sendVerificationEmail(SignUp1Activity.this);
             else
                 signOut();
             Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();

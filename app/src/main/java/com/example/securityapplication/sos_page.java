@@ -43,6 +43,9 @@ public class sos_page extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos_page);
+
+        EnableRuntimePermission(); //ASK FOR PERMISSIONS ON RUNTIME. WASN't present previously
+
         save = (Button) findViewById(R.id.sossave);
         edit = (Button) findViewById(R.id.sosedit);
         c1 = (TextInputEditText) findViewById(R.id.sose1);

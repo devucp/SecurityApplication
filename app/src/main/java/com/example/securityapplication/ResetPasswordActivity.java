@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,13 +17,65 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class ResetPasswordActivity extends AppCompatActivity {
 
     TextInputEditText emailEditText;
     Button btn_reset;
     TextView resetText;
     Validation validate;
+    ProgressBar pgsBar;
+
+
+    public void pgbarshow()
+    {
+        btn_reset.setText("");
+        findViewById(R.id.pBar).setVisibility(VISIBLE);
+        btn_reset.getBackground().setAlpha(100);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    public void pgbarhide()
+    {
+
+        findViewById(R.id.pBar).setVisibility(GONE);
+
+
+        btn_reset.getBackground().setAlpha(255);
+
+
+        btn_reset.setText("RESET PASSWORD");
+
+
+
+
+
+
+
+
+
+
+    }
+
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
@@ -33,6 +86,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
         emailEditText=findViewById(R.id.editTextEmail);
         btn_reset=findViewById(R.id.resetPasswordButton);
         resetText=findViewById(R.id.resetPasswordText);
+
+
+
+        pgsBar = findViewById(R.id.pBar);
+
         validate= new Validation();
 
         btn_reset.setOnClickListener(new View.OnClickListener(){
@@ -40,19 +98,28 @@ public class ResetPasswordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email= emailEditText.getEditableText().toString().trim();
                 if(validate.validateEmail(emailEditText)){
+                    pgbarshow();
                     mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
                                 Toast.makeText(ResetPasswordActivity.this,"EMAIL SENT. PLEASE CHECK YOUR MAIL",Toast.LENGTH_SHORT).show();
                                 //startActivity(new Intent(ResetPasswordActivity.this,MainActivity.class));
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                                 ResetPasswordActivity.this.finish();
+
                             }
                             else
                             {
                                 String error = task.getException().getMessage();
                                 Toast.makeText(ResetPasswordActivity.this,error,Toast.LENGTH_LONG).show();
+                                pgbarhide();
                             }
+
                         }
                     });
                 }

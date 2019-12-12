@@ -34,7 +34,9 @@
         <activity
             android:name=".SignUp1Activity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden">
+
 
 <!--             <intent-filter>-->
 

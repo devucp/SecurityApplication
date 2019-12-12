@@ -55,7 +55,7 @@
                         android:layout_height="36dp"
                         android:layout_gravity="center"
 
-                        android:src="@drawable/ic_person_black_24dp" />
+                        android:src="@drawable/ic_person_cyan_24dp" />
 
                     <EditText
 

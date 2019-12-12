@@ -272,12 +272,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             checkUserStatus();
         }
 
-        /** SosPlayer Service intent**/
-        mSosPlayerIntent=new Intent(this, SosPlayer .class);
-        //checks if service is running and if not running then starts it
-        if (!isMyServiceRunning(SosPlayer.class)){
-            startService(mSosPlayerIntent);
-        }
+
 
         //Log.d("MAinActivity","SMS intent");
         //check permissions
@@ -517,6 +512,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGoogleSignInButton.setVisibility(View.GONE);
             Toast.makeText(this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
             Log.d(TAG,mAuth.getCurrentUser().toString());
+
+            /** SosPlayer Service intent**/
+            /*mSosPlayerIntent=new Intent(this, SosPlayer .class);
+            //checks if service is running and if not running then starts it
+            if (!isMyServiceRunning(SosPlayer.class)){
+                startService(mSosPlayerIntent);
+            }*/
+            Intent mHomeIntent = new Intent(this,navigation.class);
+            startActivity(mHomeIntent);
+            finish();
         }
         Log.d(TAG,"UI updated successfully");
     }
@@ -785,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
-        stopService(mSosPlayerIntent);
+//        stopService(mSosPlayerIntent);
         Log.i("Mainactivity destroyed", "onDestroy!");
         super.onDestroy();
 

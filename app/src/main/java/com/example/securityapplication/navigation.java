@@ -13,11 +13,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class navigation extends AppCompatActivity {
     Boolean tmp=true;
     Boolean back=true;
+    Boolean test = true;
     int count=0;
 
     Menu optionsMenu;
@@ -51,11 +53,25 @@ public class navigation extends AppCompatActivity {
                 if(item.isChecked())
                 {
                     item.setChecked(false);
+                    home_fragment.test=false;
                     Toast.makeText(this, "Test mode Off", Toast.LENGTH_SHORT).show();
+                    if (test)
+                    {
+                        TextView tv =(TextView)findViewById(R.id.textView3);
+                        tv.setVisibility(View.INVISIBLE);
+
+                    }
                 }
                 else {
                     item.setChecked(true);
+                    home_fragment.test=true;
                     Toast.makeText(this, "Test mode On", Toast.LENGTH_SHORT).show();
+                    if (test)
+                    {
+                        TextView tv =(TextView)findViewById(R.id.textView3);
+                        tv.setVisibility(View.VISIBLE);
+
+                    }
                 }
 
                 return true;
@@ -72,18 +88,22 @@ public class navigation extends AppCompatActivity {
 
                     switch(menuItem.getItemId()){
                         case R.id.home:
+                            test = true;
                             back=false;
                             selectedFragment = new home_fragment();
                             break;
                         case R.id.setting:
+                            test = false;
                             back=true;
                             selectedFragment = new setting_fragment();
                             break;
                         case R.id.save:
+                            test = false;
                             back=true;
                             selectedFragment = new saviour_fragment();
                             break;
                         case R.id.profile:
+                            test = false;
                             back=true;
                             selectedFragment = new profile_fragment();
                             break;

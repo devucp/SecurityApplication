@@ -551,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (user.isGoogleAccountLinked())
                         googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                     else
-                        googleFirebaseSignIn.linkGoogleAccount(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                        googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
                 }
             }
         } else {

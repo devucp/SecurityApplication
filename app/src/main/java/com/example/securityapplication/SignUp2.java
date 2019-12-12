@@ -398,9 +398,10 @@ public class SignUp2 extends AppCompatActivity {
             //googleFirebaseSignIn.linkGoogleAccount(acct);
             linkGoogleAccount(acct);
         }
-        else
+        else{
             Log.d("isLoggedinGoogle:","Not logged in");
-
+            writeDataToFirebase(firebaseUser);
+        }
 
         /*ReturnIntent.putExtra("ResultIntent",user);
         Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());

@@ -199,6 +199,7 @@ public class SignUp2 extends AppCompatActivity {
                             }
                         }, mYear, mMonth, mDay);
                 datePickerDialog.show();
+                datePickerDialog.getDatePicker().setMaxDate(c.getTimeInMillis());
             }
         });
 

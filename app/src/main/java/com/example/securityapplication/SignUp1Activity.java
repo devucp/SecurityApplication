@@ -2,13 +2,21 @@ package com.example.securityapplication;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import android.database.Cursor;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -42,6 +50,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Hashtable;
 
+import static java.security.AccessController.getContext;
+
 /*
         *NOTE: Earlier TextInputLayout was used as parameter for all validation function
         *They have been changed to TextInputEditText
@@ -55,8 +65,16 @@ public class SignUp1Activity extends AppCompatActivity {
     private Button Btn_Submit;
     //Added user object to send to next
     private User user;
+//spinner added
     public static ProgressBar spinner;
     private Button b1;
+
+    DatePickerDialog datePickerDialog;
+    private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
+    private TextInputEditText date;
+    private TextInputLayout pass_outer,cnfpass_outer;
+    public TextView pass1,pass2;
+
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mEmailDatabaseReference;
@@ -64,7 +82,6 @@ public class SignUp1Activity extends AppCompatActivity {
     private Button b2;
     private Button verifyEmailButton;
     private VerifyEmail verifyEmail;
-    private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
 
     private String TAG = "SignUp1";
 
@@ -72,7 +89,6 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
-
         spinner = (ProgressBar)findViewById(R.id.progress_bar);
         spinner.setVisibility(View.GONE);
        myDb = new Database_Helper(this);
@@ -83,7 +99,15 @@ public class SignUp1Activity extends AppCompatActivity {
         textinputEmail = findViewById(R.id.textlayout_Email);
         textinputPass =  findViewById(R.id.textlayout_Pass);
         textinputCnfPass = findViewById(R.id.textlayout_CnfPass);
+
+        pass_outer=findViewById(R.id.textlayout_Pass_outer);
+        cnfpass_outer=findViewById(R.id.textlayout_CnfPass_outer);
+        pass1=findViewById(R.id.pass_text1);
+        pass2=findViewById(R.id.pass_text2);
+
+        //gender_grp = findViewById(R.id.radiogrp);
         Btn_Submit = findViewById(R.id.btn_sub);
+
         verifyEmailButton = findViewById(R.id.btn_verify);
 
         user=new User();
@@ -104,6 +128,7 @@ public class SignUp1Activity extends AppCompatActivity {
                     textinputEmail.setText(personEmail);
                     textinputEmail.setEnabled(false);
                 }
+
             }
         }
         else
@@ -125,11 +150,9 @@ public class SignUp1Activity extends AppCompatActivity {
         builder.setMessage(Message);
     }
 
-    public Hashtable<String, String> Validater(String userSelected)
-    {
-        if (val.validateEmail(textinputEmail) & val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass))
-        {
 
+    public Hashtable<String, String> Validater(String userSelected) {
+        if (val.validateEmail(textinputEmail) & val.validatePassword(textinputPass,pass1) & val.validateCnfPassword(textinputPass,textinputCnfPass,pass2)){
             Hashtable<String,String> userData = new Hashtable<>();
             userData.put("email",textinputEmail.getText().toString().trim());
             userData.put("password", textinputPass.getText().toString().trim());
@@ -308,7 +331,9 @@ public class SignUp1Activity extends AppCompatActivity {
         //Sending the user object
         myDb.setUser(user);
 
+
        Boolean isInserted = myDb.insert_data(textinputEmail.getText().toString().trim(), textinputPass.getText().toString().trim());
+
 
        // stop spinner
         spinner.setVisibility(View.GONE);
@@ -323,9 +348,11 @@ public class SignUp1Activity extends AppCompatActivity {
             textinputPass.setText(null);
             textinputCnfPass.setText(null);
            // updates the Usr object with filled fields*/
+
             user=myDb.getUser();
+
             Log.d("User",user.getEmail().toString());
-            //starting signup activity
+         //starting signup activity
             Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
             intent.putExtra("User",user);
             startActivityForResult(intent,1);
@@ -345,13 +372,10 @@ public class SignUp1Activity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==10 && requestCode==1){
-//            user=data.getParcelableExtra("ResultIntent");
-            Intent i = new Intent(this,ProfileActivity.class);
-//            i.putExtra("User",user);
-            startActivity(i);
+        if(resultCode==10 && requestCode==1)
             finish();
-        }
+
+
         if (requestCode==2){
             Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
         }
@@ -403,7 +427,9 @@ public class SignUp1Activity extends AppCompatActivity {
         else{
             Toast.makeText(SignUp1Activity.this, "Email Id is already registered",Toast.LENGTH_LONG).show();
         }
+
     }
+
     public  void Enable()
     {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -414,6 +440,18 @@ public class SignUp1Activity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
     }
+
+
+   public static void setError(String s,TextView t1)
+   {
+       if(s!=null) {
+           t1.setText(s);
+           t1.setVisibility(View.VISIBLE);
+       }
+       else{
+           t1.setVisibility(View.INVISIBLE);
+       }
+   }
 }
 
 

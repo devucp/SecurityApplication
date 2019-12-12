@@ -5,7 +5,8 @@
     android:pivotY="50%"
     android:toDegrees="270">
     <shape android:shape="ring"
-        android:useLevel="false">
+        android:useLevel="false"
+        android:thickness="5sp">
 
         <gradient
             android:endColor="#354CE0"

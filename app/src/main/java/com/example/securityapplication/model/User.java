@@ -24,8 +24,7 @@ public class User implements Parcelable {
     private boolean isPaid;
     private HashMap<String,String> sosContacts;
     private boolean isGoogleAccountLinked;
-
-    private String sosc1;
+   private String sosc1;
     private String sosc2;
     private String sosc3;
     private String sosc4;
@@ -107,6 +106,13 @@ public class User implements Parcelable {
     public void setSosc5(String sosc5) {
         this.sosc5 = sosc5;
     }
+    /*public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }*/
 
     public String getName() {
         return name;

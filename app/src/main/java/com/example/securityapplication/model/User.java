@@ -1,22 +1,29 @@
+
 package com.example.securityapplication.model;
 
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class User implements Parcelable {
-    private int id;
+    //private int id;
     private String name;
     private String email;
     private String password;
     private String gender;
     private String mobile;
-    private String aadhar;
+    //private String aadhar;
     private String location;
     private String imei;
     private String dob;
+    private boolean isPaid;
+    private HashMap<String,String> sosContacts;
+    private boolean isGoogleAccountLinked;
 
     public String getDob() {
         return dob;
@@ -30,13 +37,13 @@ public class User implements Parcelable {
     public User(){}
 
     protected User(Parcel in) {
-        id = in.readInt();
+        //id = in.readInt();
         name = in.readString();
         email = in.readString();
         password = in.readString();
         gender = in.readString();
         mobile = in.readString();
-        aadhar = in.readString();
+//        aadhar = in.readString();
         location = in.readString();
         imei = in.readString();
         dob = in.readString();
@@ -54,13 +61,13 @@ public class User implements Parcelable {
         }
     };
 
-    public int getId() {
+    /*public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
+    }*/
 
     public String getName() {
         return name;
@@ -102,14 +109,14 @@ public class User implements Parcelable {
         this.mobile = mobile;
     }
 
-    public String getAadhar() {
+  /*  public String getAadhar() {
         return aadhar;
     }
 
     public void setAadhar(String aadhar) {
         this.aadhar = aadhar;
     }
-
+*/
     public String getLocation() {
         return location;
     }
@@ -133,15 +140,29 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        //dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(email);
         dest.writeString(password);
         dest.writeString(gender);
         dest.writeString(mobile);
-        dest.writeString(aadhar);
+//        dest.writeString(aadhar);
         dest.writeString(location);
         dest.writeString(imei);
         dest.writeString(dob);
     }
+
+    public boolean IsPaid(){ return isPaid; }
+
+    public void setPaid(boolean isPaid){ this.isPaid = isPaid; }
+
+    public HashMap<String,String> getSosContacts(){ return sosContacts; }
+
+    public void setSosContacts(HashMap<String,String> sosContacts){
+        this.sosContacts = sosContacts;
+    }
+
+    public boolean isGoogleAccountLinked(){ return isGoogleAccountLinked; }
+
+    public void setGoogleAccountLinked(boolean isGoogleAccountLinked){ this.isGoogleAccountLinked = isGoogleAccountLinked; }
 }

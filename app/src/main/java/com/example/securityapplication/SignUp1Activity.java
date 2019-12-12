@@ -12,8 +12,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -47,17 +49,19 @@ import java.util.Hashtable;
 */
 public class SignUp1Activity extends AppCompatActivity {
 //
+
    Database_Helper myDb;
     Validation val = new Validation();
     private Button Btn_Submit;
     //Added user object to send to next
     private User user;
-
+    public static ProgressBar spinner;
+    private Button b1;
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mEmailDatabaseReference;
     private String uid;
-
+    private Button b2;
     private Button verifyEmailButton;
     private VerifyEmail verifyEmail;
     private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
@@ -69,7 +73,8 @@ public class SignUp1Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
 
-
+        spinner = (ProgressBar)findViewById(R.id.progress_bar);
+        spinner.setVisibility(View.GONE);
        myDb = new Database_Helper(this);
        java.util.Calendar calendar=Calendar.getInstance();
       final int year=calendar.get(Calendar.YEAR);
@@ -120,8 +125,11 @@ public class SignUp1Activity extends AppCompatActivity {
         builder.setMessage(Message);
     }
 
-    public Hashtable<String, String> Validater(String userSelected) {
-        if (val.validateEmail(textinputEmail) & val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass)){
+    public Hashtable<String, String> Validater(String userSelected)
+    {
+        if (val.validateEmail(textinputEmail) & val.validatePassword(textinputPass) & val.validateCnfPassword(textinputPass,textinputCnfPass))
+        {
+
             Hashtable<String,String> userData = new Hashtable<>();
             userData.put("email",textinputEmail.getText().toString().trim());
             userData.put("password", textinputPass.getText().toString().trim());
@@ -134,10 +142,15 @@ public class SignUp1Activity extends AppCompatActivity {
         }
     }
 
-    public void verifyEmailId(View view){
+    public void verifyEmailId(View view)
+    {
 
         Hashtable<String,String> userData =  Validater("verifyEmailId");
         if (userData != null){
+            // start spinnner
+                    spinner.setVisibility(View.VISIBLE);
+                    disable();
+
             createUserAndVerifyEmail(userData);
         }
     }
@@ -146,34 +159,57 @@ public class SignUp1Activity extends AppCompatActivity {
 
         // disable screen and show spinner
         //
+
+
+
         Hashtable<String,String> userData = Validater("signUp");
-        if (userData != null){
-            setUidFromFirebase(userData);
+        if (userData != null)
+        {
+                    spinner.setVisibility(View.VISIBLE);
+                    disable();
+                       setUidFromFirebase(userData);
         }
     }
 
     private void createUserAndVerifyEmail(final Hashtable<String,String> userData){
 
         mAuth.createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
-                .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>()
+                {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
 
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
                             checkIsEmailVerified(firebaseUser, userData.get("userSelected"));
 
-                        } else {
-                            try {
+                        } else
+                            {
+                            try
+                            {
                                 throw task.getException();
-                            } catch (FirebaseAuthUserCollisionException e){
+                            } catch (FirebaseAuthUserCollisionException e)
+                            {
                                 //signIn the user
                                 signIn(userData);
-                            } catch (FirebaseAuthInvalidCredentialsException e){
+                            } catch (FirebaseAuthInvalidCredentialsException e)
+                            {
+                                // stop spinner
+                                spinner.setVisibility(View.GONE);
+                                Enable();
+
                                 Log.d(TAG,e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
-                            } catch (Exception e){
+
+                            } catch (Exception e)
+                            {
+                                // stop spinner user interaction enabled
+                                spinner.setVisibility(View.GONE);
+                                Enable();
+
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -202,9 +238,15 @@ public class SignUp1Activity extends AppCompatActivity {
                             try {
                                 throw task.getException();
                             }catch (FirebaseAuthInvalidCredentialsException e){
+                                // stop spinner
+                                spinner.setVisibility(View.GONE);
+                                Enable();
                                 Log.d(TAG,e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
                             }catch (Exception e){
+                                // stop spinner
+                                spinner.setVisibility(View.GONE);
+                                Enable();
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
                             }
@@ -213,15 +255,28 @@ public class SignUp1Activity extends AppCompatActivity {
                 });
     }
 
-    private void checkIsEmailVerified(FirebaseUser firebaseUser, String userSelected){
+
+
+
+
+
+
+
+    private void checkIsEmailVerified(FirebaseUser firebaseUser, String userSelected)
+    {
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
-        if (verifyEmail.isEmailIdVerified()) {
+        if (verifyEmail.isEmailIdVerified())
+        {
+
             Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
+            spinner.setVisibility(View.GONE);
+            Enable();
             String emailId = firebaseUser.getEmail();
             signOut();
             // set uid from firebase
-            if (userSelected.equals("signUp")){
+            if (userSelected.equals("signUp"))
+            {
                 // can proceed to signUp2
                 AddData();
             }
@@ -230,8 +285,12 @@ public class SignUp1Activity extends AppCompatActivity {
             Log.d(TAG,userSelected);
             if (userSelected.equals("verifyEmailId"))
                 verifyEmail.sendVerificationEmail();
-            else
+            else{
+                // stop spinner
+                spinner.setVisibility(View.GONE);
+                Enable();
                 signOut();
+            }
             Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
         }
 
@@ -250,7 +309,13 @@ public class SignUp1Activity extends AppCompatActivity {
         myDb.setUser(user);
 
        Boolean isInserted = myDb.insert_data(textinputEmail.getText().toString().trim(), textinputPass.getText().toString().trim());
-        if (isInserted) {
+
+       // stop spinner
+        spinner.setVisibility(View.GONE);
+        Enable();
+        if (isInserted)
+        {
+
          /*   textinputName.setText(null);
             gender_grp.clearCheck();
             textinputDOB.setText(null);
@@ -339,4 +404,26 @@ public class SignUp1Activity extends AppCompatActivity {
             Toast.makeText(SignUp1Activity.this, "Email Id is already registered",Toast.LENGTH_LONG).show();
         }
     }
+    public  void Enable()
+    {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+    public void disable()
+    {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+    }
 }
+
+
+   /* To get user interaction back you just need to add the following code
+
+getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);*/
+
+
+
+   /* To disable the user interaction you just need to add the following code
+
+getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);*/

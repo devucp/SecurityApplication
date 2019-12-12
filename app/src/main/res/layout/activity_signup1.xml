@@ -40,7 +40,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-
                 android:gravity="center"
                 android:shadowColor="#A3050101"
                 android:shadowRadius="25"
@@ -104,6 +103,7 @@
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/textlayout_Pass"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
@@ -170,7 +170,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
-                android:layout_marginBottom="0dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/btn_cus"
                 android:onClick="signUp"
                 android:paddingTop="9dp"
@@ -180,7 +180,12 @@
                 android:textColorHint="#ffffff"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progress_bar"
 
+                />
 
         </LinearLayout>
     </ScrollView>

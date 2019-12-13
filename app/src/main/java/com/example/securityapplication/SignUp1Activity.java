@@ -58,6 +58,7 @@ import static java.security.AccessController.getContext;
 public class SignUp1Activity extends AppCompatActivity {
 //
    Database_Helper myDb;
+   SQLiteDBHelper db;
     Validation val = new Validation();
     private Button Btn_Submit;
     //Added user object to send to next
@@ -271,7 +272,6 @@ public class SignUp1Activity extends AppCompatActivity {
 
         //Sending the user object
         myDb.setUser(user);
-
 
        Boolean isInserted = myDb.insert_data(textinputEmail.getText().toString().trim(), textinputPass.getText().toString().trim());
         if (isInserted) {

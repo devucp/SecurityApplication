@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -62,7 +63,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
    Database_Helper myDb;
     Validation val = new Validation();
-    private Button Btn_Submit;
+    public static Button Btn_Submit;
     //Added user object to send to next
     private User user;
 //spinner added
@@ -70,20 +71,22 @@ public class SignUp1Activity extends AppCompatActivity {
     private Button b1;
 
     DatePickerDialog datePickerDialog;
-    private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
-    private TextInputEditText date;
-    private TextInputLayout pass_outer,cnfpass_outer;
-    public TextView pass1,pass2;
+    public static TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
+    private TextInputEditText date,t2,t3;
+    public static   TextInputLayout pass_outer,cnfpass_outer;
+    public static TextView pass1,pass2;
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mEmailDatabaseReference;
     private String uid;
     private Button b2;
-    private Button verifyEmailButton;
+    public static Button verifyEmailButton;
     private VerifyEmail verifyEmail;
 
     private String TAG = "SignUp1";
+
+    //TextInputEditText t1,t2,t3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,7 @@ public class SignUp1Activity extends AppCompatActivity {
         setContentView(R.layout.activity_signup1);
         spinner = (ProgressBar)findViewById(R.id.progress_bar);
         spinner.setVisibility(View.GONE);
+
        myDb = new Database_Helper(this);
        java.util.Calendar calendar=Calendar.getInstance();
       final int year=calendar.get(Calendar.YEAR);
@@ -109,6 +113,12 @@ public class SignUp1Activity extends AppCompatActivity {
         Btn_Submit = findViewById(R.id.btn_sub);
 
         verifyEmailButton = findViewById(R.id.btn_verify);
+
+       // t1 =(TextInputEditText)findViewById(R.id.textlayout_Email);
+        t2 =(TextInputEditText)findViewById(R.id.textlayout_Pass);
+        t3 =(TextInputEditText)findViewById(R.id.textlayout_CnfPass);
+
+
 
         user=new User();
 
@@ -173,6 +183,11 @@ public class SignUp1Activity extends AppCompatActivity {
             // start spinnner
                     spinner.setVisibility(View.VISIBLE);
                     disable();
+/*            textinputEmail.setAlpha((float) 0.6);
+            t2.setAlpha((float) 0.6);
+            t3.setAlpha((float) 0.6);
+            verifyEmailButton.setAlpha((float) 0.6);
+            Btn_Submit.setAlpha((float) 0.6);*/
 
             createUserAndVerifyEmail(userData);
         }
@@ -190,7 +205,13 @@ public class SignUp1Activity extends AppCompatActivity {
         {
                     spinner.setVisibility(View.VISIBLE);
                     disable();
-                       setUidFromFirebase(userData);
+/*            textinputEmail.setAlpha((float) 0.6);
+            textinputPass.setAlpha((float) 0.6);
+            textinputCnfPass.setAlpha((float) 0.6);
+            verifyEmailButton.setAlpha((float) 0.6);
+            Btn_Submit.setAlpha((float) 0.6);*/
+
+            setUidFromFirebase(userData);
         }
     }
 
@@ -223,6 +244,11 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // stop spinner
                                 spinner.setVisibility(View.GONE);
                                 Enable();
+/*                                textinputEmail.setAlpha(1);
+                                textinputPass.setAlpha(1);
+                                textinputCnfPass.setAlpha(1);
+                                verifyEmailButton.setAlpha(1);
+                                Btn_Submit.setAlpha(1);*/
 
                                 Log.d(TAG,e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
@@ -232,7 +258,10 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // stop spinner user interaction enabled
                                 spinner.setVisibility(View.GONE);
                                 Enable();
-
+/*                                textinputEmail.setAlpha(1);
+                                textinputPass.setAlpha(1);
+                                textinputCnfPass.setAlpha(1);
+                                verifyEmailButton.setAlpha(1);*/
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -264,12 +293,20 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // stop spinner
                                 spinner.setVisibility(View.GONE);
                                 Enable();
+/*                                textinputEmail.setAlpha(1);
+                                textinputPass.setAlpha(1);
+                                textinputCnfPass.setAlpha(1);
+                                verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG,e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Invalid Password",Toast.LENGTH_SHORT).show();
                             }catch (Exception e){
                                 // stop spinner
                                 spinner.setVisibility(View.GONE);
                                 Enable();
+ /*                               textinputEmail.setAlpha(1);
+                                textinputPass.setAlpha(1);
+                                textinputCnfPass.setAlpha(1);
+                                verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
                             }
@@ -293,8 +330,14 @@ public class SignUp1Activity extends AppCompatActivity {
         {
 
             Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
+            //spinner stopped
             spinner.setVisibility(View.GONE);
             Enable();
+            /*
+            textinputEmail.setAlpha(1);
+            textinputPass.setAlpha(1);
+            textinputCnfPass.setAlpha(1);
+            verifyEmailButton.setAlpha(1);*/
             String emailId = firebaseUser.getEmail();
             signOut();
             // set uid from firebase
@@ -307,12 +350,17 @@ public class SignUp1Activity extends AppCompatActivity {
         else {
             Log.d(TAG,userSelected);
             if (userSelected.equals("verifyEmailId"))
-                verifyEmail.sendVerificationEmail();
+                verifyEmail.sendVerificationEmail(SignUp1Activity.this); //spinner added for email verification
             else{
                 // stop spinner
+                signOut();
                 spinner.setVisibility(View.GONE);
                 Enable();
-                signOut();
+               /* textinputEmail.setAlpha(1);
+                textinputPass.setAlpha(1);
+                textinputCnfPass.setAlpha(1);
+                verifyEmailButton.setAlpha(1);*/
+
             }
             Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
         }
@@ -338,6 +386,10 @@ public class SignUp1Activity extends AppCompatActivity {
        // stop spinner
         spinner.setVisibility(View.GONE);
         Enable();
+/*        textinputEmail.setAlpha(1);
+        textinputPass.setAlpha(1);
+        textinputCnfPass.setAlpha(1);
+        verifyEmailButton.setAlpha(1);*/
         if (isInserted)
         {
 
@@ -426,20 +478,12 @@ public class SignUp1Activity extends AppCompatActivity {
         }
         else{
             Toast.makeText(SignUp1Activity.this, "Email Id is already registered",Toast.LENGTH_LONG).show();
+            spinner.setVisibility(View.GONE);
+            Enable();
         }
 
     }
 
-    public  void Enable()
-    {
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-    public void disable()
-    {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-    }
 
 
    public static void setError(String s,TextView t1)
@@ -447,21 +491,36 @@ public class SignUp1Activity extends AppCompatActivity {
        if(s!=null) {
            t1.setText(s);
            t1.setVisibility(View.VISIBLE);
+           t1.setTextColor(Color.parseColor("#FFFFFF"));
        }
        else{
-           t1.setVisibility(View.INVISIBLE);
+           t1.setVisibility(View.GONE);
        }
    }
+
+   //screen enable disable
+
+    public  void Enable()
+    {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        textinputEmail.setAlpha(1);
+        pass_outer.setAlpha(1);
+        cnfpass_outer.setAlpha(1);
+        verifyEmailButton.setAlpha(1);
+        Btn_Submit.setAlpha(1);
+    }
+    public void disable()
+    {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        textinputEmail.setAlpha((float) 0.6);
+        pass_outer.setAlpha((float) 0.6);
+        cnfpass_outer.setAlpha((float) 0.6);
+        verifyEmailButton.setAlpha((float) 0.6);
+        Btn_Submit.setAlpha((float) 0.6);
+
+    }
 }
 
 
-   /* To get user interaction back you just need to add the following code
-
-getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);*/
-
-
-
-   /* To disable the user interaction you just need to add the following code
-
-getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);*/
+  

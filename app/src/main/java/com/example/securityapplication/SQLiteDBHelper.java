@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.example.securityapplication.model.User;
 
+import java.util.HashMap;
+
 import static android.icu.text.MessagePattern.ArgType.SELECT;
 
 
@@ -59,11 +61,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_SOSTABLE_QUERY =
             "CREATE TABLE "+ SOS_TABLE +"(" +
-                    COLUMN_C1 + " TEXT DEFAULT '', " +
-                    COLUMN_C2 + " TEXT DEFAULT '',"+
-                    COLUMN_C3 + " TEXT DEFAULT ''," +
-                    COLUMN_C4 + " TEXT DEFAULT ''," +
-                    COLUMN_C5 + " TEXT DEFAULT ''" +")";
+                    COLUMN_C1 + " TEXT , " +
+                    COLUMN_C2 + " TEXT ,"+
+                    COLUMN_C3 + " TEXT ," +
+                    COLUMN_C4 + " TEXT ," +
+                    COLUMN_C5 + " TEXT " +")";
     private User user;
 
 
@@ -101,6 +103,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     /**Adding user*/
     public boolean addUser(User user){
         newU=user;
+        this.user = user;
         try{SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME, user.getName());
@@ -130,15 +133,15 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             return false;
         }
     }
-    public boolean addsosContacts(User user){
+    public boolean addsosContacts(HashMap<String,String> SosC){
         SQLiteDatabase db = this.getWritableDatabase();
        ContentValues contentValues = new ContentValues();
 
-        contentValues.put(COLUMN_C1, user.getSosc1());
-        contentValues.put(COLUMN_C2, user.getSosc2());
-        contentValues.put(COLUMN_C3, user.getSosc3());
-        contentValues.put(COLUMN_C4, user.getSosc4());
-        contentValues.put(COLUMN_C5, user.getSosc5());
+        contentValues.put(COLUMN_C1, SosC.get("c1"));
+        contentValues.put(COLUMN_C2, SosC.get("c2"));
+        contentValues.put(COLUMN_C3, SosC.get("c3"));
+        contentValues.put(COLUMN_C4, SosC.get("c4"));
+        contentValues.put(COLUMN_C5, SosC.get("c5"));
 
         long result = db.insert(SOS_TABLE,null,contentValues);
         db.close();
@@ -165,11 +168,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
 
-//    public boolean addsosContacts(){
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//    }
-
     //TO UPDATE TESTMODE
     public void updatetestmode(Boolean bool){
 
@@ -178,7 +176,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_TESTM,bool);
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
                 new String[]{"1"});
-        Log.d("checking3","indide updatetestmode"+this.getTestmode());
+        Log.d("checking3","inside updatetestmode"+this.getTestmode());
         db.close();
     }
     /**Updating user*/
@@ -196,8 +194,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 //        contentValues.put(COLUMN_IMEI, user.getImei());
 //        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
 
-        db.update(TABLE_NAME,contentValues,COLUMN_EMAIL + "=?",
-                new String[]{String.valueOf(user.getEmail())});
+        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?", //Changed from Column_Email to Column_ID
+                new String[]{"1"});
         db.close();
     }
 

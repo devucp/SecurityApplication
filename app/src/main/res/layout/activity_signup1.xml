@@ -97,7 +97,6 @@
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/textlayout_Pass"
-
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
@@ -120,7 +119,7 @@
                 android:visibility="invisible"
                 android:layout_marginTop="-4dp"
                 android:layout_marginLeft="15dp"
-                android:text="password can't be empty"
+                android:text="@string/password_can_t_be_empty"
                 android:textSize="12sp"
                 android:textColor="#ff2222"
                 >
@@ -169,8 +168,8 @@
                 android:id="@+id/btn_verify"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/btn_cus"
                 android:onClick="verifyEmailId"
                 android:paddingTop="9dp"
@@ -179,15 +178,13 @@
                 android:textColor="#000000"
                 android:textColorHint="#ffffff"
                 android:textSize="18sp"
-                android:textStyle="bold"
-
-                />
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btn_sub"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/btn_cus"
                 android:onClick="signUp"

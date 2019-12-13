@@ -3,6 +3,7 @@ package com.example.securityapplication;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -17,10 +18,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     private static final String DB_name = "userinfo.db";
     private static final int DB_version = 1;
-
+    User newU;
     private static final String TABLE_NAME = "user";
 
-    //public static final String COLUMN_ID = "id";
+    public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_GENDER = "gender";
@@ -30,10 +31,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LOCATION = "location";
     public static final String COLUMN_IMEI = "imei";
     public static final String COLUMN_DOB = "dob";
+    public static final String COLUMN_TESTM = "testmode";
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
-                    //COLUMN_ID + " INTEGER, " +
+                    COLUMN_ID + " INTEGER DEFAULT 1 , " +
                     COLUMN_NAME + " TEXT, "+
                     COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
                     COLUMN_GENDER + " TEXT, " +
@@ -42,7 +44,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 //                    COLUMN_AADHAR + " TEXT, " +
                     COLUMN_LOCATION + " TEXT, " +
                     COLUMN_DOB + " TEXT, " +
-                    COLUMN_IMEI + " TEXT " + ")";
+                    COLUMN_IMEI + " TEXT, " +
+                    COLUMN_TESTM + " BOOLEAN DEFAULT FALSE " + ")";
+
+
 
     private static final String SOS_TABLE = "sostable";
     public static final String COLUMN_C1 = "c1";
@@ -60,7 +65,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_C4 + " TEXT DEFAULT ''," +
                     COLUMN_C5 + " TEXT DEFAULT ''" +")";
     private User user;
-
 
 
     /**Constructor*/
@@ -86,12 +90,19 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
         onCreate(sqLiteDatabase);
     }
+    //it return number of rows in the table
+    public int numberOfRows(){
+        SQLiteDatabase db=this.getReadableDatabase();
+        int numRows= (int) DatabaseUtils.queryNumEntries(db,TABLE_NAME);
+        return numRows;
+
+    }
 
     /**Adding user*/
     public boolean addUser(User user){
+        newU=user;
         try{SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-
         contentValues.put(COLUMN_NAME, user.getName());
         contentValues.put(COLUMN_EMAIL, user.getEmail());
 //        contentValues.put(COLUMN_PASSWORD, user.getPassword());
@@ -109,7 +120,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         }
         else{
             Log.d("Database","User object added successfully");
-
+            int k=numberOfRows();
+            Log.d("NUMBER OF ROWS",String.valueOf(k));
             return true;
             }
         }catch(Exception e){
@@ -153,8 +165,25 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
 
+//    public boolean addsosContacts(){
+//        SQLiteDatabase db = this.getWritableDatabase();
+//
+//    }
+
+    //TO UPDATE TESTMODE
+    public void updatetestmode(Boolean bool){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(COLUMN_TESTM,bool);
+        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
+                new String[]{"1"});
+        Log.d("checking3","indide updatetestmode"+this.getTestmode());
+        db.close();
+    }
     /**Updating user*/
-    /*public void updateUser(User user){
+    public void updateUser(User user){
+        newU=user;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
@@ -170,9 +199,23 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         db.update(TABLE_NAME,contentValues,COLUMN_EMAIL + "=?",
                 new String[]{String.valueOf(user.getEmail())});
         db.close();
-    }*/
+    }
 
     /**Checking if user is present*/
+    public boolean getTestmode(){
+        String str="false";
+        Cursor cursor = getReadableDatabase().rawQuery("select "+ COLUMN_TESTM +" FROM "+TABLE_NAME, null);
+        if(cursor.getCount()!=0){
+            while (cursor.moveToNext()){
+                str = cursor.getString(0);
+            }
+            if(str.equals("1"))
+                return true;
+        }
+        Log.d("checking4",str);
+        return false;
+    }
+
     public boolean checkUser(String mobile){
         String[] columns = {
                 COLUMN_MOBILE   //NOTE:changed to column Email
@@ -212,7 +255,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     /**Delete User */
-   /* public void deleteUser(User user) {
+
+    /*public void deleteUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // NOTE: delete user record by Aadhar
@@ -228,8 +272,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         Log.d("DH.java","User object set");
     }
     //Returns the User with filled fields
-    public User getUser(){
-        Log.d("DH.java","User object sent");
+    public User getUser() {
+        Log.d("DH.java", "User object sent");
         return user;
     }
 }

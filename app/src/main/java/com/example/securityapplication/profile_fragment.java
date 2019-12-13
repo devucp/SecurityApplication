@@ -100,6 +100,14 @@ public class profile_fragment extends Fragment {
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                 signOut();
+
+                //finishing the navigation activity
+                getActivity().finish();
+                //Clear the back stack and re-directing to the sign-up page
+                Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+                mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(mLogOutAndRedirect);
+
             }
         });
     }

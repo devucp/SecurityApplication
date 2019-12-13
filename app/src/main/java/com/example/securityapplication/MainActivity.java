@@ -268,6 +268,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /** SosPlayer Service intent**/
         startService(new Intent(this, SosPlayer.class));
+
+        /** DATABASE FORCEFUL CREATION**/
+        //uncomment to forcefully delete database
+//        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
+//        sqLiteDBHelper.deleteDatabase(this);
+
     }
 
     public void onStart(){

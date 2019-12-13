@@ -22,7 +22,7 @@ public class User implements Parcelable {
     private String imei;
     private String dob;
     private boolean isPaid;
-    private HashMap<String,String> sosContacts;
+    public HashMap<String,String> sosContacts;
     private boolean isGoogleAccountLinked;
    private String sosc1;
     private String sosc2;

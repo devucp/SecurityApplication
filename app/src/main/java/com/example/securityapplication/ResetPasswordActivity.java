@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,22 +30,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
     ProgressBar pgsBar;
 
 
+
+
     public void pgbarshow()
     {
         btn_reset.setText("");
         findViewById(R.id.pBar).setVisibility(VISIBLE);
         btn_reset.getBackground().setAlpha(100);
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -105,12 +97,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                 Toast.makeText(ResetPasswordActivity.this,"EMAIL SENT. PLEASE CHECK YOUR MAIL",Toast.LENGTH_SHORT).show();
                                 //startActivity(new Intent(ResetPasswordActivity.this,MainActivity.class));
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                ResetPasswordActivity.this.finish();
+
 
                             }
                             else

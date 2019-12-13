@@ -62,6 +62,8 @@ public class navigation extends AppCompatActivity {
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
 
+    private ValueEventListener mUsersDatabaseReferenceListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,14 +112,14 @@ public class navigation extends AppCompatActivity {
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
             FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
             DatabaseReference databaseReference = firebaseDatabase.getReference();
-            databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
+            mUsersDatabaseReferenceListener = databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
                     // check if user signed in from two devices
                     if (FirebaseAuth.getInstance().getCurrentUser() != null)
                         if (dataSnapshot.getValue(User.class).getImei() != "null")
-                            recheckUserAuthentication(firebaseUser);
+                            recheckUserAuthentication(FirebaseAuth.getInstance().getCurrentUser());
 
                     if (check == 1) {
                         db.addUser(newUser);
@@ -277,7 +279,8 @@ public class navigation extends AppCompatActivity {
     }
 
     private void recheckUserAuthentication(final FirebaseUser firebaseUser){
-
+        Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        Log.d(TAG,firebaseUser.getEmail());
         Log.d(TAG,"Inside recheckUserAuthentication");
         getImei();
         mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -333,6 +336,7 @@ public class navigation extends AppCompatActivity {
             mAuth.signOut();
             Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
+        mUsersDatabaseReference.removeEventListener(mUsersDatabaseReferenceListener);
         //Google signOut
         /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
             mGoogleSignInClient.signOut()

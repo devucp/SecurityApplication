@@ -1,8 +1,11 @@
 package com.example.securityapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -10,6 +13,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import static com.example.securityapplication.SignUp1Activity.Btn_Submit;
+import static com.example.securityapplication.SignUp1Activity.cnfpass_outer;
+import static com.example.securityapplication.SignUp1Activity.pass_outer;
+import static com.example.securityapplication.SignUp1Activity.spinner;
+import static com.example.securityapplication.SignUp1Activity.textinputCnfPass;
+import static com.example.securityapplication.SignUp1Activity.textinputEmail;
+import static com.example.securityapplication.SignUp1Activity.textinputPass;
+import static com.example.securityapplication.SignUp1Activity.verifyEmailButton;
 
 public class VerifyEmail {
 
@@ -37,7 +49,7 @@ public class VerifyEmail {
         }
     }
 
-    public void sendVerificationEmail(){
+    public void sendVerificationEmail(final Activity activity){
         Log.d(TAG,"Inside sendEmailVerification");
         if (firebaseUser == null){
             Log.d(TAG,"User is null inside sendVerificationEmail");
@@ -67,6 +79,15 @@ public class VerifyEmail {
                                     Toast.LENGTH_LONG).show();
                         }
                         signOut();
+                        //spinner
+                        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        spinner.setVisibility(View.GONE);
+                        textinputEmail.setAlpha(1);
+                        pass_outer.setAlpha(1);
+                        cnfpass_outer.setAlpha(1);
+                        verifyEmailButton.setAlpha(1);
+                        Btn_Submit.setAlpha(1);
+                        //spinner end
                     }
                 });
     }

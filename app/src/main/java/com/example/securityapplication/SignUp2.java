@@ -98,9 +98,7 @@ public class SignUp2 extends AppCompatActivity {
     private RadioGroup gender_grp;
     private RadioButton Radio_Gender;
     private DatePickerDialog datePickerDialog;
-    private TextInputEditText textinputName,textinputDOB;
-    private TextInputEditText date;
-
+    private TextInputEditText textinputName,textinputDOB,date; // was earlier TextInputLayout
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

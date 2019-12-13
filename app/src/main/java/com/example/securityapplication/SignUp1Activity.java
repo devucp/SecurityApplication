@@ -58,15 +58,12 @@ import static java.security.AccessController.getContext;
         * and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
 */
 public class SignUp1Activity extends AppCompatActivity {
-//
-   Database_Helper myDb;
+
     Validation val = new Validation();
-    private Button Btn_Submit;
     //Added user object to send to next
     private User user;
 
     private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
-    private TextInputEditText date;
     private TextInputLayout pass_outer,cnfpass_outer;
     public TextView pass1,pass2;
 
@@ -83,9 +80,6 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
-       myDb = new Database_Helper(this);
-       java.util.Calendar calendar=Calendar.getInstance();
-      final int year=calendar.get(Calendar.YEAR);
 
       //removed most the view castings as they're unnecessary
         textinputEmail = findViewById(R.id.textlayout_Email);
@@ -97,9 +91,6 @@ public class SignUp1Activity extends AppCompatActivity {
         pass1=findViewById(R.id.pass_text1);
         pass2=findViewById(R.id.pass_text2);
 
-        //gender_grp = findViewById(R.id.radiogrp);
-        Btn_Submit = findViewById(R.id.btn_sub);
-
         user=new User();
 
         // check if user is signed in to google or facebook
@@ -107,11 +98,7 @@ public class SignUp1Activity extends AppCompatActivity {
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
                 String personName = acct.getDisplayName();
-                //String personGivenName = acct.getGivenName();
-                //String personFamilyName = acct.getFamilyName();
                 String personEmail = acct.getEmail();
-                //String personId = acct.getId();
-                //Uri personPhoto = acct.getPhotoUrl();
                 Log.d("Usernanme",personName);
                 Log.d("Email",personEmail);
                 if (personEmail != null) {
@@ -172,7 +159,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
-                            checkIsEmailVerified(firebaseUser);
+                            checkIsEmailVerified(firebaseUser,userData);
 
                         } else {
                             try {
@@ -189,7 +176,7 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                 Toast.makeText(SignUp1Activity.this, "Authentication failed.Please check your connection and try again",
-                                        Toast.LENGTH_SHORT).show();
+                                        Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -208,7 +195,7 @@ public class SignUp1Activity extends AppCompatActivity {
                             Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                            checkIsEmailVerified(firebaseUser);
+                            checkIsEmailVerified(firebaseUser, userData);
                         } else {
                             try {
                                 throw task.getException();
@@ -225,7 +212,7 @@ public class SignUp1Activity extends AppCompatActivity {
                 });
     }
 
-    private void checkIsEmailVerified(FirebaseUser firebaseUser){
+    private void checkIsEmailVerified(FirebaseUser firebaseUser, Hashtable<String,String> userData){
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
@@ -233,7 +220,7 @@ public class SignUp1Activity extends AppCompatActivity {
             String emailId = firebaseUser.getEmail();
             signOut();
             // can proceed to signUp2
-            AddData();
+            AddData(userData);
         }
         else {
             verifyEmail.sendVerificationEmail(SignUp1Activity.this);
@@ -248,32 +235,14 @@ public class SignUp1Activity extends AppCompatActivity {
         }
     }
 
-    private void AddData() {
+    private void AddData(Hashtable<String,String> userData) {
 
-        //Sending the user object
-        myDb.setUser(user);
-
-       Boolean isInserted = myDb.insert_data(textinputEmail.getText().toString().trim(), textinputPass.getText().toString().trim());
-        if (isInserted) {
-            //updates the Usr object with filled fields
-            user=myDb.getUser();
-
-            Log.d("User",user.getEmail().toString());
-         //starting signup activity
-            Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
-            intent.putExtra("User",user);
-            startActivityForResult(intent,1);
-        }
-        else {
-            String UserEmail = textinputEmail.getText().toString().trim();
-            boolean res = myDb.CheckUserEmail(UserEmail);
-            if (res){
-                Toast.makeText(this,"Email already taken",Toast.LENGTH_SHORT).show();
-            }
-            else{
-                //Toast.makeText(this,"User Entry Unsuccessful",Toast.LENGTH_SHORT).show();
-           }
-        }
+        user.setEmail(userData.get("email"));
+        user.setPassword(userData.get("password"));
+        //starting signup activity
+        Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
+        intent.putExtra("User",user);
+        startActivityForResult(intent,1);
    }
 
     @Override

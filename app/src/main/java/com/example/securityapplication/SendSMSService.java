@@ -24,8 +24,8 @@ public class SendSMSService extends Service {
     private Integer emergency;
 
 
-    private String SOS_MESSAGE=" NEEDS YOUR HELP. PLEASE HELP THEM." +
-                                "THE ALERT WAS SENT FROM ";
+    private String SOS_MESSAGE=" You are my SOS Contact." ;
+
 
     private sentReceiver sentReceiver;
     private deliveryReceiver deliveryReceiver;
@@ -102,36 +102,39 @@ public class SendSMSService extends Service {
         {
             toastmsg="send alert sos message";
         }
-        else if(emergency==1)
+        else if(safe==1)
         {
-            toastmsg="send emergency sos message";
+            toastmsg="send safe sos message";
         }
         else
         {
-            toastmsg="send safety sos message";
+            toastmsg="send emergency sos message";
         }
         Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
         this.stopSelf();//FINISH the service
     }
 
     public void sendMessage(String number,String location){
+        //modified message depending on the extra received from calling intent
         if(alert==1)
         {
-            SOS_MESSAGE="HELP";
+            SOS_MESSAGE+="I'm feeling UNSAFE. ";
         }
-        else if(emergency==2)
+        else if(safe==1)
         {
-            SOS_MESSAGE="SAFE";
+            SOS_MESSAGE+="Just wanted to let you know that I'm SAFE. ";
         }
         else
         {
-            SOS_MESSAGE="EMERGENCY";
+            SOS_MESSAGE+="PLEASE HELP ME. ";
 
         }
 
-        String messageToSend= getSenderName()+SOS_MESSAGE;
-        if(location!=null)
-                messageToSend+=" https://www.google.com/maps/place/";
+        SOS_MESSAGE+="This is my approximate location ";
+
+        String messageToSend= SOS_MESSAGE; //removed senderName
+        if(location!=null && location!="Location unavailable")
+                messageToSend+="\nhttps://www.google.com/maps/place/";
         messageToSend+=location;
 
 

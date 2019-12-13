@@ -25,13 +25,15 @@ import android.widget.Toast;
 
 import com.example.securityapplication.model.User;
 
+import java.util.HashMap;
+
 public class sos_page extends AppCompatActivity {
 
     Intent intent;
     public  static final int RequestPermissionCode  = 1 ;
-    Button btn_SosEdit, btn_SosSave;
+    private Button btn_SosEdit, btn_SosSave;
 
-
+    private HashMap<String,String> SosContacts;
     private TextInputEditText c1, c2, c3, c4, c5,current;
     private TextInputLayout cc1,cc2,cc3,cc4,cc5;
     private final static int CONTACT_PICKER_RESULT = 1001;
@@ -42,7 +44,6 @@ public class sos_page extends AppCompatActivity {
     private SQLiteDBHelper mydb;
     private Validation val;
     private User user;
-    private Button btn_Edit,btn_Save;
     boolean c1added,c2added,c3added,c4added,c5added;
 
     @Override
@@ -54,6 +55,7 @@ public class sos_page extends AppCompatActivity {
         values = new ContentValues();
         mydb = new SQLiteDBHelper(this);
         user = new User();
+        SosContacts = new HashMap<String, String>();
         val = new Validation();
 
         EnableRuntimePermission();
@@ -68,8 +70,6 @@ public class sos_page extends AppCompatActivity {
         c3.setEnabled(false);
         c4.setEnabled(false);
         c5.setEnabled(false);
-
-
 
     }
 
@@ -104,27 +104,41 @@ public class sos_page extends AppCompatActivity {
                 FillViews();
             }
             while (res.moveToNext()) {
-                user.setSosc1(res.getString(0));
+                SosContacts.put("c1",res.getString(0));
+                SosContacts.put("c2",res.getString(1));
+                SosContacts.put("c3",res.getString(2));
+                SosContacts.put("c4",res.getString(3));
+                SosContacts.put("c5",res.getString(4));
+
+                /*user.setSosc2(res.getString(1));
                 user.setSosc2(res.getString(1));
                 user.setSosc3(res.getString(2));
                 user.setSosc4(res.getString(3));
-                user.setSosc5(res.getString(4));
+                user.setSosc5(res.getString(4));*/
 
-                Log.d("SOS Activity", "User Object set in SOS activity successfully " +
-                        "Sosc1 = " + user.getSosc1() + " Sosc2 = " + user.getSosc2());
+                Log.d("SOS Activity", "LocalHashMap updated by SOS activity successfully " +
+                        "Sosc1 = " + SosContacts.get("c1") + " Sosc2 = " + SosContacts.get("c2"));
 
-                sos_n1 = user.getSosc1();
+                /*sos_n1 = user.getSosc1();
                 sos_n2 = user.getSosc2();
                 sos_n3 = user.getSosc3();
                 sos_n4 = user.getSosc4();
-                sos_n5 = user.getSosc5();
-                Log.d("SOS Activity", "Current SOS Contacts loaded into Variables; sos_n1="+sos_n1+"sos_n2="+sos_n2);
+                sos_n5 = user.getSosc5();*/
+
+                sos_n1 = SosContacts.get("c1");
+                sos_n2 = SosContacts.get("c2");
+                sos_n3 = SosContacts.get("c3");
+                sos_n4 = SosContacts.get("c4");
+                sos_n5 = SosContacts.get("c5");
+
+                Log.d("SOS Activity", "Current SOS Contacts fetched from HashMap and loaded into Variables; sos_n1=" +sos_n1+" sos_n2=" +sos_n2);
                 FillViews();
             }
 
         }
         catch (RuntimeException e){
-            Log.d("SOS Contact page","Encountered Null pointer Exception; Setting initial values to empty");
+            e.printStackTrace();
+            Log.d("SOS Contact page","Encountered RuntimeException; Setting initial values to empty");
             sos_n1 = "";
             sos_n2 = "";
             sos_n3 = "";
@@ -139,8 +153,8 @@ public class sos_page extends AppCompatActivity {
         c3.setText(sos_n3);
         c4.setText(sos_n4);
         c5.setText(sos_n5);
-        Log.d("SOS Activity","FillViews() sos_n1="+sos_n1+" value");
-        Log.d("SOS Activity","SOS contact views filled with values c1="+c1.getText()+"value before this");
+        Log.d("SOS Activity","FillViews() sos_n1= "+sos_n1);
+        Log.d("SOS Activity","SOS contact views filled with values c1= "+c1.getText());
     }
 
     private void initfirstvalues() {
@@ -149,7 +163,7 @@ public class sos_page extends AppCompatActivity {
         sos_n3 = "";
         sos_n4 = "";
         sos_n5 = "";
-        Log.d("SOS Activity","SOS Contact table loaded for 1st time, empty values set; sos_n1=" +sos_n1+" value");
+        Log.d("SOS Activity","SOS Contact table loaded for 1st time, empty values set; sos_n1=" +sos_n1);
     }
 
     private void initTempValues() {
@@ -460,19 +474,30 @@ public class sos_page extends AppCompatActivity {
                     }
 
                     if (c1added||c2added||c3added||c4added||c5added){
-                       user.setSosc1(temp_n1);
+
+                       /*user.setSosc1(temp_n1);
                        user.setSosc2(temp_n2);
                        user.setSosc3(temp_n3);
                        user.setSosc4(temp_n4);
-                       user.setSosc5(temp_n5);
+                       user.setSosc5(temp_n5);*/
 
-                       if (mydb.addsosContacts(user)){
-                           c1.setEnabled(false);
+                        SosContacts.put("c1",temp_n1);
+                        SosContacts.put("c2",temp_n2);
+                        SosContacts.put("c3",temp_n3);
+                        SosContacts.put("c4",temp_n4);
+                        SosContacts.put("c5",temp_n5);
+
+                        user.setSosContacts(SosContacts);
+                        Log.d("SosActivity","HashMap updated in User object c1="+user.sosContacts.get("c1"));
+
+                       if (mydb.addsosContacts(SosContacts)){
+                           Log.d("SosActivity","SOS contacts was added in database");
+                          /* c1.setEnabled(false);
                            c2.setEnabled(false);
                            c3.setEnabled(false);
                            c4.setEnabled(false);
                            c5.setEnabled(false);
-                           btn_SosSave.setEnabled(false);
+                           btn_SosSave.setEnabled(false);*/
 
                            Toast.makeText(sos_page.this,"DATA saved successfully ",Toast.LENGTH_SHORT).show();
                             startActivity(intent);
@@ -487,9 +512,6 @@ public class sos_page extends AppCompatActivity {
                         //nochange found move to next activity
                         startActivity(intent);
                     }
-
-
-
             }
         });
 

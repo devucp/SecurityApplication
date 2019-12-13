@@ -38,6 +38,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 public class navigation extends AppCompatActivity {
 
     int count=0;
@@ -103,30 +105,35 @@ public class navigation extends AppCompatActivity {
 
     public void getData(final int check){
         final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
-        String uid=firebaseUser.getUid();
-        FirebaseAuth firebaseAuth=FirebaseAuth.getInstance();
-        FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference=firebaseDatabase.getReference();
-        databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                newUser=dataSnapshot.getValue(User.class);
-                // check if user signed in from two devices
-                recheckUserAuthentication(firebaseUser);
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference databaseReference = firebaseDatabase.getReference();
+            databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    newUser = dataSnapshot.getValue(User.class);
+                    // check if user signed in from two devices
+                    if (FirebaseAuth.getInstance().getCurrentUser() != null)
+                        if (dataSnapshot.getValue(User.class).getImei() != "null")
+                            recheckUserAuthentication(firebaseUser);
 
-                if(check==1) {
-                    db.addUser(newUser);
-                    Log.d("FirebaseUsername",newUser.getName()+" 1 "+newUser.getEmail());
+                    if (check == 1) {
+                        db.addUser(newUser);
+                        Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
+                    } else if (check == 2) {
+                        Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
+                        db.updateUser(newUser);
+                    }
                 }
-                else if(check==2)
-                {Log.d("FirebaseUsername",newUser.getName()+" 2 "+newUser.getEmail());
-                        db.updateUser(newUser);}
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
 
     }
 
@@ -284,8 +291,7 @@ public class navigation extends AppCompatActivity {
                     if (!user.getImei().equals(mImeiNumber)){
                         // same user trying to login from multiple devices -> logout the user
                         Log.d(TAG, "User is LoggedIn in other device");
-                        Toast.makeText(navigation.this,
-                                "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
                         signOut();
                     }
                     else{/* nothing to do*/}
@@ -326,7 +332,6 @@ public class navigation extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             mAuth.signOut();
             Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
-            finish();
         }
         //Google signOut
         /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
@@ -339,5 +344,17 @@ public class navigation extends AppCompatActivity {
                         }
                     });
         }*/
+        //Clear the back stack and re-directing to the sign-up page
+        Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+        mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mLogOutAndRedirect);
+        //finishing the navigation activity
+        try {
+            closeNow();
+            Log.d(TAG,"closed activity successfully");
+        }catch (Exception e){
+            Log.d(TAG,"Closing app exception:"+e.getMessage());
+            finish();
+        }
     }
 }

@@ -530,8 +530,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     mUsersDatabaseReference.child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-
-                                            //recheckUserAuthentication(firebaseUser);
+                                            updateUI(firebaseUser);
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -547,10 +546,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             });
 
-                            //mUsersDatabaseReference.child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber);
-
-                            // to check if user simultaneously tries to login from multiple devices
-                            //recheckUserAuthentication(firebaseUser);
                         } else {
 
                             pgbarhide();
@@ -617,7 +612,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             Intent mHomeIntent = new Intent(this,navigation.class);
             startActivity(mHomeIntent);
-            finish();
+            try {
+                closeNow();
+            }catch (Exception e){
+                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                finish();
+            }
             pgbarhide();
 
 

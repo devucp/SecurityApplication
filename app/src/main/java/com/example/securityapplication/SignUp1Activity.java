@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.SnackbarContentLayout;
@@ -249,7 +250,12 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==10 && requestCode==1)
-            finish();
+            try {
+                closeNow();
+            }catch (Exception e){
+                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                finish();
+            }
 
         if (requestCode==2){
             Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
@@ -258,10 +264,16 @@ public class SignUp1Activity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Log.d(TAG,"Inside onbackpressed function");
         Intent returnIntent = new Intent();
         returnIntent.putExtra("hasBackPressed",true);
         setResult(Activity.RESULT_OK,returnIntent);
-        finish();
+        try {
+            closeNow();
+        }catch (Exception e){
+            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+            finish();
+        }
     }
 
     private void setUidFromFirebase(final Hashtable<String,String> userData){
@@ -315,4 +327,13 @@ public class SignUp1Activity extends AppCompatActivity {
            t1.setVisibility(View.INVISIBLE);
        }
    }
+
+    private void closeNow(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            finishAffinity();
+        }
+        else{
+            finish();
+        }
+    }
 }

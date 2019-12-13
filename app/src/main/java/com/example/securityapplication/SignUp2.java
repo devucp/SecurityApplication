@@ -100,6 +100,8 @@ public class SignUp2 extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private TextInputEditText textinputName,textinputDOB,date; // was earlier TextInputLayout
 
+    private String password;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,6 +171,7 @@ public class SignUp2 extends AppCompatActivity {
         DBHelper = new SQLiteDBHelper(activity);
         ReturnIntent = new Intent();
         user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
+        password = getIntent().getStringExtra("password");
     }
 
     private void initDatabaseReferences(){
@@ -279,7 +282,7 @@ public class SignUp2 extends AppCompatActivity {
 
                     if (DBHelper.checkUser(input_mobile.getText().toString().trim()) ){
 
-                        if (user.getEmail() == null || user.getPassword() == null){
+                        if (user.getEmail() == null || password == null){
                             // go back to signUp1
                             finishActivity(2);
                         }
@@ -332,7 +335,7 @@ public class SignUp2 extends AppCompatActivity {
             Log.d("User imei:",user.getImei());
 
             // create the User
-             mAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+             mAuth.createUserWithEmailAndPassword(user.getEmail(), password)
                     .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -350,7 +353,7 @@ public class SignUp2 extends AppCompatActivity {
                                 }
                                 catch (FirebaseAuthUserCollisionException e){
                                     // user exists -> sign in the user
-                                    mAuth.signInWithEmailAndPassword(user.getEmail(), user.getPassword())
+                                    mAuth.signInWithEmailAndPassword(user.getEmail(), password)
                                             .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<AuthResult> task) {

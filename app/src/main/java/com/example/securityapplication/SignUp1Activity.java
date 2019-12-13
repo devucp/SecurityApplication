@@ -238,10 +238,10 @@ public class SignUp1Activity extends AppCompatActivity {
     private void AddData(Hashtable<String,String> userData) {
 
         user.setEmail(userData.get("email"));
-        user.setPassword(userData.get("password"));
         //starting signup activity
         Intent intent=new Intent(SignUp1Activity.this,SignUp2.class);
         intent.putExtra("User",user);
+        intent.putExtra("password",userData.get("password"));
         startActivityForResult(intent,1);
    }
 

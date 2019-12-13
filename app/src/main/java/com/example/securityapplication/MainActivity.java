@@ -535,6 +535,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent mHomeIntent = new Intent(this,navigation.class);
             startActivity(mHomeIntent);
             finish();
+            pgbarhide();
+
 
         }
         Log.d(TAG,"UI updated successfully");
@@ -773,6 +775,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // or other user may have formatted the mobile without logging out
                 Log.d(TAG,"Current user:"+mAuth.getCurrentUser());
                 updateUI(mAuth.getCurrentUser());
+                pgbarhide();
             }
         } else {
             Log.d(TAG, "Imei not registered");

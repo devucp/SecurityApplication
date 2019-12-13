@@ -43,8 +43,8 @@
 
                 android:gravity="center"
                 android:shadowColor="#A3050101"
-                android:shadowRadius="25"
-                android:text="@string/signup"
+                android:shadowRadius="10"
+                android:text="SIGN UP"
                 android:textAlignment="center"
                 android:textColor="#FFF8F8"
                 android:textSize="30sp"
@@ -171,15 +171,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:layout_marginBottom="30dp"
-                android:background="@drawable/btn_cus"
+                android:background="@drawable/shapelogin"
                 android:onClick="verifyEmailId"
                 android:paddingTop="9dp"
                 android:paddingBottom="9dp"
                 android:text="@string/verify_email"
                 android:textColor="#000000"
                 android:textColorHint="#ffffff"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:textSize="15sp"
 
                 />
 
@@ -189,16 +188,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="0dp"
                 android:layout_marginBottom="0dp"
-                android:background="@drawable/btn_cus"
+                android:background="@drawable/shapelogin"
                 android:onClick="signUp"
                 android:paddingTop="9dp"
                 android:paddingBottom="9dp"
                 android:text="@string/proceed"
                 android:textColor="#000000"
                 android:textColorHint="#ffffff"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
+                android:textSize="15sp" />
 
         </LinearLayout>
     </ScrollView>

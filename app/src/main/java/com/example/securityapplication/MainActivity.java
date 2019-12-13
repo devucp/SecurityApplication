@@ -16,14 +16,19 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+
 import android.widget.TextView;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+//import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -33,7 +38,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -48,6 +52,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.Hashtable;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 //import androidx.annotation.NonNull;
 
 
@@ -61,6 +68,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mPassword;
     private Button mSignInButton;
     private String TAG = "MainActivity";
+    private Button signupbttn;
+
+
+
+
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDevicesDatabaseReference;
@@ -72,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
     private static final int RC_SIGN_IN = 9001;
+    ProgressBar pgsBar;
+    ProgressBar pgsBar1;
+    ProgressBar pgsBar2;
 
     private User user;
     private Device device;
@@ -83,12 +98,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //Permissions request code
     int RC;
 
+    String background;
+
+    public void pgbarshow()
+    {
+        mSignInButton.setText("");
+        findViewById(R.id.pBar).setVisibility(VISIBLE);
+         mSignInButton.getBackground().setAlpha(100);
+
+
+         mSignInButton.setClickable(false);
+         signupbttn.setClickable(false);
+
+
+         mEmail.setEnabled(false);
+         mPassword.setEnabled(false);
+
+         findViewById(R.id.ForgetPassword).setEnabled(false);
+
+         findViewById(R.id.checkbox).setEnabled(false);
+
+        mGoogleSignInButton.setEnabled(false);
+
+
+
+
+
+    }
+
+    public void pgbarhide()
+    {
+
+        findViewById(R.id.pBar).setVisibility(GONE);
+        mSignInButton.setText("SIGN IN");
+        mSignInButton.getBackground().setAlpha(255);
+
+
+
+        signupbttn.setClickable(true);
+        mSignInButton.setClickable(true);
+
+        mEmail.setEnabled(true);
+        mPassword.setEnabled(true);
+
+        findViewById(R.id.ForgetPassword).setEnabled(true);
+
+        findViewById(R.id.checkbox).setEnabled(true);
+
+        mGoogleSignInButton.setEnabled(true);
+
+
+
+
+
+    }
+
+
+
+
+
+
     @Override
     public void onClick(View v) {
+
         int i = v.getId();
         if(i== R.id.signInButton){
             if(mAuth.getCurrentUser()==null) {
+                Log.d(TAG,"Current user is null");
                 if(validateForm()){
+
+                    pgbarshow();
+
+
+
+
                     Hashtable<String,String> userData = new Hashtable<>();
                     userData.put("email",mEmail.getText().toString());
                     userData.put("password",mPassword.getText().toString());
@@ -111,6 +194,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
         else if (i==R.id.signUpButton){
+
+
+            signupbttn.setText("");
+            findViewById(R.id.pBar1).setVisibility(VISIBLE);
+            mSignInButton.setClickable(false);
+
+            signupbttn.getBackground().setAlpha(100);
+
             // check if imei is registered
             setDeviceForSignUp(mImeiNumber);
         }
@@ -133,6 +224,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initViews();
         initOnClickListeners();
 
+
+
+
+
+         pgsBar = findViewById(R.id.pBar);
+        pgsBar1= findViewById(R.id.pBar1);
+        pgsBar2= findViewById(R.id.pBar2);
+
+
+
+        signupbttn = findViewById(R.id.signUpButton);
+        mEmail=findViewById(R.id.editEmail);
+        mPassword=findViewById(R.id.editPassword);
+        mStatus= findViewById(R.id.status);
+        mSignInButton=findViewById(R.id.signInButton);
+        mGoogleSignInButton=findViewById(R.id.googleSignInButton);
         FirebaseApp.initializeApp(this);
         mAuth=FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -278,8 +385,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
+
+            Log.d(TAG, "PGBAR2 VISIBLE");
+
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -299,7 +410,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, "Authentication failed. Try Again",Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
+
+
         }
+
 
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
@@ -307,6 +421,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(TAG,"hasBackPressed:"+hasBackPressed);
                 if (hasBackPressed){
                     signOut();
+
+
+                    pgsBar1.setVisibility(GONE);
+                    signupbttn.getBackground().setAlpha(255);
+                    signupbttn.setText("SIGN UP");
+                    mSignInButton.getBackground().setAlpha(255);
+
+                    if(pgsBar.getVisibility()==VISIBLE)
+                    {
+                        pgsBar.setVisibility(GONE);
+
+
+                    }
+                    mSignInButton.setClickable(true);
+
+
+
                 }
             }
             else if (resultCode == Activity.RESULT_CANCELED) {
@@ -338,10 +469,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //verifyEmailId();
                             updateUI(user);
                         } else {
+
+                            pgbarhide();
                             try{
                                 throw task.getException();
                             }
                             catch (FirebaseAuthInvalidCredentialsException e){
+
+
                                 Log.d(TAG,"Exception:"+e.getMessage());
                                 Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
                             }
@@ -381,32 +516,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void updateUI(FirebaseUser user){
-        if(user==null){
+    public void updateUI(FirebaseUser firebaseUser){
+        if(firebaseUser==null){
             mStatus.setText(R.string.not_logged);
             mSignInButton.setText(R.string.sign_in_text);
-            mEmail.setVisibility(View.VISIBLE);
-            mPassword.setVisibility(View.VISIBLE);
-            mGoogleSignInButton.setVisibility(View.VISIBLE);
+            mEmail.setVisibility(VISIBLE);
+            mPassword.setVisibility(VISIBLE);
+            mGoogleSignInButton.setVisibility(VISIBLE);
         }
-        else if(user!=null){
-            mStatus.setText(R.string.logged);
-            mSignInButton.setText(R.string.sign_out_text);
-            mEmail.setVisibility(View.GONE);
-            mPassword.setVisibility(View.GONE);
-            mGoogleSignInButton.setVisibility(View.GONE);
-            Toast.makeText(this, "Signed In Successfully", Toast.LENGTH_SHORT).show();
-            Log.d(TAG,mAuth.getCurrentUser().toString());
+        else if(firebaseUser!=null){
+            //mStatus.setText(R.string.logged);
+            //mSignInButton.setText(R.string.sign_out_text);
+            //mEmail.setVisibility(GONE);
+            ///mPassword.setVisibility(GONE);
+            //mGoogleSignInButton.setVisibility(GONE);
+            //mFaceBookLoginButton.setVisibility(GONE);
 
-            /** SosPlayer Service intent**/
-            /*mSosPlayerIntent=new Intent(this, SosPlayer .class);
-            //checks if service is running and if not running then starts it
-            if (!isMyServiceRunning(SosPlayer.class)){
-                startService(mSosPlayerIntent);
-            }*/
             Intent mHomeIntent = new Intent(this,navigation.class);
             startActivity(mHomeIntent);
             finish();
+            pgbarhide();
+
+
         }
         Log.d(TAG,"UI updated successfully");
     }
@@ -471,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,"Exception");
             }
         });
     }
@@ -534,6 +665,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else
                 Toast.makeText(MainActivity.this,"Email Id not registered",Toast.LENGTH_LONG).show();
+            pgbarhide();
         }
         else {
             /*  case1: user tries to sign in from same device
@@ -606,6 +738,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             });
                         }
+                        pgbarhide();
+
+
                     } else {
                         user = null;
                         Log.d(TAG,"User is null");
@@ -614,6 +749,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
+
+
                     // Getting User failed, log a message
                     Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
                     Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
@@ -638,6 +775,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // or other user may have formatted the mobile without logging out
                 Log.d(TAG,"Current user:"+mAuth.getCurrentUser());
                 updateUI(mAuth.getCurrentUser());
+                pgbarhide();
             }
         } else {
             Log.d(TAG, "Imei not registered");

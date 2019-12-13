@@ -21,7 +21,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     User newU;
     private static final String TABLE_NAME = "user";
 
-    //public static final String COLUMN_ID = "id";
+    public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_GENDER = "gender";
@@ -35,7 +35,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
-                    //COLUMN_ID + " INTEGER, " +
+                    COLUMN_ID + " INTEGER DEFAULT 1 , " +
                     COLUMN_NAME + " TEXT, "+
                     COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
                     COLUMN_GENDER + " TEXT, " +
@@ -103,7 +103,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         newU=user;
         try{SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-
         contentValues.put(COLUMN_NAME, user.getName());
         contentValues.put(COLUMN_EMAIL, user.getEmail());
 //        contentValues.put(COLUMN_PASSWORD, user.getPassword());
@@ -177,8 +176,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues=new ContentValues();
         contentValues.put(COLUMN_TESTM,bool);
-        db.update(TABLE_NAME,contentValues,COLUMN_EMAIL + "=?",
-                new String[]{String.valueOf(newU.getEmail())});
+        db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
+                new String[]{"1"});
+        Log.d("checking3","indide updatetestmode"+this.getTestmode());
         db.close();
     }
     /**Updating user*/
@@ -209,9 +209,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             while (cursor.moveToNext()){
                 str = cursor.getString(0);
             }
-            if(str.equals("true"))
+            if(str.equals("1"))
                 return true;
         }
+        Log.d("checking4",str);
         return false;
     }
 

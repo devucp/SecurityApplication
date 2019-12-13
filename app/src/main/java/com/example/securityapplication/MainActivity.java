@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
-import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
+//import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -225,14 +225,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initOnClickListeners();
 
 
-        TashieLoader tashie = new TashieLoader(
-                this, 5,
-                30, 10,
-                ContextCompat.getColor(this, R.color.colorPrimary));
 
-        tashie.setAnimDuration(500);
-        tashie.setAnimDelay(100);
-        tashie.setInterpolator(new LinearInterpolator());
 
 
          pgsBar = findViewById(R.id.pBar);
@@ -743,6 +736,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             });
                         }
+                        pgbarhide();
+
+
                     } else {
                         user = null;
                         Log.d(TAG,"User is null");

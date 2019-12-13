@@ -470,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             updateUI(user);
                         } else {
 
-                            pgbarhide();
+                            //pgbarhide();
                             try{
                                 throw task.getException();
                             }
@@ -535,7 +535,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent mHomeIntent = new Intent(this,navigation.class);
             startActivity(mHomeIntent);
             finish();
-            pgbarhide();
 
 
         }

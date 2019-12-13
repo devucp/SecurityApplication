@@ -17,7 +17,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
-import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -225,14 +223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initOnClickListeners();
 
 
-        TashieLoader tashie = new TashieLoader(
-                this, 5,
-                30, 10,
-                ContextCompat.getColor(this, R.color.colorPrimary));
 
-        tashie.setAnimDuration(500);
-        tashie.setAnimDelay(100);
-        tashie.setInterpolator(new LinearInterpolator());
 
 
          pgsBar = findViewById(R.id.pBar);

@@ -324,7 +324,6 @@ public class navigation extends AppCompatActivity {
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
-            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
             mAuth.signOut();
             Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
             finish();

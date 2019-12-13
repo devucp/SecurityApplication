@@ -21,6 +21,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 public class profile_fragment extends Fragment {
     private TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
     private Button btn_edit;
+    navigation nv=new navigation();
     SQLiteDBHelper mydb ;
     Database_Helper dbHelper;
     User user;
@@ -52,17 +53,17 @@ public class profile_fragment extends Fragment {
 
     private void initListeners() {
         btn_edit.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            Intent intent = new Intent(getContext(),EditProfileActivity.class);
-                  /*  intent.putExtra("Name",ansName);
-                    intent.putExtra("Email",ansEmail);
-                    intent.putExtra("Phone",ansPhone);
-                    intent.putExtra("Address",ansAddress);*/
-                                            intent.putExtra("User",user);
-                                            startActivityForResult(intent,1);
-                                        }//Sending Data to EditProfileActivity
-                                    }
+            @Override public void onClick(View view) {
+                if (IsInternet.isNetworkAvaliable(getContext())) {
+                    Intent intent = new Intent(getContext(), EditProfileActivity.class);
+                    intent.putExtra("User", user);
+                    startActivityForResult(intent, 1);
+                }//Sending Data to EditProfileActivity
+                else {
+                    Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
+                }
+            }
+           }
         );
     }
 
@@ -79,9 +80,9 @@ public class profile_fragment extends Fragment {
         }
 //        StringBuffer buffer = new StringBuffer();
         while (res.moveToNext()){
-            user.setName(res.getString(0));
-            user.setEmail(res.getString(1));
-            user.setGender(res.getString(2));
+            user.setName(res.getString(1));
+            user.setEmail(res.getString(2));
+            user.setGender(res.getString(3));
             user.setMobile(res.getString(4));
 //            ansAadhaar = res.getString(6);
             user.setLocation(res.getString(5));
@@ -123,7 +124,7 @@ public class profile_fragment extends Fragment {
             if (resultCode == 110){
                 user = data.getParcelableExtra("ResultUser");
                 Log.d("Profile","User object returned"+user.getEmail());
-                //mydb.updateUser(user);
+                mydb.updateUser(user);
                 DisplayData();
             }
         }

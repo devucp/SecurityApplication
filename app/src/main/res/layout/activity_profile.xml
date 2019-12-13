@@ -245,7 +245,8 @@
                     android:background="@drawable/buttonstylegradient"
                     android:text="log out"
                     android:textColor="#fff"
-                    android:textSize="20sp" />
+                    android:textSize="20sp" >
+                </Button>
             </LinearLayout>
 
 

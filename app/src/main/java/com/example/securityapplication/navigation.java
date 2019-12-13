@@ -1,17 +1,22 @@
 package com.example.securityapplication;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +25,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +48,18 @@ public class navigation extends AppCompatActivity {
     public static Boolean test=false;
 
     Menu optionsMenu;
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mDevicesDatabaseReference;
+    private User user;
+    private Device device;
+    private String TAG = "NavigatonFragment";
+    private String mImeiNumber;
+    private TelephonyManager telephonyManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +69,13 @@ public class navigation extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
+
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
+        // initialise database references
+        initDataBaseReferences();
+
         //sqlite db code here
         Log.d("cchecking","Oncreate : Loaded"+is_home);
         if(db.numberOfRows()==0)
@@ -67,10 +95,14 @@ public class navigation extends AppCompatActivity {
 
     }
 
-
+    private void initDataBaseReferences(){
+        //Initialize Database references
+        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
+        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
+    }
 
     public void getData(final int check){
-        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         String uid=firebaseUser.getUid();
         FirebaseAuth firebaseAuth=FirebaseAuth.getInstance();
         FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
@@ -79,6 +111,8 @@ public class navigation extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 newUser=dataSnapshot.getValue(User.class);
+                // check if user signed in from two devices
+                recheckUserAuthentication(firebaseUser);
 
                 if(check==1) {
                     db.addUser(newUser);
@@ -208,5 +242,103 @@ public class navigation extends AppCompatActivity {
 
     public void sos(View view) {
         startActivity(new Intent(this,sos_page.class));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getImei();
+                } else {
+                    closeNow();
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void closeNow(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            finishAffinity();
+        }
+        else{
+            finish();
+        }
+    }
+
+    private void recheckUserAuthentication(final FirebaseUser firebaseUser){
+
+        Log.d(TAG,"Inside recheckUserAuthentication");
+        getImei();
+        mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                Log.d("User Data Snapshot:", userDataSnapshot.toString());
+                if (userDataSnapshot.exists()) {
+                    user = userDataSnapshot.getValue(User.class);
+                    Log.d(TAG,"Imei of device:"+mImeiNumber);
+                    Log.d(TAG,"Imei from firebase:"+user.getImei());
+                    if (!user.getImei().equals(mImeiNumber)){
+                        // same user trying to login from multiple devices -> logout the user
+                        Log.d(TAG, "User is LoggedIn in other device");
+                        Toast.makeText(navigation.this,
+                                "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                        signOut();
+                    }
+                    else{/* nothing to do*/}
+                } else {/* this should not be the case*/}
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void getImei(){
+        telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+            return;
+        }
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mImeiNumber = telephonyManager.getImei(0);
+                Log.d("IMEI", "IMEI Number of slot 1 is:" + mImeiNumber);
+            } else {
+                mImeiNumber = telephonyManager.getDeviceId();
+            }
+        }
+    }
+
+    private void signOut(){
+
+        // first make uid under imei null in Devices and imei under uid null in Users
+        device = new Device();
+        device.setUID("null");
+        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
+
+        //Firebase signOut
+        if (mAuth.getCurrentUser() != null) {
+            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
+            mAuth.signOut();
+            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        //Google signOut
+        /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //updateUI(null);
+                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }*/
     }
 }

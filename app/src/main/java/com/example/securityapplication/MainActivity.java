@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     deviceId();
                 } else {
                     closeNow();
-                    Toast.makeText(this, "Without permission we check", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
                 break;
             default:
@@ -376,37 +376,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
-    /*private void recheckUserAuthentication(final FirebaseUser firebaseUser){
-
-        Log.d(TAG,"Inside recheckUserAuthentication");
-        mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                Log.d("User Data Snapshot:", userDataSnapshot.toString());
-                if (userDataSnapshot.exists()) {
-                    user = userDataSnapshot.getValue(User.class);
-                    if (user.getImei().equals(mImeiNumber)){
-                        updateUI(firebaseUser);
-                    }
-                    else {
-                        // same user trying to login from multiple devices -> logout the user
-                        Log.d(TAG, "User is LoggedIn in other device");
-                        Toast.makeText(MainActivity.this,
-                                "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                        signOut();
-                    }
-                } else {
-                    // this should not be the case
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }*/
 
     public void signIn(final String email, final String password){
          Log.d(TAG,"Signing IN user with email "+email+" and password "+password);

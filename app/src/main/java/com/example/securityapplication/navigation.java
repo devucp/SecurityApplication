@@ -1,5 +1,6 @@
 package com.example.securityapplication;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -32,9 +33,9 @@ public class navigation extends AppCompatActivity {
 
     int count=0;
     static User newUser=new User();
-    static Boolean is_home=true;
-    SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
+    Boolean is_home=true;
 
+    SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
     public static Boolean test=false;
 
     Menu optionsMenu;
@@ -48,16 +49,21 @@ public class navigation extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
         //sqlite db code here
+        Log.d("cchecking","Oncreate : Loaded"+is_home);
         if(db.numberOfRows()==0)
             getData(1);
         else
         {
+            Log.d("checking","oncreate option menu 3 is running");
             getData(2);
             if(db.getTestmode())
+            {
+                Log.d("checking","oncreate option menu 2 is running");
                 test=true;
-        }
+            }
+            }
 
-        Log.d("Navigation :","Oncreate : Loaded");
+
 
     }
 
@@ -96,41 +102,54 @@ public class navigation extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.top_menu,menu);
         optionsMenu=menu;
         MenuItem titem=optionsMenu.findItem(R.id.testmode);
-        MenuItem kk = test ? titem.setChecked(true) : titem.setChecked(false);
+        test=db.getTestmode();
+        Log.d("checking","oncreate option menu is running"+db.getTestmode());
+        if(test)
+            titem.setChecked(true);
+        else
+            titem.setChecked(false);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.testmode:
-                if(item.isChecked())
-                {
-                    item.setChecked(false);
+        try {
+            switch (item.getItemId()) {
+                case R.id.testmode:
+                    if (item.isChecked()) {
+                        item.setChecked(false);
+                        test = false;
+                        db.updatetestmode(test);
+                        //Log.d("checking1", String.valueOf(db.getTestmode()) + "home" + is_home);
+                        Toast.makeText(this, "Test mode Off", Toast.LENGTH_SHORT).show();
+                        if (is_home) {
+                            TextView tv = (TextView) findViewById(R.id.textView3);
+                            tv.setVisibility(View.INVISIBLE);
+                        }
+                    } else {
+                        item.setChecked(true);
+                        test = true;
+                        db.updatetestmode(test);
+                        //Log.d("checking2", String.valueOf(db.getTestmode()));
+                        Toast.makeText(this, "Test mode On", Toast.LENGTH_SHORT).show();
+                        if (is_home) {
+                            TextView tv = (TextView) findViewById(R.id.textView3);
+                            tv.setVisibility(View.VISIBLE);
+                        }
+                    }
 
-                    test=false;
-                    db.updatetestmode(test);
-                    Log.d("Test",String.valueOf(test));
-                    Toast.makeText(this, "Test mode Off", Toast.LENGTH_SHORT).show();
-                    if(is_home)
-                    {
-                    TextView tv =(TextView)findViewById(R.id.textView3);
-                    tv.setVisibility(View.INVISIBLE);}
-                }
-                else {
-                    item.setChecked(true);
-                    test=true;
-                    db.updatetestmode(test);
-                    Log.d("Test",String.valueOf(test));
-                    Toast.makeText(this, "Test mode On", Toast.LENGTH_SHORT).show();
-                    if(is_home){
-                    TextView tv =(TextView)findViewById(R.id.textView3);
-                    tv.setVisibility(View.VISIBLE);}
-                }
 
-                return true;
-            default :
-                return super.onOptionsItemSelected(item);
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
+        catch (Exception e)
+        {
+            item.setChecked(db.getTestmode());
+            Toast.makeText(this, "Loading.....please wait for a second", Toast.LENGTH_LONG).show();
+        }
+        finally {
+            return true;
         }
 
     }

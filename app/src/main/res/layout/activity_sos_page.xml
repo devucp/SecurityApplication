@@ -4,11 +4,13 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:gravity="center"
+    android:theme="@style/sos"
     android:background="@mipmap/back"
     >
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,32 +18,39 @@
         android:paddingTop="0dp"
         android:layout_margin="20dp"
         android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Emergency Contacts"
-            android:textStyle="italic|bold"
-            android:textColor="#000000"
-            android:textSize="30sp"
-            android:layout_gravity="center_horizontal"
 
-            ></TextView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:fadingEdge="horizontal|vertical"
+            android:fontFamily="@font/aclonica"
+            android:gravity="center"
+            android:text="Emergency Contacts"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="28sp"
+            android:textStyle="bold|italic" />
 
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/sosl1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:alpha="0.6"
+            android:clipChildren="false"
             android:textColorHint="#FFFFFF"
-            app:hintAnimationEnabled="true"
-          >
+            app:hintAnimationEnabled="false"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/sose1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="1"
                 android:background="@drawable/ed_cus"
+                android:drawableRight="@drawable/ic_account_circle_whilte_24dp"
                 android:ems="10"
                 android:focusable="auto"
                 android:hint="Emergency Contact 1"
@@ -52,26 +61,31 @@
                 android:paddingEnd="5dp"
                 android:paddingBottom="9dp"
                 android:textColor="#ffffff"
-                android:textColorHighlight="#F8FA0707"
+                android:textColorHighlight="#264FA3"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/holo_red_dark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:translationY="5dp" />
         </android.support.design.widget.TextInputLayout>
+
         <android.support.design.widget.TextInputLayout
             android:id="@+id/sosl2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="0dp"
+            android:alpha="0.6"
+            android:clipChildren="false"
             android:textColorHint="#FFFFFF"
             app:hintAnimationEnabled="true"
-            >
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/sose2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="1"
                 android:background="@drawable/ed_cus"
+                android:drawableRight="@drawable/ic_account_circle_whilte_24dp"
                 android:ems="10"
                 android:focusable="auto"
                 android:hint="Emergency Contact 2"
@@ -82,27 +96,31 @@
                 android:paddingEnd="5dp"
                 android:paddingBottom="9dp"
                 android:textColor="#ffffff"
-                android:textColorHighlight="#F8FA0707"
+                android:textColorHighlight="#264FA3"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/holo_red_dark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:translationY="5dp" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/sosl3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="0dp"
+            android:alpha="0.6"
+            android:clipChildren="false"
             android:textColorHint="#FFFFFF"
             app:hintAnimationEnabled="true"
-            >
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/sose3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="1"
                 android:background="@drawable/ed_cus"
+                android:drawableRight="@drawable/ic_account_circle_whilte_24dp"
                 android:ems="10"
                 android:focusable="auto"
                 android:hint="Emergency Contact 3"
@@ -113,27 +131,31 @@
                 android:paddingEnd="5dp"
                 android:paddingBottom="9dp"
                 android:textColor="#ffffff"
-                android:textColorHighlight="#F8FA0707"
+                android:textColorHighlight="#264FA3"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/holo_red_dark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:translationY="5dp" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/sosl4"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="0dp"
+            android:alpha="0.6"
+            android:clipChildren="false"
             android:textColorHint="#FFFFFF"
             app:hintAnimationEnabled="true"
-            >
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/sose4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="1"
                 android:background="@drawable/ed_cus"
+                android:drawableRight="@drawable/ic_account_circle_whilte_24dp"
                 android:ems="10"
                 android:focusable="auto"
                 android:hint="Emergency Contact 4"
@@ -144,27 +166,31 @@
                 android:paddingEnd="5dp"
                 android:paddingBottom="9dp"
                 android:textColor="#ffffff"
-                android:textColorHighlight="#F8FA0707"
+                android:textColorHighlight="#264FA3"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/holo_red_dark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:translationY="5dp" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/sosl5"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="0dp"
+            android:alpha="0.6"
+            android:clipChildren="false"
             android:textColorHint="#FFFFFF"
             app:hintAnimationEnabled="true"
-            >
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/sose5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:alpha="1"
                 android:background="@drawable/ed_cus"
+                android:drawableRight="@drawable/ic_account_circle_whilte_24dp"
                 android:ems="10"
                 android:focusable="auto"
                 android:hint="Emergency Contact 5"
@@ -175,11 +201,11 @@
                 android:paddingEnd="5dp"
                 android:paddingBottom="9dp"
                 android:textColor="#ffffff"
-                android:textColorHighlight="#F8FA0707"
+                android:textColorHighlight="#264FA3"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/holo_red_dark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:translationY="5dp" />
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
@@ -187,14 +213,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="10dp"
             >
             <Button
                 android:id="@+id/sosedit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
-               android:layout_marginRight="20dp"
+
+                android:layout_marginRight="20dp"
                 android:background="@drawable/btn_cus"
                 android:paddingBottom="9dp"
                 android:paddingTop="9dp"
@@ -204,15 +230,17 @@
                 android:textColorHint="#ffffff"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
             <Button
                 android:id="@+id/sossave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+
+                android:alpha="0.6"
                 android:background="@drawable/btn_cus"
-                android:paddingBottom="9dp"
-                android:paddingTop="9dp"
                 android:paddingHorizontal="50dp"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp"
                 android:text="save"
                 android:textColor="#000000"
                 android:textColorHint="#ffffff"
@@ -221,5 +249,5 @@
 
         </LinearLayout>
     </LinearLayout>
-    </ScrollView>
+        </ScrollView>
 </LinearLayout>

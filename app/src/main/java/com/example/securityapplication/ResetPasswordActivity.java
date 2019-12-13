@@ -97,6 +97,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                 Toast.makeText(ResetPasswordActivity.this,"EMAIL SENT. PLEASE CHECK YOUR MAIL",Toast.LENGTH_SHORT).show();
                                 //startActivity(new Intent(ResetPasswordActivity.this,MainActivity.class));
+                                pgbarhide();
+
 
 
                             }
@@ -105,6 +107,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                 String error = task.getException().getMessage();
                                 Toast.makeText(ResetPasswordActivity.this,error,Toast.LENGTH_LONG).show();
                                 pgbarhide();
+
                             }
 
                         }

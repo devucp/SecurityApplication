@@ -65,8 +65,7 @@ public class SignUp1Activity extends AppCompatActivity {
     //Added user object to send to next
     private User user;
 
-    DatePickerDialog datePickerDialog;
-    private TextInputEditText textinputName,textinputDOB,textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
+    private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
     private TextInputEditText date;
     private TextInputLayout pass_outer,cnfpass_outer;
     public TextView pass1,pass2;
@@ -76,7 +75,6 @@ public class SignUp1Activity extends AppCompatActivity {
     private DatabaseReference mEmailDatabaseReference;
     private String uid;
 
-    private Button verifyEmailButton;
     private VerifyEmail verifyEmail;
 
     private String TAG = "SignUp1";
@@ -102,8 +100,6 @@ public class SignUp1Activity extends AppCompatActivity {
         //gender_grp = findViewById(R.id.radiogrp);
         Btn_Submit = findViewById(R.id.btn_sub);
 
-        verifyEmailButton = findViewById(R.id.btn_verify);
-
         user=new User();
 
         // check if user is signed in to google or facebook
@@ -122,7 +118,6 @@ public class SignUp1Activity extends AppCompatActivity {
                     textinputEmail.setText(personEmail);
                     textinputEmail.setEnabled(false);
                 }
-
             }
         }
         else
@@ -144,13 +139,11 @@ public class SignUp1Activity extends AppCompatActivity {
         builder.setMessage(Message);
     }
 
-
-    public Hashtable<String, String> Validater(String userSelected) {
+    public Hashtable<String, String> Validater() {
         if (val.validateEmail(textinputEmail) & val.validatePassword(textinputPass,pass1) & val.validateCnfPassword(textinputPass,textinputCnfPass,pass2)){
             Hashtable<String,String> userData = new Hashtable<>();
             userData.put("email",textinputEmail.getText().toString().trim());
             userData.put("password", textinputPass.getText().toString().trim());
-            userData.put("userSelected", userSelected);
             return userData;
         }
         else {
@@ -159,19 +152,11 @@ public class SignUp1Activity extends AppCompatActivity {
         }
     }
 
-    public void verifyEmailId(View view){
-
-        Hashtable<String,String> userData =  Validater("verifyEmailId");
-        if (userData != null){
-            createUserAndVerifyEmail(userData);
-        }
-    }
-
     public void signUp(View view){
 
         // disable screen and show spinner
         //
-        Hashtable<String,String> userData = Validater("signUp");
+        Hashtable<String,String> userData = Validater();
         if (userData != null){
             setUidFromFirebase(userData);
         }
@@ -187,7 +172,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
-                            checkIsEmailVerified(firebaseUser, userData.get("userSelected"));
+                            checkIsEmailVerified(firebaseUser);
 
                         } else {
                             try {
@@ -223,7 +208,7 @@ public class SignUp1Activity extends AppCompatActivity {
                             Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                            checkIsEmailVerified(firebaseUser, userData.get("userSelected"));
+                            checkIsEmailVerified(firebaseUser);
                         } else {
                             try {
                                 throw task.getException();
@@ -240,26 +225,18 @@ public class SignUp1Activity extends AppCompatActivity {
                 });
     }
 
-    private void checkIsEmailVerified(FirebaseUser firebaseUser, String userSelected){
+    private void checkIsEmailVerified(FirebaseUser firebaseUser){
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
-            Toast.makeText(SignUp1Activity.this, "EmailId is verified", Toast.LENGTH_LONG).show();
+            Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
             String emailId = firebaseUser.getEmail();
             signOut();
-            // set uid from firebase
-            if (userSelected.equals("signUp")){
-                // can proceed to signUp2
-                AddData();
-            }
+            // can proceed to signUp2
+            AddData();
         }
         else {
-            Log.d(TAG,userSelected);
-            if (userSelected.equals("verifyEmailId"))
-                verifyEmail.sendVerificationEmail(SignUp1Activity.this);
-            else
-                signOut();
-            Toast.makeText(SignUp1Activity.this, "EmailId not verified",Toast.LENGTH_SHORT).show();
+            verifyEmail.sendVerificationEmail(SignUp1Activity.this);
         }
 
     }
@@ -276,15 +253,8 @@ public class SignUp1Activity extends AppCompatActivity {
         //Sending the user object
         myDb.setUser(user);
 
-
        Boolean isInserted = myDb.insert_data(textinputEmail.getText().toString().trim(), textinputPass.getText().toString().trim());
         if (isInserted) {
-//            textinputName.setText(null);
-//            gender_grp.clearCheck();
-//            textinputDOB.setText(null);
-//            textinputEmail.setText(null);
-//            textinputPass.setText(null);
-//            textinputCnfPass.setText(null);
             //updates the Usr object with filled fields
             user=myDb.getUser();
 
@@ -311,7 +281,6 @@ public class SignUp1Activity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==10 && requestCode==1)
             finish();
-
 
         if (requestCode==2){
             Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
@@ -362,7 +331,7 @@ public class SignUp1Activity extends AppCompatActivity {
             Log.d(TAG,"Email not stored in email node in firebase db");
         }
         else{
-            Toast.makeText(SignUp1Activity.this, "Email Id is already registered",Toast.LENGTH_LONG).show();
+            Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
         }
 
     }

@@ -206,19 +206,7 @@
             android:text="@string/not_logged"
             android:paddingTop="10dp"
             android:layout_below="@+id/googleFbButtons"/>
-        <com.agrawalsuneet.dotsloader.loaders.TashieLoader
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            app:tashieloader_animDelay="200"
-            app:tashieloader_animDur="1000"
-            android:layout_marginTop="16dp"
-            android:visibility="gone"
-            android:layout_marginStart="40dp"
-            app:tashieloader_dotsColor="@color/colorPrimary"
-            app:tashieloader_dotsDist="5dp"
-            app:tashieloader_dotsRadius="18dp"
-            app:tashieloader_interpolator="@android:anim/accelerate_interpolator"
-            app:tashieloader_noOfDots="6" />
+
 
 
     </RelativeLayout>

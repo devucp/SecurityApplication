@@ -101,13 +101,17 @@ public class SignUp2 extends AppCompatActivity {
     private TextInputEditText textinputName,textinputDOB;
     private TextInputEditText date;
 
-    private ProgressBar Spinner;
+    public static   ProgressBar Spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup2);
+        Spinner = (ProgressBar)findViewById(R.id.progress_bar);
+        Spinner.setVisibility(View.INVISIBLE);
 
         initViews();
         initListeners();
@@ -126,7 +130,8 @@ public class SignUp2 extends AppCompatActivity {
 //        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
         // check if user is signed in to google or facebook
-        if (GoogleSignIn.getLastSignedInAccount(this) != null){
+        if (GoogleSignIn.getLastSignedInAccount(this) != null)
+        {
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
                 String personName = acct.getDisplayName();
@@ -136,13 +141,14 @@ public class SignUp2 extends AppCompatActivity {
             }
         }
         else
+        {
             Log.d("isLoggedinGoogle","Not logged in");
+        }
 
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
 
-        Spinner = (ProgressBar)findViewById(R.id.progress_bar);
-        Spinner.setVisibility(View.GONE);
+
     }
 
     private void initializeGoogleFirebaseSignIn(){
@@ -214,8 +220,8 @@ public class SignUp2 extends AppCompatActivity {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
+            public void onClick(View view)
+            {
 
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
@@ -245,6 +251,8 @@ public class SignUp2 extends AppCompatActivity {
 
                     Spinner.setVisibility(View.GONE);
                     Enable();
+                    btn_submit.setText("SIGNUP");
+
                 }
                 else{
                     valid_location = true;
@@ -272,11 +280,14 @@ public class SignUp2 extends AppCompatActivity {
                 if(!empty && valid){
                     Spinner.setVisibility(View.VISIBLE);
                     disable();
+                    btn_submit.setText("");
+
                     imei = null;
                     TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
                     String permission = Manifest.permission.READ_PHONE_STATE;
                     int res = getApplicationContext().checkCallingOrSelfPermission(permission);
-                    if (res == PackageManager.PERMISSION_GRANTED) {
+                    if (res == PackageManager.PERMISSION_GRANTED)
+                    {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             imei = tm.getImei(0);
                             Log.d("IMEI", "IMEI Number of slot 1 is:" + imei);
@@ -289,6 +300,7 @@ public class SignUp2 extends AppCompatActivity {
                     } else {
                         Spinner.setVisibility(View.GONE);
                         Enable();
+                        btn_submit.setText("SIGNUP");
                         Log.d("SIgnUP2", "PERMISSION FOR READ STATE NOT GRANTED, REQUESTING PERMSISSION...");
                         ActivityCompat.requestPermissions(activity,
                                 new String[]{Manifest.permission.READ_PHONE_STATE}, RC);
@@ -299,6 +311,8 @@ public class SignUp2 extends AppCompatActivity {
                         if (user.getEmail() == null || user.getPassword() == null){
                             Spinner.setVisibility(View.GONE);
                             Enable();
+                            btn_submit.setText("SIGNUP");
+
                             // go back to signUp1
                             finishActivity(2);
                         }
@@ -322,6 +336,8 @@ public class SignUp2 extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "MOBILE NO. ALREADY EXISTS", Toast.LENGTH_LONG).show();
                         Spinner.setVisibility(View.GONE);
                         Enable();
+                        btn_submit.setText("SIGNUP");
+
                     }
                 }
                 }
@@ -448,6 +464,8 @@ public class SignUp2 extends AppCompatActivity {
                                 catch (Exception e){
                                     Spinner.setVisibility(View.GONE);
                                     Enable();
+                                    btn_submit.setText("SIGNUP");
+
                                     // If sign in fails, display a message to the user.
                                     Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
                                     Toast.makeText(SignUp2.this, "Authentication failed.",
@@ -460,6 +478,8 @@ public class SignUp2 extends AppCompatActivity {
         else {
             Spinner.setVisibility(View.GONE);
             Enable();
+            btn_submit.setText("SIGNUP");
+
             Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
         }
 
@@ -499,6 +519,8 @@ public class SignUp2 extends AppCompatActivity {
         startActivity(profileActivity);*/
     }
 
+
+
     private void setUidFromFirebase(final String mobile){
         mMobileDatabaseReference.child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -529,13 +551,15 @@ public class SignUp2 extends AppCompatActivity {
         else{
             Spinner.setVisibility(View.GONE);
             Enable();
+            btn_submit.setText("SIGNUP");
+
             // prompt user to enter different mobile no.
             Log.d(TAG, "Mobile no. already registered in firebase");
             Toast.makeText(SignUp2.this, "Mobile no. already registered. Enter different mobile number",Toast.LENGTH_LONG).show();
         }
     }
 
-    //screen enable disable
+    //screen enable/disable
 
     public  void Enable()
     {

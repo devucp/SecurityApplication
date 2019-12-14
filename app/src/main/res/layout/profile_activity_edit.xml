@@ -167,7 +167,7 @@
 
                     <Button
                         android:id="@+id/btn_Submit_Changes"
-                        android:layout_width="125dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="25dp"
                         android:layout_marginTop="30dp"

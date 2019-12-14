@@ -55,7 +55,7 @@
                         android:layout_height="36dp"
                         android:layout_gravity="center"
 
-                        android:src="@drawable/ic_person_black_24dp" />
+                        android:src="@drawable/ic_person_cyan_24dp" />
 
                     <EditText
 
@@ -167,7 +167,7 @@
 
                     <Button
                         android:id="@+id/btn_Submit_Changes"
-                        android:layout_width="125dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="25dp"
                         android:layout_marginTop="30dp"

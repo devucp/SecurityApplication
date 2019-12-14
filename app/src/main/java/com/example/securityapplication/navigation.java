@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,10 @@ public class navigation extends AppCompatActivity {
 
     SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
     public static Boolean test=false;
+    public static TextView tmode;
+    public static TextView tmode1;
 
+    private int flag=0;
     Menu optionsMenu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,29 @@ public class navigation extends AppCompatActivity {
             }
             }
 
+
+
+        tmode1=(TextView)findViewById(R.id.testmode);
+
+        tmode1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (flag==0){
+                    flag=1;
+                    tmode1.setText("TEST MODE : ON");
+
+                  //  tmode1.setPadding(0,0,10,0);
+                    tmode1.setTextColor(Color.GREEN);
+                }
+                else {
+                    flag=0;
+                    tmode1.setTextColor(Color.WHITE);
+                    tmode1.setText("TEST MODE : OFF");
+                   // tmode.setTextColor(Color.WHITE);
+
+                }
+            }
+        });
 
 
     }
@@ -97,7 +124,7 @@ public class navigation extends AppCompatActivity {
     }
 
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.top_menu,menu);
         optionsMenu=menu;
@@ -109,7 +136,7 @@ public class navigation extends AppCompatActivity {
         else
             titem.setChecked(false);
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -209,4 +236,6 @@ public class navigation extends AppCompatActivity {
     public void sos(View view) {
         startActivity(new Intent(this,sos_page.class));
     }
+
+
 }

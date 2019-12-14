@@ -263,7 +263,7 @@ public class sos_page extends AppCompatActivity {
                 intent = new Intent(sos_page.this,navigation.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus));
+                //btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus));
 
                 //FOR c1
                 Log.d("SosActivity","OnClick : Initial value for c1="+c1.getText());
@@ -612,10 +612,17 @@ public class sos_page extends AppCompatActivity {
 
                                 TempNumberHolder = cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                                 Log.i("contact_name",TempNameHolder);
+                                TempNumberHolder=TempNumberHolder.replaceAll("\\D+","");
                                 int len=TempNumberHolder.length();
-                                String tmp;
-                                tmp=TempNumberHolder.substring(len-10,len);
-                                current.setText(tmp);
+                                if(len<10)
+                                {
+                                    current.setText("");
+                                }
+                                else{
+                                    String tmp;
+                                    tmp=TempNumberHolder.substring(len-10,len);
+                                    current.setText(tmp);
+                                }
 
                             }
                         }

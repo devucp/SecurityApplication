@@ -25,7 +25,9 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
         <activity android:name=".recent_cards"></activity>
-        <activity android:name=".sos_page"></activity>
+        <activity android:name=".sos_page"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            ></activity>
         <activity android:name=".navigation"/>
         <activity android:name=".EditProfileActivity">
         </activity>

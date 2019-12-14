@@ -24,6 +24,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.securityapplication.model.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
@@ -51,7 +55,6 @@ public class sos_page extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos_page);
 
-
         values = new ContentValues();
         mydb = new SQLiteDBHelper(this);
         user = new User();
@@ -61,34 +64,31 @@ public class sos_page extends AppCompatActivity {
         EnableRuntimePermission();
         initViews();
         initInitialContacts();
-        initTempValues();
+        //initTempValues();
         initListeners();
-
 
         c1.setEnabled(false);
         c2.setEnabled(false);
         c3.setEnabled(false);
         c4.setEnabled(false);
         c5.setEnabled(false);
-
+        btn_SosSave.setEnabled(false);
     }
 
     private void initViews() {
 
-        btn_SosEdit = (Button) findViewById(R.id.sosedit);
-        btn_SosSave = (Button) findViewById(R.id.sossave);
-        c1 = (TextInputEditText) findViewById(R.id.sose1);
-        c2 = (TextInputEditText) findViewById(R.id.sose2);
-        c3 = (TextInputEditText) findViewById(R.id.sose3);
-        c4 = (TextInputEditText) findViewById(R.id.sose4);
-        c5 = (TextInputEditText) findViewById(R.id.sose5);
-        cc1 = (TextInputLayout) findViewById(R.id.sosl1);
-        cc2 = (TextInputLayout) findViewById(R.id.sosl2);
-        cc3 = (TextInputLayout) findViewById(R.id.sosl3);
-        cc4 = (TextInputLayout) findViewById(R.id.sosl4);
-        cc5 = (TextInputLayout) findViewById(R.id.sosl5);
-
-        btn_SosSave.setEnabled(false);
+        btn_SosEdit = findViewById(R.id.sosedit);
+        btn_SosSave = findViewById(R.id.sossave);
+        c1 = findViewById(R.id.sose1);
+        c2 = findViewById(R.id.sose2);
+        c3 = findViewById(R.id.sose3);
+        c4 = findViewById(R.id.sose4);
+        c5 = findViewById(R.id.sose5);
+        cc1 = findViewById(R.id.sosl1);
+        cc2 = findViewById(R.id.sosl2);
+        cc3 = findViewById(R.id.sosl3);
+        cc4 = findViewById(R.id.sosl4);
+        cc5 = findViewById(R.id.sosl5);
     }
 
     private void initInitialContacts() {
@@ -100,7 +100,7 @@ public class sos_page extends AppCompatActivity {
                         "No SOS Contact records Found",
                         Toast.LENGTH_LONG).show();
                 Log.d("SOS Activity","No Contact Data found ");
-                initfirstvalues();
+                //Removed initvalues as it was not required anymore
                 FillViews();
             }
             while (res.moveToNext()) {
@@ -110,20 +110,8 @@ public class sos_page extends AppCompatActivity {
                 SosContacts.put("c4",res.getString(3));
                 SosContacts.put("c5",res.getString(4));
 
-                /*user.setSosc2(res.getString(1));
-                user.setSosc2(res.getString(1));
-                user.setSosc3(res.getString(2));
-                user.setSosc4(res.getString(3));
-                user.setSosc5(res.getString(4));*/
-
                 Log.d("SOS Activity", "LocalHashMap updated by SOS activity successfully " +
                         "Sosc1 = " + SosContacts.get("c1") + " Sosc2 = " + SosContacts.get("c2"));
-
-                /*sos_n1 = user.getSosc1();
-                sos_n2 = user.getSosc2();
-                sos_n3 = user.getSosc3();
-                sos_n4 = user.getSosc4();
-                sos_n5 = user.getSosc5();*/
 
                 sos_n1 = SosContacts.get("c1");
                 sos_n2 = SosContacts.get("c2");
@@ -139,11 +127,6 @@ public class sos_page extends AppCompatActivity {
         catch (RuntimeException e){
             e.printStackTrace();
             Log.d("SOS Contact page","Encountered RuntimeException; Setting initial values to empty");
-            sos_n1 = "";
-            sos_n2 = "";
-            sos_n3 = "";
-            sos_n4 = "";
-            sos_n5 = "";
         }
     }
 
@@ -157,14 +140,6 @@ public class sos_page extends AppCompatActivity {
         Log.d("SOS Activity","SOS contact views filled with values c1= "+c1.getText());
     }
 
-    private void initfirstvalues() {
-        sos_n1 = "";
-        sos_n2 = "";
-        sos_n3 = "";
-        sos_n4 = "";
-        sos_n5 = "";
-        Log.d("SOS Activity","SOS Contact table loaded for 1st time, empty values set; sos_n1=" +sos_n1);
-    }
 
     private void initTempValues() {
         temp_n1 = "";
@@ -173,7 +148,6 @@ public class sos_page extends AppCompatActivity {
         temp_n4 = "";
         temp_n5 = "";
     }
-
 
     private void initListeners(){
 
@@ -273,40 +247,39 @@ public class sos_page extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent;
-                intent = new Intent(sos_page.this,navigation.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (IsInternet.isNetworkAvaliable(sos_page.this)) {
 
-                btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus));
+                    Intent intent;
+                    intent = new Intent(sos_page.this, navigation.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                //FOR c1
-                Log.d("SosActivity","OnClick : Initial value for c1="+c1.getText());
+                    btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus));
+
+                    //FOR c1
+                    Log.d("SosActivity", "OnClick : Initial value for c1=" + c1.getText());
                     if (c1.getText().toString().equals("")) {
                         //toast
-                        Log.d("SOS Activity","C1 Empty");
+                        Log.d("SOS Activity", "C1 Empty");
                         Toast.makeText(getApplicationContext(), "1st contact is mandatory", Toast.LENGTH_LONG).show();
                         return;
                     } else {
                         temp_n1 = c1.getText().toString().trim();
-                        if (!temp_n1.equals("")){
-                            if (val.EditvalidatePhone(c1)){
-                                if (temp_n1.equals(sos_n1)){
+                        if (!temp_n1.equals("")) {
+                            Log.d("SosActivity", "Inside If , returns true");
+                            if (val.EditvalidatePhone(c1)) {
+                                if (temp_n1.equals(sos_n1)) {
                                     //no change
                                     c1added = false;
                                 }
-                                if (!checkUnique(c1,1)){
-                                    Log.d("SOS Activity", "OnClick : Duplicate c1 values found; c1="+c1.getText());
-//                                    c2.setError("Duplicate Contact Found");
+                                if (!checkUnique(c1, 1)) {
+                                    Log.d("SOS Activity", "OnClick : Duplicate c1 value found; c1=" + c1.getText());
                                     c1added = false;
                                     return;
-                                }
-                                else {
+                                } else {
                                     c1added = true;
-//                                    user.setSosc1(temp_n1);
+                                    SosContacts.put("c1", temp_n1);
                                 }
-                            }
-                            else {
-//                                c1.setError("Enter a valid mobile number");
+                            } else {
                                 return;
                             }
                         }
@@ -314,226 +287,212 @@ public class sos_page extends AppCompatActivity {
                     //FOR C2
                     if (c2.getText().toString().equals("")) {
                         Log.d("Sos", "c2 found empty");
-                        if (sos_n2.isEmpty()) {
+                        if (sos_n2 == null) {//changed the condition for if , changed from .equals to ==
                             //was empty previously too
                             c2added = false;
-                            temp_n2="";
+                            temp_n2 = null;
                         } else {
                             //update db .. was not empty previously
                             c2added = true;
-                            temp_n2="";
-//                            user.setSosc2(temp_n2);
+                            temp_n2 = null;
+                            SosContacts.put("c2", temp_n2);
                         }
                     } else {
                         temp_n2 = c2.getText().toString();
-                        if (!temp_n2.equals("")){
-                            if (val.EditvalidatePhone(c2)){
+                        if (!temp_n2.equals("")) {
+                            Log.d("SosActivity", "Inside If of c2, returns true");
+                            if (val.EditvalidatePhone(c2)) {
                                 if (temp_n2.equals(sos_n2)) {
                                     //no change
                                     c2added = false;
                                 }
-                                if (!checkUnique(c2,2)) {
+                                if (!checkUnique(c2, 2)) {
                                     //duplicate value raise alert
-                                    Log.d("SOS Activity", "onClick : Duplicate c2 values found; c2="+c2.getText());
-//                                    c2.setError("Duplicate Contact Found");
+                                    Log.d("SOS Activity", "onClick : Duplicate c2 values found; c2=" + c2.getText());
                                     c2added = false;
                                     return;
                                 } else {
                                     //save c2
                                     c2.setError(null);
                                     c2added = true;
-//                                    user.setSosc2(temp_n2);
+                                    SosContacts.put("c2", temp_n2);
                                 }
-                            }
-                            else {
-//                                c2.setError("Enter a valid Mobile number");
+                            } else {
                                 return;
                             }
-                        }
-                        else {
-                            temp_n2.equals("");
+                        } else {
+                            temp_n2 = null;
                         }
                     }
 
                     //FOR C3
                     if (c3.getText().toString().equals("")) {
-                        if (sos_n3.isEmpty()) {
+                        if (sos_n3 == null) {//changed the condition for if , changed from .equals to ==
                             //was empty previously
-                            temp_n3="";
                             c3added = false;
                         } else {
+                            //was not empty earlier
                             c3added = true;
-                            temp_n3="";
-//                            user.setSosc3(temp_n3);
+                            temp_n3 = null;
+                            SosContacts.put("c3", temp_n3);
                         }
                     } else {
                         temp_n3 = c3.getText().toString();
-                        if (!temp_n3.equals("")){
-                            if (val.EditvalidatePhone(c3)){
+                        if (!temp_n3.equals("")) {
+                            if (val.EditvalidatePhone(c3)) {
                                 if (temp_n3.equals(sos_n3)) {
                                     //no change
                                     c3added = false;
                                 }
-                                if (!checkUnique(c3,3)) {
+                                if (!checkUnique(c3, 3)) {
                                     // duplicate value raise alert
-                                    Log.d("SOS Activity","onClick : Duplicate C3 values found ; c3="+c3.getText());
-//                                    c3.setError("Duplicate contact found");
+                                    Log.d("SOS Activity", "onClick : Duplicate C3 values found ; c3=" + c3.getText());
                                     c3added = false;
                                     return;
                                 } else {
                                     //save c3
                                     c3added = true;
                                     c3.setError(null);
-//                                    user.setSosc3(temp_n3);
+                                    SosContacts.put("c3", temp_n3);
                                 }
-                            }
-                            else {
-//                                c3.setError("Enter a Valid Mobile Number");
+                            } else {
                                 return;
                             }
                         }
                     }
                     //FOR c4
-                    if (c4.getText().toString().equals("")){
-                        if (sos_n4.isEmpty()) {
+                    if (c4.getText().toString().equals("")) {
+                        if (sos_n4 == null) {//changed the condition for if , changed from .equals to ==
                             //was empty previously
                             c4added = false;
-                            temp_n4="";
+                            temp_n4 = null;
                         } else {
                             //was not empty previously
                             c4added = true;
-                            temp_n3="";
-//                            user.setSosc4(temp_n4);
+                            temp_n4 = null;
+                            SosContacts.put("c4", temp_n4);
                         }
                     } else {
                         temp_n4 = c4.getText().toString();
-                        if (!temp_n4.equals("")){
-                           if (val.EditvalidatePhone(c4)){
-                               if (temp_n4.equals(sos_n4)) {
-                                   //no change
-                                   c4added = false;
-                               }
-                               if (!checkUnique(c4,4)) {
-                                   // duplicate value raise alert
-                                   Log.d("SOS","onClick :Duplicate c4 values found; c4="+c4.getText());
-//                                   c4.setError("Duplicate Contact found");
-                                   c4added = false;
-                                   return;
-                               } else {
-                                   //save c4
-                                   c4added = true;
-                                   c4.setError(null);
-//                                   user.setSosc4(temp_n4);
-                               }
-                           }
-                           else {
-//                               c4.setError("Enter a valid mobile number");
-                               return;
-                           }
+                        if (!temp_n4.equals("")) {
+                            if (val.EditvalidatePhone(c4)) {
+                                if (temp_n4.equals(sos_n4)) {
+                                    //no change
+                                    c4added = false;
+                                }
+                                if (!checkUnique(c4, 4)) {
+                                    // duplicate value raise alert
+                                    Log.d("SOS", "onClick :Duplicate c4 values found; c4=" + c4.getText());
+                                    c4added = false;
+                                    return;
+                                } else {
+                                    //save c4
+                                    c4added = true;
+                                    c4.setError(null);
+                                    SosContacts.put("c4", temp_n4);
+                                }
+                            } else {
+                                return;
+                            }
                         }
                     }
                     //FOR C5
-                    if (c5.getText().toString().equals("")){
-                        if (sos_n5.isEmpty()) {
+                    if (c5.getText().toString().equals("")) {
+                        if (sos_n5 == null) {//changed the condition for if , changed from .equals to ==
                             //was empty previously
                             c5added = false;
-                            temp_n5="";
-                        }
-                        else {
+                        } else {
                             //was not empty previously
                             c5added = true;
-                            temp_n5="";
-//                            user.setSosc5(temp_n5);
+                            temp_n5 = null;
+                            SosContacts.put("c5", temp_n5);
                         }
                     } else {
                         temp_n5 = c5.getText().toString();
-                        if (!temp_n5.equals("")){
-                            if (val.EditvalidatePhone(c5)){
+                        if (!temp_n5.equals("")) {
+                            if (val.EditvalidatePhone(c5)) {
                                 if (temp_n5.equals(sos_n5)) {
                                     //no change
                                     c5added = false;
                                 }
-                                if (!checkUnique(c5,5)) {
+                                if (!checkUnique(c5, 5)) {
                                     // duplicate value raise alert
-//                                    c5.setError("Duplicate contact found");
-                                    Log.d("SOS","onClick :Duplicate c5 values found; c5="+c5.getText());
+                                    Log.d("SOS", "onClick :Duplicate c5 values found; c5=" + c5.getText());
                                     c5added = false;
                                     return;
                                 } else {
                                     //save c5
                                     c5.setError(null);
                                     c5added = true;
-//                                    user.setSosc5(temp_n5);
+                                    SosContacts.put("c5", temp_n5);
                                 }
-                            }
-                            else {
-//                                c5.setError("Enter a valid mobile number");
+                            } else {
                                 return;
                             }
                         }
                     }
 
-                    if (c1added||c2added||c3added||c4added||c5added){
-
-                       /*user.setSosc1(temp_n1);
-                       user.setSosc2(temp_n2);
-                       user.setSosc3(temp_n3);
-                       user.setSosc4(temp_n4);
-                       user.setSosc5(temp_n5);*/
-
-                        SosContacts.put("c1",temp_n1);
-                        SosContacts.put("c2",temp_n2);
-                        SosContacts.put("c3",temp_n3);
-                        SosContacts.put("c4",temp_n4);
-                        SosContacts.put("c5",temp_n5);
+                    if (c1added || c2added || c3added || c4added || c5added) {
 
                         user.setSosContacts(SosContacts);
-                        Log.d("SosActivity","HashMap updated in User object c1="+user.sosContacts.get("c1"));
+                        Log.d("SosActivity", "HashMap updated in User object c1=" + user.sosContacts.get("c1"));
 
-                       if (mydb.addsosContacts(SosContacts)){
-                           Log.d("SosActivity","SOS contacts was added in database");
-                          /* c1.setEnabled(false);
-                           c2.setEnabled(false);
-                           c3.setEnabled(false);
-                           c4.setEnabled(false);
-                           c5.setEnabled(false);
-                           btn_SosSave.setEnabled(false);*/
+                        if (mydb.addsosContacts(SosContacts)) {
+                            Log.d("SosActivity", "SOS contacts was added in database");
+                            updateFireBaseSOS();
+                            Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();
 
-                           Toast.makeText(sos_page.this,"DATA saved successfully ",Toast.LENGTH_SHORT).show();
                             startActivity(intent);
+                        } else {
+                            Toast.makeText(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT).show();
+                            Log.d("SosActivity", "Data was not entered");
                         }
-                       else {
-                           Toast.makeText(sos_page.this,"SOS Contact could not be added",Toast.LENGTH_SHORT).show();
-                           Log.d("SosActivity","Data was not entered");
-                       }
-
-                    }
-                    else {
-                        //nochange found move to next activity
+                    } else {
+                        //no change found move to next activity
                         startActivity(intent);
                     }
+                    //End
+                }
+                else {
+                    Toast.makeText(sos_page.this,"Please check your Internet Connectivity and try again",Toast.LENGTH_LONG).show();
+                }
             }
         });
 
         btn_SosEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus_edit));
-            c1.setEnabled(true);
-            btn_SosSave.setAlpha(1);
-                cc1.setAlpha(1);
-                cc2.setAlpha(1);
-                cc3.setAlpha(1);
-                cc4.setAlpha(1);
-                cc5.setAlpha(1);
-            c2.setEnabled(true);
-            c3.setEnabled(true);
-            c4.setEnabled(true);
-            c5.setEnabled(true);
-            btn_SosSave.setEnabled(true);
+                if (IsInternet.isNetworkAvaliable(sos_page.this)){
+                    Log.d("SOSActivity","Context = "+sos_page.this);
+                    btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus_edit));
+                    btn_SosSave.setAlpha(1);
+                    cc1.setAlpha(1);
+                    cc2.setAlpha(1);
+                    cc3.setAlpha(1);
+                    cc4.setAlpha(1);
+                    cc5.setAlpha(1);
+                    c1.setEnabled(true);
+                    c2.setEnabled(true);
+                    c3.setEnabled(true);
+                    c4.setEnabled(true);
+                    c5.setEnabled(true);
+                    btn_SosSave.setEnabled(true);
+                }
+                else {
+                    Toast.makeText(sos_page.this,"Please check your Internet Connectivity",Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
+
+    private void updateFireBaseSOS() {
+        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = firebaseDatabase.getReference();
+        databaseReference.child("Users").child(firebaseUser.getUid()).child("sosContacts").setValue(SosContacts);
+        Log.d("SOSActivity","Firebase : Data updated in firebase");
+    }
+
     private boolean checkUnique(EditText contact,int i) {
         String check1 = c1.getText().toString();
         String check2 = c2.getText().toString();
@@ -647,6 +606,5 @@ public class sos_page extends AppCompatActivity {
             break;
         }
     }
-
 
 }

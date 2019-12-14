@@ -1,8 +1,10 @@
 package com.example.securityapplication;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
@@ -20,7 +22,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,6 +37,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Objects;
 
 import static android.support.v4.content.ContextCompat.getSystemService;
@@ -41,7 +46,8 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class profile_fragment extends Fragment {
 
-    private EditText textName,textEmail,textPhone,textAddress,textGender,textDob;
+    private EditText textName,textEmail,textPhone,textGender,textDob;
+    private AutoCompleteTextView textAddress;
     private Button btn_edit;
     private Button btn_logout;
     SQLiteDBHelper mydb ;
@@ -57,6 +63,7 @@ public class profile_fragment extends Fragment {
     private int RC;
     private String TAG = "ProfileActivity";
     Spinner spinner;
+    DatePickerDialog datePickerDialog;
 
 
 
@@ -116,6 +123,31 @@ public class profile_fragment extends Fragment {
     }
 
     private void initListeners() {
+        textDob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar c= java.util.Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                textDob.setText(dayOfMonth + "/"
+                                        + (monthOfYear + 1) + "/" + year);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+                datePickerDialog.getDatePicker().setMaxDate(c.getTimeInMillis());
+            }
+        });
+
         btn_edit.setOnClickListener(new View.OnClickListener() {
                                         @Override public void onClick(View view) {
 
@@ -126,24 +158,30 @@ public class profile_fragment extends Fragment {
                                                     enable();
                                                 alphaa(1.0f);}
                                                 else {
-                                                    //save code will come here
-                                                    user.setName(textName.getText().toString());
-                                                    user.setDob(textDob.getText().toString());
-                                                    user.setLocation(textAddress.getText().toString());
-                                                    user.setMobile(textPhone.getText().toString());
-                                                    if(spinner.getSelectedItemPosition()==0)
-                                                        user.setGender("male");
-                                                    else if(spinner.getSelectedItemPosition()==1)
-                                                        user.setGender("female");
-                                                    else
-                                                        user.setGender("others");
+                                                    if(!validate())
+                                                    {
+                                                        Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    else {
+                                                        //save code will come here
+                                                        user.setName(textName.getText().toString());
+                                                        user.setDob(textDob.getText().toString());
+                                                        user.setLocation(textAddress.getText().toString());
+                                                        user.setMobile(textPhone.getText().toString());
+                                                        if (spinner.getSelectedItemPosition() == 0)
+                                                            user.setGender("male");
+                                                        else if (spinner.getSelectedItemPosition() == 1)
+                                                            user.setGender("female");
+                                                        else
+                                                            user.setGender("others");
 
-                                                    mydb.updateUser(user);
+                                                        mydb.updateUser(user);
 
 
-                                                    btn_edit.setText("edit");
-                                                    alphaa(0.6f);
-                                                    disable();
+                                                        btn_edit.setText("edit");
+                                                        alphaa(0.6f);
+                                                        disable();
+                                                    }
                                                 }
                                             }//Sending Data to EditProfileActivity
                                             else {
@@ -170,6 +208,13 @@ public class profile_fragment extends Fragment {
 
             }
         });
+    }
+
+    private boolean validate() {
+        if(textName.getText().toString().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10)
+            return true;
+        else
+            return false;
     }
 
     private void initDataBaseReferences(){
@@ -256,6 +301,10 @@ public class profile_fragment extends Fragment {
         textDob = getActivity().findViewById(R.id.text_DOB);
         btn_edit = getActivity().findViewById(R.id.btn_Edit);
         btn_logout = getActivity().findViewById(R.id.btn_Logout);
+        Resources res = getResources();
+        String[] Locality = res.getStringArray(R.array.Locality);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,Locality);
+        textAddress.setAdapter(adapter);
         disable();
 
 //        textAadhaar = findViewById(R.id.text_Aadhaar);

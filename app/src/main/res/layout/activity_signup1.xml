@@ -87,6 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
+
                 android:clickable="true"
                 android:hapticFeedbackEnabled="true"
                 app:errorEnabled="false"
@@ -101,6 +102,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:hint="@string/password"
+
                     android:inputType="text|textPassword"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
@@ -141,6 +143,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:hint="@string/confirm_password"
+
                     android:inputType="textPassword"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
@@ -174,37 +177,41 @@
                 android:background="@drawable/shapelogin"
 
                 android:onClick="verifyEmailId"
-                android:paddingTop="9dp"
-                android:paddingBottom="9dp"
-                android:text="@string/verify_email"
+                android:padding="15dp"
+                android:shadowColor="@android:color/transparent"
                 android:textColor="#000000"
+                android:text="@string/verify_email"
                 android:textColorHint="#ffffff"
-
                 android:textSize="15sp"
 
                 />
-
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             <Button
                 android:id="@+id/btn_sub"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="0dp"
                 android:background="@drawable/shapelogin"
                 android:onClick="signUp"
-                android:paddingTop="9dp"
-                android:paddingBottom="9dp"
-                android:text="@string/proceed"
+                android:padding="15dp"
+                android:shadowColor="@android:color/transparent"
                 android:textColor="#000000"
+                android:text="@string/proceed"
                 android:textColorHint="#ffffff"
-                android:textSize="15sp" />
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/progress_bar"
-
+                android:textSize="15sp"
                 />
 
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminateDrawable="@drawable/cpb"
+                    android:indeterminateTintMode="src_atop"
+                    android:foregroundGravity="center"
+ />
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

@@ -19,14 +19,19 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
-        <activity android:name=".recent_cards"></activity>
-        <activity android:name=".sos_page"></activity>
-        <activity android:name=".navigation"/>
-        <activity android:name=".EditProfileActivity">
+        <activity android:name=".recent_cards"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".sos_page"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".navigation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".EditProfileActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ResetPasswordActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden"></activity>
         <activity
             android:name=".SignUp2"
             android:screenOrientation="portrait">

@@ -41,6 +41,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:text="user"
+                android:capitalize="characters"
                 android:textColor="#fff"
                 android:textSize="35sp"
                 android:textStyle="bold" />
@@ -204,6 +205,7 @@
                     android:focusable="true"
                     android:paddingStart="30dp"
                     android:paddingLeft="10dp"
+                    android:layout_marginBottom="10dp"
 
                     android:text="change password"
                     android:textSize="22sp"

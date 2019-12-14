@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
 
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SEND_SMS"/>
@@ -22,7 +25,9 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:appComponentFactory">
         <activity android:name=".recent_cards"></activity>
-        <activity android:name=".sos_page"></activity>
+        <activity android:name=".sos_page"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            ></activity>
         <activity android:name=".navigation"/>
         <activity android:name=".EditProfileActivity">
         </activity>
@@ -72,10 +77,21 @@
             </intent-filter>
 
         </activity>
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
+
+        <receiver
+            android:name=".deliveryReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
+
+        <receiver
+            android:name=".sentReceiver"
+            android:enabled="true"
+            android:exported="true" />
         <receiver
             android:name=".RestartServiceBroadcastReceiver"
             android:enabled="true"
@@ -86,8 +102,7 @@
         <service
             android:name=".SendSMSService"
             android:enabled="true"
-            android:exported="true"></service>
-
+            android:exported="true" />
         <service
             android:name=".SosPlayer"
             android:enabled="true"
@@ -96,7 +111,10 @@
         <service
             android:name=".RestartJobService"
             android:enabled="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".GetGPSCoordinates"
+            android:enabled="true"
+            android:exported="true" />
     </application>
-
 </manifest>

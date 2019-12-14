@@ -136,7 +136,7 @@
                         android:layout_height="36dp"
                         android:src="@drawable/ic_home_black_24dp" />
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/text_Address"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -207,6 +207,7 @@
 
                     <EditText
                         android:id="@+id/text_DOB"
+                        android:focusable="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"

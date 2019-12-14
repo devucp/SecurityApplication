@@ -41,7 +41,7 @@
                 android:layout_marginTop="15dp"
 
                 android:gravity="center"
-                android:shadowColor="#A3050101"
+                android:shadowColor="@color/cyan"
                 android:shadowRadius="25"
                 android:text="@string/signup"
                 android:textAllCaps="true"
@@ -75,7 +75,7 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="10dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#F8FA0707"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
                     android:textCursorDrawable="@android:color/white"
@@ -123,6 +123,8 @@
                             android:layout_marginLeft="5dp"
                             android:paddingStart="5dp"
                             android:text="Male"
+                            android:buttonTint="@color/white"
+
                             android:textColor="#FFFFFF"
                             android:textSize="18sp" />
 
@@ -132,6 +134,7 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="5dp"
                             android:text="Female"
+                            android:buttonTint="@color/white"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp" />
 
@@ -144,7 +147,7 @@
                 android:id="@+id/textlayout_Dob_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
                 android:textColorHint="#FFFFFF"
                 app:counterEnabled="false"
                 app:errorEnabled="true"
@@ -156,6 +159,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:editable="false"
+                    style="@style/datepicker"
+
                     android:ems="10"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
@@ -166,11 +171,12 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#F8FA0707"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
                     android:textCursorDrawable="@android:color/white"
                     android:textIsSelectable="false"
+                    android:drawableTint="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -198,7 +204,7 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#F8FA0707"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
                     android:textCursorDrawable="@android:color/white"
@@ -218,7 +224,7 @@
 
             <android.support.v7.widget.AppCompatAutoCompleteTextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:id="@+id/AutoCompleteTextView"
                 android:hint="Locality"
                 android:maxLength="40"
@@ -228,7 +234,8 @@
                 android:paddingStart="20dp"
                 android:paddingTop="0dp"
                 android:textColor="#ffffff"
-                android:textColorHighlight="#F8FA0707"
+                android:elegantTextHeight="true"
+                android:textColorHighlight="#007399"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
                 android:textCursorDrawable="@android:color/white"

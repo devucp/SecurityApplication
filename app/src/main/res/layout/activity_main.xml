@@ -34,7 +34,7 @@
         android:textCursorDrawable="@color/white"
         android:padding="15dp"
         android:textColor="@color/white"
-        android:textColorHighlight="#264FA3"
+        android:textColorHighlight="#007399"
         android:textColorHint="@color/white" />
 
     <android.support.design.widget.TextInputLayout
@@ -146,6 +146,7 @@
             android:layout_marginTop="0dp"
             android:background="@drawable/shapesignup"
             android:textColor="@color/white"
+
             android:layout_below="@+id/signInButton"/>
         <ProgressBar
             android:id="@+id/pBar"

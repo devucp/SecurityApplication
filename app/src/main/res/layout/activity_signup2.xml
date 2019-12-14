@@ -65,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:ems="10"
+                    android:layout_gravity="center"
                     android:hint="Full Name"
                     android:inputType="textPersonName"
                     android:maxLength="40"
@@ -88,21 +89,22 @@
                 android:textColorHint="#FFFFFF"
                 app:counterEnabled="false"
                 app:errorEnabled="true"
-                app:hintEnabled="false"
-                >
+                app:hintEnabled="false">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-
+                    android:layout_marginBottom="20dp"
                     >
 
                     <TextView
                         android:id="@+id/text_gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_marginLeft="5dp"
+
                         android:text="Gender : "
                         android:textColor="#FFFFFF"
                         android:textSize="18sp" />
@@ -180,7 +182,8 @@
                 android:textColorHint="#FFFFFF"
                 app:counterEnabled="false"
                 app:errorEnabled="true"
-                app:hintEnabled="false">
+                app:hintEnabled="false"
+                android:layout_gravity="center">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/input_mobile"
@@ -188,6 +191,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/ed_cus"
                     android:ems="10"
+                    android:layout_gravity="center"
                     android:hint="Mobile Number"
                     android:inputType="number"
                     android:maxLength="10"
@@ -200,7 +204,8 @@
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
                     android:textCursorDrawable="@android:color/holo_red_dark"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -234,13 +239,16 @@
 
                 >
             </android.support.v7.widget.AppCompatAutoCompleteTextView>
-
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
             <Button
                 android:id="@+id/btn_submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:layout_marginTop="25dp"
+
+
                 android:background="@drawable/btn_cus"
                 android:paddingBottom="9dp"
                 android:paddingTop="9dp"
@@ -252,10 +260,14 @@
 
             <ProgressBar
                 android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:indeterminateDrawable="@drawable/circular_progress_bar" />
-
+                android:indeterminateDrawable="@drawable/cpb"
+                android:indeterminateTintMode="src_atop"
+                android:foregroundGravity="center"
+                />
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

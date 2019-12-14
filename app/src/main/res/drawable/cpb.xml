@@ -6,10 +6,10 @@
     android:toDegrees="270">
     <shape android:shape="ring"
         android:useLevel="false"
-        android:thickness="5sp">
+        android:thickness="4sp">
 
         <gradient
-            android:endColor="#354CE0"
+            android:endColor="#1636E2"
             android:type="sweep"
             android:centerY="0.5"
 

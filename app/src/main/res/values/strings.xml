@@ -36,7 +36,7 @@
 
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="signup">SignUp</string>
+    <string name="signup">Sign Up</string>
     <string name="head">Save Me</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>

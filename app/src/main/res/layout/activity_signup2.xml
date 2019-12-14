@@ -96,6 +96,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
 
+
                     >
 
                     <TextView
@@ -203,16 +204,7 @@
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/textlayout_Pass_outer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:clickable="true"
-                app:errorEnabled="true"
-                app:hintEnabled="false"
-                app:passwordToggleEnabled="true"
-                app:passwordToggleTint="#FFF"/>
+
 
             <android.support.v7.widget.AppCompatAutoCompleteTextView
                 android:layout_width="match_parent"
@@ -234,6 +226,17 @@
 
                 >
             </android.support.v7.widget.AppCompatAutoCompleteTextView>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/textlayout_Pass_outer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="2dp"
+                android:clickable="true"
+                app:errorEnabled="true"
+                app:hintEnabled="false"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="#FFF"/>
 
             <Button
                 android:id="@+id/btn_submit"

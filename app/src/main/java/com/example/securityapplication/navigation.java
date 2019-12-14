@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -63,6 +64,7 @@ public class navigation extends AppCompatActivity {
     private TelephonyManager telephonyManager;
 
     private ValueEventListener mUsersDatabaseReferenceListener;
+    private FirebaseHelper firebaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,10 @@ public class navigation extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         firebaseUser = mAuth.getCurrentUser();
         // initialise database references
-        initDataBaseReferences();
+        //initDataBaseReferences();
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase(navigation.this);
+        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
 
         //sqlite db code here
         Log.d("cchecking","Oncreate : Loaded"+is_home);
@@ -95,15 +100,13 @@ public class navigation extends AppCompatActivity {
             }
             }
 
-
-
     }
 
-    private void initDataBaseReferences(){
+    /*private void initDataBaseReferences(){
         //Initialize Database references
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
         mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-    }
+    }*/
 
     public void getData(final int check){
         final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
@@ -119,7 +122,7 @@ public class navigation extends AppCompatActivity {
                     // check if user signed in from two devices
                     if (FirebaseAuth.getInstance().getCurrentUser() != null)
                         if (dataSnapshot.getValue(User.class).getImei() != "null")
-                            recheckUserAuthentication(FirebaseAuth.getInstance().getCurrentUser());
+                            firebaseHelper.recheckUserAuthentication(FirebaseAuth.getInstance().getCurrentUser(),mImeiNumber,navigation.this);
 
                     if (check == 1) {
                         db.addUser(newUser);
@@ -278,7 +281,7 @@ public class navigation extends AppCompatActivity {
         }
     }
 
-    private void recheckUserAuthentication(final FirebaseUser firebaseUser){
+    /*private void recheckUserAuthentication(final FirebaseUser firebaseUser){
         Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
         Log.d(TAG,firebaseUser.getEmail());
         Log.d(TAG,"Inside recheckUserAuthentication");
@@ -297,8 +300,8 @@ public class navigation extends AppCompatActivity {
                         //Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
                         signOut();
                     }
-                    else{/* nothing to do*/}
-                } else {/* this should not be the case*/}
+                    else{/* nothing to do*//*}
+                } else {/* this should not be the case*//*}
             }
 
             @Override
@@ -306,7 +309,7 @@ public class navigation extends AppCompatActivity {
 
             }
         });
-    }
+    }*/
 
     private void getImei(){
         telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
@@ -324,7 +327,7 @@ public class navigation extends AppCompatActivity {
         }
     }
 
-    private void signOut(){
+    /*private void signOut(){
 
         // first make uid under imei null in Devices and imei under uid null in Users
         device = new Device();
@@ -349,7 +352,7 @@ public class navigation extends AppCompatActivity {
                     });
         }*/
         //Clear the back stack and re-directing to the sign-up page
-        Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+        /*Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
         mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mLogOutAndRedirect);
         //finishing the navigation activity
@@ -360,5 +363,5 @@ public class navigation extends AppCompatActivity {
             Log.d(TAG,"Closing app exception:"+e.getMessage());
             finish();
         }
-    }
+    }*/
 }

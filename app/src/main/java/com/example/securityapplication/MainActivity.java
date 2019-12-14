@@ -333,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, RC);

@@ -43,9 +43,11 @@
                 android:layout_marginTop="15dp"
 
                 android:gravity="center"
-                android:shadowColor="#A3050101"
-                android:shadowRadius="10"
+                android:shadowColor="@color/cyan"
+                android:shadowRadius="25"
                 android:text="SIGN UP"
+                android:textAllCaps="true"
+
                 android:textAlignment="center"
                 android:textColor="#FFF8F8"
                 android:textSize="30sp"
@@ -76,10 +78,9 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#F8FA0707"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
-                    android:textColorLink="#00F30707"
-
+                    android:textColorLink="@color/white"
                     android:textCursorDrawable="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -109,10 +110,9 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#FFFFFF"
-                    android:textColorHighlight="#264FA3"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#FFFFFF"
                     android:textCursorDrawable="@color/white"
-
                     android:textColorLink="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -120,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/pass_text1"
-                android:visibility="gone"
+                android:visibility="invisible"
                 android:layout_marginTop="-2dp"
                 android:layout_marginLeft="15dp"
                 android:text="password can't be empty"
@@ -151,7 +151,7 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#264FA3"
+                    android:textColorHighlight="#007399"
                     android:textCursorDrawable="@color/white"
 
                     android:textColorHint="#FFFFFF"

@@ -274,4 +274,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         Log.d("DH.java", "User object sent");
         return user;
     }
+    //forcefully deletes database using context to ensure creation of tables
+    public void deleteDatabase(Context ctx){
+        ctx.deleteDatabase(DB_name);
+        Log.d("SQLiteDBHelper","on deleteDatabse: Deleted databse");
+
+    }
 }

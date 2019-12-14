@@ -96,6 +96,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <Button
             android:id="@+id/signInButton"
             android:layout_width="match_parent"
@@ -110,6 +111,7 @@
             android:textColor="#000"
             android:shadowColor="@android:color/transparent"
             android:text="@string/sign_in_text" />
+
 
         <Button
             android:id="@+id/signUpButton"
@@ -126,6 +128,17 @@
             android:background="@drawable/shapesignup"
             android:textColor="@color/white"
             android:layout_below="@+id/signInButton"/>
+        <ProgressBar
+            android:id="@+id/pBar"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="110dp"
+            android:layout_marginTop="15dp"
+            android:foregroundGravity="center">
+
+        </ProgressBar>
+
 
         <ProgressBar
             android:id="@+id/pBar"

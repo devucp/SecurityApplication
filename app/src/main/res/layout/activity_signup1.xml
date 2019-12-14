@@ -167,24 +167,6 @@
                 >
             </TextView>
 
-            <Button
-                android:id="@+id/btn_verify"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="30dp"
-                android:background="@drawable/shapelogin"
-
-                android:onClick="verifyEmailId"
-                android:padding="15dp"
-                android:shadowColor="@android:color/transparent"
-                android:textColor="#000000"
-                android:text="@string/verify_email"
-                android:textColorHint="#ffffff"
-                android:textSize="15sp"
-
-                />
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -200,6 +182,7 @@
                 android:text="@string/proceed"
                 android:textColorHint="#ffffff"
                 android:textSize="15sp"
+                android:layout_marginTop="20dp"
                 />
 
                 <ProgressBar
@@ -210,6 +193,7 @@
                     android:indeterminateDrawable="@drawable/cpb"
                     android:indeterminateTintMode="src_atop"
                     android:foregroundGravity="center"
+                    android:layout_marginTop="20dp"
  />
             </RelativeLayout>
 

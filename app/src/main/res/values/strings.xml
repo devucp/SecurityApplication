@@ -1,4 +1,10 @@
 <resources>
+    <string-array name="gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Others</item>
+    </string-array>
+
     <string name="app_name">SecurityApplication</string>
 
     <string name="title_activity_settings">Settings</string>

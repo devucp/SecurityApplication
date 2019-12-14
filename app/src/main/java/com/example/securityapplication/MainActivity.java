@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RC_SIGN_IN = 9001;
     ProgressBar pgsBar;
     ProgressBar pgsBar1;
-    ProgressBar pgsBar2;
 
     private User user;
     private Device device;
@@ -99,6 +98,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int RC;
 
     String background;
+
+
+
 
     public void pgbarshow()
     {
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
          pgsBar = findViewById(R.id.pBar);
         pgsBar1= findViewById(R.id.pBar1);
-        pgsBar2= findViewById(R.id.pBar2);
+
 
 
 

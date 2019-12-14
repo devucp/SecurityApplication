@@ -7,6 +7,7 @@
     android:gravity="center"
     android:theme="@style/sos"
     android:background="@mipmap/back"
+    android:focusableInTouchMode="true"
     >
         <ScrollView
             android:layout_width="match_parent"

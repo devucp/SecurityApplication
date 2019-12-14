@@ -11,24 +11,17 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class User implements Parcelable {
-    //private int id;
     private String name;
     private String email;
     private String password;
     private String gender;
     private String mobile;
-    //private String aadhar;
     private String location;
     private String imei;
     private String dob;
     private boolean isPaid;
     public HashMap<String,String> sosContacts;
     private boolean isGoogleAccountLinked;
-   private String sosc1;
-    private String sosc2;
-    private String sosc3;
-    private String sosc4;
-    private String sosc5;
 
     public String getDob() {
         return dob;
@@ -67,45 +60,6 @@ public class User implements Parcelable {
     };
 
 
-    public String getSosc1() {
-        return sosc1;
-    }
-
-    public void setSosc1(String sosc1) {
-        this.sosc1 = sosc1;
-    }
-
-    public String getSosc2() {
-        return sosc2;
-    }
-
-    public void setSosc2(String sosc2) {
-        this.sosc2 = sosc2;
-    }
-
-    public String getSosc3() {
-        return sosc3;
-    }
-
-    public void setSosc3(String sosc3) {
-        this.sosc3 = sosc3;
-    }
-
-    public String getSosc4() {
-        return sosc4;
-    }
-
-    public void setSosc4(String sosc4) {
-        this.sosc4 = sosc4;
-    }
-
-    public String getSosc5() {
-        return sosc5;
-    }
-
-    public void setSosc5(String sosc5) {
-        this.sosc5 = sosc5;
-    }
     /*public int getId() {
         return id;
     }
@@ -154,14 +108,6 @@ public class User implements Parcelable {
         this.mobile = mobile;
     }
 
-  /*  public String getAadhar() {
-        return aadhar;
-    }
-
-    public void setAadhar(String aadhar) {
-        this.aadhar = aadhar;
-    }
-*/
     public String getLocation() {
         return location;
     }
@@ -185,7 +131,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        //dest.writeInt(id);
+//        dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(email);
         dest.writeString(password);

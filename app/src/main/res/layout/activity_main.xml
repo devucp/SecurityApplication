@@ -62,7 +62,7 @@
             android:inputType="textPassword"
             android:padding="15dp"
             android:textColor="@color/white"
-            android:textColorHighlight="#264FA3"
+            android:textColorHighlight="#007399"
             android:textColorHint="@color/white" />
     </android.support.design.widget.TextInputLayout>
 

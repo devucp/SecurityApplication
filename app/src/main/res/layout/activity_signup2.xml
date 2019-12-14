@@ -44,6 +44,7 @@
                 android:shadowColor="#A3050101"
                 android:shadowRadius="25"
                 android:text="@string/signup"
+                android:textAllCaps="true"
                 android:textAlignment="center"
                 android:textColor="#FFF8F8"
                 android:textSize="30sp"
@@ -57,7 +58,8 @@
                 android:textColorHint="#FFFFFF"
                 app:counterEnabled="false"
                 app:errorEnabled="true"
-                app:hintEnabled="false">
+                app:hintEnabled="false"
+                >
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/textlayout_Name"
@@ -71,12 +73,12 @@
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
                     android:paddingEnd="5dp"
-                    android:paddingBottom="9dp"
+                    android:paddingBottom="10dp"
                     android:textColor="#ffffff"
                     android:textColorHighlight="#F8FA0707"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/holo_red_dark"
+                    android:textCursorDrawable="@android:color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -142,7 +144,7 @@
                 android:id="@+id/textlayout_Dob_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 android:textColorHint="#FFFFFF"
                 app:counterEnabled="false"
                 app:errorEnabled="true"
@@ -167,7 +169,7 @@
                     android:textColorHighlight="#F8FA0707"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/holo_red_dark"
+                    android:textCursorDrawable="@android:color/white"
                     android:textIsSelectable="false"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -176,7 +178,7 @@
                 android:id="@+id/textlayout_Email_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 android:textColorHint="#FFFFFF"
                 app:counterEnabled="false"
                 app:errorEnabled="true"
@@ -199,7 +201,7 @@
                     android:textColorHighlight="#F8FA0707"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/holo_red_dark"
+                    android:textCursorDrawable="@android:color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -207,7 +209,7 @@
                 android:id="@+id/textlayout_Pass_outer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="0dp"
                 android:clickable="true"
                 app:errorEnabled="true"
                 app:hintEnabled="false"
@@ -224,12 +226,12 @@
                 android:paddingBottom="9dp"
                 android:paddingEnd="5dp"
                 android:paddingStart="20dp"
-                android:paddingTop="9dp"
+                android:paddingTop="0dp"
                 android:textColor="#ffffff"
                 android:textColorHighlight="#F8FA0707"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/holo_red_dark"
+                android:textCursorDrawable="@android:color/white"
                 android:textSize="18sp"
 
                 >
@@ -240,15 +242,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="50dp"
-                android:layout_marginTop="25dp"
-                android:background="@drawable/btn_cus"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/shapelogin"
                 android:paddingBottom="9dp"
                 android:paddingTop="9dp"
                 android:text="@string/signup"
                 android:textColor="#000000"
                 android:textColorHint="#ffffff"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                 />
 
         </LinearLayout>
     </ScrollView>

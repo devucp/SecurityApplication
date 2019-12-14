@@ -26,30 +26,43 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/shapeemail"
-        android:drawableLeft="@drawable/ic_person_black_24dp"
+        android:drawableStart="@drawable/ic_person_black_24dp"
         android:drawablePadding="10dp"
-
-        android:hint="Email/Mobile no"
+        android:hint="Email"
         android:inputType="textEmailAddress"
         android:padding="15dp"
         android:textColor="@color/white"
         android:textColorHighlight="#264FA3"
         android:textColorHint="@color/white" />
 
-    <EditText
-        android:id="@+id/editPassword"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textlayout_Pass_outer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/shapeemail"
-        android:drawableLeft="@drawable/ic_lock_black_24dp"
-        android:drawablePadding="10dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="15dp"
-        android:textColor="@color/white"
-        android:textColorHighlight="#264FA3"
-        android:textColorHint="@color/white" />
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:hapticFeedbackEnabled="true"
+        app:errorEnabled="false"
+        app:hintEnabled="false"
+        app:passwordToggleEnabled="true"
+        app:errorTextAppearance="@style/ErrorAppearance"
+        app:passwordToggleTint="#FFF">
+
+        <EditText
+            android:id="@+id/editPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/shapeemail"
+            android:drawableStart="@drawable/ic_lock_black_24dp"
+            android:drawablePadding="10dp"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="15dp"
+            android:textColor="@color/white"
+            android:textColorHighlight="#264FA3"
+            android:textColorHint="@color/white" />
+    </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -96,6 +109,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <Button
             android:id="@+id/signInButton"
             android:layout_width="match_parent"
@@ -110,6 +124,7 @@
             android:textColor="#000"
             android:shadowColor="@android:color/transparent"
             android:text="@string/sign_in_text" />
+
 
         <Button
             android:id="@+id/signUpButton"
@@ -126,15 +141,22 @@
             android:background="@drawable/shapesignup"
             android:textColor="@color/white"
             android:layout_below="@+id/signInButton"/>
+        <ProgressBar
+            android:id="@+id/pBar"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="110dp"
+            android:layout_marginTop="15dp"
+            android:foregroundGravity="center">
+        </ProgressBar>
 
         <ProgressBar
             android:id="@+id/pBar"
             style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:layout_marginTop="10dp"
-
             android:indeterminateDrawable="@drawable/cpb"
             android:indeterminateTintMode="src_atop"
             android:visibility="gone"
@@ -146,9 +168,7 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:layout_marginTop="70dp"
-
             android:indeterminateDrawable="@drawable/cpb"
             android:indeterminateTintMode="src_atop"
             android:visibility="gone"

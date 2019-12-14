@@ -16,7 +16,7 @@
     <color name="redBackground">#C60202</color>
     <color name="cyan">#007CB6</color>
     <color name="accept">#00cc00</color>
-
+    <color name="btnPressedColor">#FF0000</color>
     <color name="bluedecent">#71D6FF</color>
     <color name="shadow">#292929</color>
 

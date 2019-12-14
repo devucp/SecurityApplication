@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
+
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -47,6 +48,9 @@ public class profile_fragment extends Fragment {
     private int RC;
     private String TAG = "ProfileActivity";
 
+
+    navigation nv=new navigation();
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -76,16 +80,17 @@ public class profile_fragment extends Fragment {
 
     private void initListeners() {
         btn_edit.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            Intent intent = new Intent(getContext(),EditProfileActivity.class);
-                  /*  intent.putExtra("Name",ansName);
-                    intent.putExtra("Email",ansEmail);
-                    intent.putExtra("Phone",ansPhone);
-                    intent.putExtra("Address",ansAddress);*/
-                                            intent.putExtra("User",user);
-                                            startActivityForResult(intent,1);
-                                        }//Sending Data to EditProfileActivity
+                                        @Override public void onClick(View view) {
+                                            if (IsInternet.isNetworkAvaliable(getContext())) {
+                                                Intent intent = new Intent(getContext(), EditProfileActivity.class);
+                                                intent.putExtra("User", user);
+                                                startActivityForResult(intent, 1);
+                                            }//Sending Data to EditProfileActivity
+                                            else {
+                                                Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+
                                     }
         );
 
@@ -95,6 +100,14 @@ public class profile_fragment extends Fragment {
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                 signOut();
+
+                //finishing the navigation activity
+                getActivity().finish();
+                //Clear the back stack and re-directing to the sign-up page
+                Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+                mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(mLogOutAndRedirect);
+
             }
         });
     }
@@ -103,7 +116,9 @@ public class profile_fragment extends Fragment {
         //Initialize Database
         mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
+
     }
+
 
     private void FetchAllData(){
         int i =0;
@@ -121,10 +136,10 @@ public class profile_fragment extends Fragment {
             user.setName(res.getString(1));
             user.setEmail(res.getString(2));
             user.setGender(res.getString(3));
-            user.setMobile(res.getString(5));
+           user.setMobile(res.getString(4));
 //            ansAadhaar = res.getString(6);
-            user.setLocation(res.getString(6));
-            user.setDob(res.getString(7));
+            user.setLocation(res.getString(5));
+            user.setDob(res.getString(6));
             i++;
             Log.d("Profile Activity","User Object set in Profile activity successfully" +i);
         }
@@ -144,7 +159,7 @@ public class profile_fragment extends Fragment {
     }
 
     private void initviews() {
-        textName = getActivity().findViewById(R.id.text_Name);
+        textName =getActivity().findViewById(R.id.text_Name);
         textEmail = getActivity().findViewById(R.id.text_Email);
         textPhone = getActivity().findViewById(R.id.text_Phone);
         textAddress = getActivity().findViewById(R.id.text_Address);
@@ -163,7 +178,7 @@ public class profile_fragment extends Fragment {
             if (resultCode == 110){
                 user = data.getParcelableExtra("ResultUser");
                 Log.d("Profile","User object returned"+user.getEmail());
-                //mydb.updateUser(user);
+                mydb.updateUser(user);
                 DisplayData();
             }
         }

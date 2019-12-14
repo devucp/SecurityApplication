@@ -508,6 +508,7 @@ public class SignUp1Activity extends AppCompatActivity {
         cnfpass_outer.setAlpha(1);
         verifyEmailButton.setAlpha(1);
         Btn_Submit.setAlpha(1);
+        Btn_Submit.setText("PROCEED");
     }
     public void disable()
     {
@@ -518,6 +519,7 @@ public class SignUp1Activity extends AppCompatActivity {
         cnfpass_outer.setAlpha((float) 0.6);
         verifyEmailButton.setAlpha((float) 0.6);
         Btn_Submit.setAlpha((float) 0.6);
+        Btn_Submit.setText("");
 
     }
 }

@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/back"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:padding="5dp">
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -79,7 +80,7 @@
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
 
-                    android:textCursorDrawable="@android:color/holo_red_dark"
+                    android:textCursorDrawable="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -110,6 +111,8 @@
                     android:textColor="#FFFFFF"
                     android:textColorHighlight="#264FA3"
                     android:textColorHint="#FFFFFF"
+                    android:textCursorDrawable="@color/white"
+
                     android:textColorLink="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -117,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/pass_text1"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_marginTop="-2dp"
                 android:layout_marginLeft="15dp"
                 android:text="password can't be empty"
@@ -149,6 +152,8 @@
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
                     android:textColorHighlight="#264FA3"
+                    android:textCursorDrawable="@color/white"
+
                     android:textColorHint="#FFFFFF"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>

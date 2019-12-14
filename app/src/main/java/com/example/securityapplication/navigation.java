@@ -29,9 +29,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 public class navigation extends AppCompatActivity {
 
-    int count=0;
+    int count=0,aa;
     static User newUser=new User();
     Boolean is_home=true;
 
@@ -49,9 +51,9 @@ public class navigation extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
         //sqlite db code here
-        Log.d("cchecking","Oncreate : Loaded"+is_home);
-        if(db.numberOfRows()==0)
-            getData(1);
+        if((aa=db.numberOfRows())==0)
+        {  getData(1);
+        Log.d("SQL","No. of rows in navigation "+aa);}
         else
         {
             Log.d("checking","oncreate option menu 3 is running");
@@ -61,12 +63,8 @@ public class navigation extends AppCompatActivity {
                 Log.d("checking","oncreate option menu 2 is running");
                 test=true;
             }
-            }
-
-
-
+        }
     }
-
 
 
     public void getData(final int check){
@@ -75,6 +73,7 @@ public class navigation extends AppCompatActivity {
         FirebaseAuth firebaseAuth=FirebaseAuth.getInstance();
         FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
         DatabaseReference databaseReference=firebaseDatabase.getReference();
+        DatabaseReference childref = databaseReference.child("Users").child(uid);
         databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -83,6 +82,7 @@ public class navigation extends AppCompatActivity {
                 if(check==1) {
                     db.addUser(newUser);
                     Log.d("FirebaseUsername",newUser.getName()+" 1 "+newUser.getEmail());
+                    db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
                 }
                 else if(check==2)
                 {Log.d("FirebaseUsername",newUser.getName()+" 2 "+newUser.getEmail());
@@ -93,7 +93,6 @@ public class navigation extends AppCompatActivity {
 
             }
         });
-
     }
 
 

@@ -35,7 +35,6 @@ public class profile_fragment extends Fragment {
     private Button btn_edit;
     private Button btn_logout;
     SQLiteDBHelper mydb ;
-    Database_Helper dbHelper;
     User user;
     Device device;
     private FirebaseDatabase mFirebaseDatabase;

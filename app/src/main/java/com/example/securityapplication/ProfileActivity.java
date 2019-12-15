@@ -33,7 +33,6 @@ public class ProfileActivity extends AppCompatActivity {
     private Button btn_edit;
     private Button btn_logout;
     SQLiteDBHelper mydb ;
-    Database_Helper dbHelper;
     User user;
     Device device;
     private FirebaseDatabase mFirebaseDatabase;

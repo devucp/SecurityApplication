@@ -252,7 +252,8 @@ public class sos_page extends AppCompatActivity {
                     Intent intent;
                     intent = new Intent(sos_page.this, navigation.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-               //btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus));
+
+                //btn_SosEdit.setBackground(getResources().getDrawable(R.drawable.btn_cus));
 
                     //FOR c1
                     Log.d("SosActivity", "OnClick : Initial value for c1=" + c1.getText());

@@ -370,11 +370,6 @@ public class SignUp2 extends AppCompatActivity {
 
         writeDataToFirebase(firebaseUser);
 
-        ReturnIntent.putExtra("ResultIntent",user);
-        //Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
-        setResult(10,ReturnIntent);//to finish sing up 1 activity
-        activity.finish();
-
         /*user=data.getParcelableExtra("ResultIntent");
         Intent profileActivity = new Intent(SignUp2.this,ProfileActivity.class);
         profileActivity.putExtra("User",user);
@@ -525,8 +520,7 @@ public class SignUp2 extends AppCompatActivity {
 
                         Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
                         // start next activity
-                        Intent sosPage = new Intent(SignUp2.this, sos_page.class);
-                        startActivity(sosPage);
+                        startNextActivity();
                         //closeNow();
                     }
                 }
@@ -540,8 +534,7 @@ public class SignUp2 extends AppCompatActivity {
         else {
             Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
             // start next activity
-            Intent sosPage = new Intent(SignUp2.this, sos_page.class);
-            startActivity(sosPage);
+            startNextActivity();
             //closeNow();
         }
     }
@@ -553,5 +546,14 @@ public class SignUp2 extends AppCompatActivity {
         else{
             finish();
         }
+    }
+
+    private void startNextActivity(){
+        ReturnIntent.putExtra("ResultIntent",user);
+        //Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
+        setResult(10,ReturnIntent);//to finish sing up 1 activity
+        activity.finish();
+        Intent sosPage = new Intent(SignUp2.this, sos_page.class);
+        startActivity(sosPage);
     }
 }

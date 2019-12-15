@@ -54,6 +54,7 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import static android.view.View.GONE;
@@ -486,7 +487,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         } else {
 
-                            pgbarhide();
                             try{
                                 throw task.getException();
                             }
@@ -519,15 +519,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGoogleSignInButton.setVisibility(VISIBLE);
         }
         else if(firebaseUser!=null){
-            Intent mHomeIntent = new Intent(this,navigation.class);
-            startActivity(mHomeIntent);
-            try {
-                closeNow();
-            }catch (Exception e){
-                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-                finish();
-            }
-            pgbarhide();
+            // check if first sos contact is added
+            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
+                    HashMap<String,String> sosContacts = user.getSosContacts();
+                    if (sosContacts.containsKey("c1")){
+                        Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
+                        startActivity(mHomeIntent);
+                    }
+                    else {
+                        Intent sosPage = new Intent(MainActivity.this, sos_page.class);
+                        startActivity(sosPage);
+                    }
+                    try {
+                        closeNow();
+                    }catch (Exception e){
+                        Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                        finish();
+                    }
+               //     pgbarhide();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
         }
         Log.d(TAG,"UI updated successfully");
     }
@@ -642,14 +661,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void isEmailRegistered(){
         Log.d(TAG,"Inside isEmailRegistered");
         if (uid.equals("null")){
-            Log.d(TAG,"EmailId not registered");
+            Log.d(TAG,"Account not registered");
             // prompt user to signUp
             if (userData.get("SignInType").equals("google")){
                 Intent signUpIntent = new Intent(this,SignUp1Activity.class);
                 startActivityForResult(signUpIntent,1);
             }
             else
-                Toast.makeText(MainActivity.this,"Email Id not registered",Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
             pgbarhide();
         }
         else {
@@ -695,6 +714,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             Toast.makeText(MainActivity.this,
                                                     "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
                                             LogOutUser();
+                                            pgbarhide();
                                         }
                                     } else {
                                         //user can login
@@ -723,7 +743,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             });
                         }
-                        pgbarhide();
 
                     } else {
                         user = null;

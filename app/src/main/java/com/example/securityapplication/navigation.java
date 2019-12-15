@@ -39,8 +39,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
-
 public class navigation extends AppCompatActivity {
 
     int count=0;
@@ -52,11 +50,11 @@ public class navigation extends AppCompatActivity {
 
     Menu optionsMenu;
 
-    private FirebaseAuth mAuth;
+    //private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
-    private FirebaseDatabase mFirebaseDatabase;
+    /*private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mDevicesDatabaseReference;
+    private DatabaseReference mDevicesDatabaseReference;*/
     private User user;
     private Device device;
     private String TAG = "NavigatonFragment";
@@ -69,6 +67,9 @@ public class navigation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getImei();
+
         setContentView(R.layout.activity_navigation);
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,14 +77,15 @@ public class navigation extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
 
-        mAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseUser = mAuth.getCurrentUser();
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(navigation.this);
+        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
+        /*mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();*/
+        firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
         // initialise database references
         //initDataBaseReferences();
-        firebaseHelper = FirebaseHelper.getInstance();
-        firebaseHelper.initFirebase(navigation.this);
-        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
 
         //sqlite db code here
         Log.d("cchecking","Oncreate : Loaded"+is_home);
@@ -112,17 +114,17 @@ public class navigation extends AppCompatActivity {
         final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
-            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            DatabaseReference databaseReference = firebaseDatabase.getReference();
-            mUsersDatabaseReferenceListener = databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
+            //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+            //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            //DatabaseReference databaseReference = firebaseDatabase.getReference();
+            mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
                     // check if user signed in from two devices
                     if (FirebaseAuth.getInstance().getCurrentUser() != null)
-                        if (dataSnapshot.getValue(User.class).getImei() != "null")
-                            firebaseHelper.recheckUserAuthentication(FirebaseAuth.getInstance().getCurrentUser(),mImeiNumber,navigation.this);
+                        if (!dataSnapshot.getValue(User.class).getImei().equals("null"))
+                            recheckUserAuthentication(FirebaseAuth.getInstance().getCurrentUser());
 
                     if (check == 1) {
                         db.addUser(newUser);
@@ -141,7 +143,6 @@ public class navigation extends AppCompatActivity {
         }
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -281,36 +282,6 @@ public class navigation extends AppCompatActivity {
         }
     }
 
-    /*private void recheckUserAuthentication(final FirebaseUser firebaseUser){
-        Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        Log.d(TAG,firebaseUser.getEmail());
-        Log.d(TAG,"Inside recheckUserAuthentication");
-        getImei();
-        mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                Log.d("User Data Snapshot:", userDataSnapshot.toString());
-                if (userDataSnapshot.exists()) {
-                    user = userDataSnapshot.getValue(User.class);
-                    Log.d(TAG,"Imei of device:"+mImeiNumber);
-                    Log.d(TAG,"Imei from firebase:"+user.getImei());
-                    if (!user.getImei().equals(mImeiNumber)){
-                        // same user trying to login from multiple devices -> logout the user
-                        Log.d(TAG, "User is LoggedIn in other device");
-                        //Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                        signOut();
-                    }
-                    else{/* nothing to do*//*}
-                } else {/* this should not be the case*//*}
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }*/
-
     private void getImei(){
         telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
@@ -327,32 +298,40 @@ public class navigation extends AppCompatActivity {
         }
     }
 
-    /*private void signOut(){
-
-        // first make uid under imei null in Devices and imei under uid null in Users
-        device = new Device();
-        device.setUID("null");
-        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-
-        //Firebase signOut
-        if (mAuth.getCurrentUser() != null) {
-            mAuth.signOut();
-            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+    private void recheckUserAuthentication(final FirebaseUser firebaseUser){
+    Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
+    Log.d(TAG,firebaseUser.getEmail());
+    Log.d(TAG,"Inside recheckUserAuthentication");
+    getImei();
+    firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+            Log.d("User Data Snapshot:", userDataSnapshot.toString());
+            if (userDataSnapshot.exists()) {
+                user = userDataSnapshot.getValue(User.class);
+                Log.d(TAG,"Imei of device:"+mImeiNumber);
+                Log.d(TAG,"Imei from firebase:"+user.getImei());
+                if (!user.getImei().equals(mImeiNumber)){
+                    // same user trying to login from multiple devices -> logout the user
+                    Log.d(TAG, "User is LoggedIn in other device");
+                    Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                    LogOutAndStartMainActivity();
+                }
+                else{/* nothing to do*/}
+            } else {/* this should not be the case*/}
         }
-        mUsersDatabaseReference.removeEventListener(mUsersDatabaseReferenceListener);
-        //Google signOut
-        /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            //updateUI(null);
-                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }*/
-        //Clear the back stack and re-directing to the sign-up page
-        /*Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+        }
+    });
+    }
+
+    public void LogOutAndStartMainActivity(){
+        firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
+        firebaseHelper.firebaseSignOut(mImeiNumber);
+        firebaseHelper.googleSignOut(navigation.this);
+        Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);
         mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mLogOutAndRedirect);
         //finishing the navigation activity
@@ -363,5 +342,5 @@ public class navigation extends AppCompatActivity {
             Log.d(TAG,"Closing app exception:"+e.getMessage());
             finish();
         }
-    }*/
+    }
 }

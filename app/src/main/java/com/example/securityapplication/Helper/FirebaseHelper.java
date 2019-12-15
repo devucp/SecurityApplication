@@ -3,12 +3,16 @@ package com.example.securityapplication.Helper;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.securityapplication.GoogleFirebaseSignIn;
+import com.example.securityapplication.MainActivity;
+import com.example.securityapplication.ProfileActivity;
 import com.example.securityapplication.R;
+import com.example.securityapplication.SignUp2;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -39,12 +43,15 @@ public class FirebaseHelper {
     private GoogleSignInClient mGoogleSignInClient;
     private static volatile FirebaseHelper firebaseHelperInstance;
 
-    public void initFirebase(Context context){
-        this.context = context;
+    public void initFirebase(){
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         initDataBaseReferences();
         Log.d(TAG,"Firebase Initialization complete");
+    }
+
+    public void initContext(Context context){
+        this.context = context;
     }
 
     public static FirebaseHelper getInstance() {
@@ -128,37 +135,6 @@ public class FirebaseHelper {
         }
     }
 
-    public void recheckUserAuthentication(final FirebaseUser firebaseUser, final String imei, final Activity activity){
-        Log.d(TAG,"recheckUserAuthentication called");
-        Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        Log.d(TAG,firebaseUser.getEmail());
-        Log.d(TAG,"Inside recheckUserAuthentication");
-        mUsersDatabaseReference.child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                Log.d("User Data Snapshot:", userDataSnapshot.toString());
-                if (userDataSnapshot.exists()) {
-                    user = userDataSnapshot.getValue(User.class);
-                    Log.d(TAG,"Imei of device:"+imei);
-                    Log.d(TAG,"Imei from firebase:"+user.getImei());
-                    if (!user.getImei().equals(imei)){
-                        // same user trying to login from multiple devices -> logout the user
-                        Log.d(TAG, "User is LoggedIn in other device");
-                        //Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                        firebaseSignOut(imei);
-                        googleSignOut(activity);
-                    }
-                    else{/* nothing to do*/}
-                } else {/* this should not be the case*/}
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
     public DatabaseReference getUsersDatabaseReference(){
         return mUsersDatabaseReference;
     }
@@ -171,11 +147,15 @@ public class FirebaseHelper {
         return mEmailDatabaseReference;
     }
 
-    public DatabaseReference getmMobileDatabaseReference(){
+    public DatabaseReference getMobileDatabaseReference(){
         return mMobileDatabaseReference;
     }
 
     public GoogleSignInClient getGoogleSignInClient(){
         return mGoogleSignInClient;
     }
+
+    public FirebaseAuth getFirebaseAuth() { return mAuth; }
+
+    public  FirebaseDatabase getFirebaseDatabase() { return mFirebaseDatabase; }
 }

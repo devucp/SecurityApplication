@@ -12,21 +12,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/linkFacebookAccountButton"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="20dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
-            android:textSize="15sp"
-            app:com_facebook_login_text="Link Facebook Account"
-            />
-
         <com.google.android.gms.common.SignInButton
             android:id="@+id/linkGoogleAccountButton"
             android:layout_width="match_parent"

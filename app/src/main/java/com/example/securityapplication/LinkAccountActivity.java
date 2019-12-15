@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,7 +37,7 @@ public class LinkAccountActivity extends AppCompatActivity implements View.OnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_link_account);
 
-        findViewById(R.id.linkFacebookAccountButton).setOnClickListener(this);
+
         mGoogleLinkAccountButton = findViewById(R.id.linkGoogleAccountButton);
         mGoogleLinkAccountButton.setOnClickListener(this);
 
@@ -130,9 +129,6 @@ public class LinkAccountActivity extends AppCompatActivity implements View.OnCli
                 startActivityForResult(signInIntent, RC_SIGN_IN);
                 break;
 
-            case R.id.linkFacebookAccountButton:
-                //linkFaceBookAccount();
-                break;
         }
 
     }

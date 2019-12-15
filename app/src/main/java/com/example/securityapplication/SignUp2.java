@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -64,10 +65,7 @@ public class SignUp2 extends AppCompatActivity {
 
 
     private TextInputEditText input_mobile;
-//    private TextInputEditText input_aadhar;
     private AutoCompleteTextView input_location;
-//    private TextView error_message;
-
 
     private Button btn_submit;
     private Intent ReturnIntent;
@@ -80,14 +78,9 @@ public class SignUp2 extends AppCompatActivity {
     //adding requestCode variable for requestPermission
     private int RC;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDevicesDatabaseReference;
-    private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mEmailDatabaseReference;
-    private DatabaseReference mMobileDatabaseReference;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseHelper firebaseHelper;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
+    private ValueEventListener mUsersDatabaseReferenceListener;
 
     private String uid;
 
@@ -99,7 +92,6 @@ public class SignUp2 extends AppCompatActivity {
     private RadioButton Radio_Gender;
     private DatePickerDialog datePickerDialog;
     private TextInputEditText textinputName,textinputDOB,date; // was earlier TextInputLayout
-
     private String password;
 
     @Override
@@ -111,10 +103,12 @@ public class SignUp2 extends AppCompatActivity {
         initListeners();
         initObjects();
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        initDatabaseReferences();
+        /**  Get FirebaseHelper Instance **/
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(SignUp2.this);
+        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
 
-        mAuth=FirebaseAuth.getInstance();
         device = new Device();
 
         Resources res = getResources();
@@ -138,18 +132,12 @@ public class SignUp2 extends AppCompatActivity {
 
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
+        initializeGoogleFirebaseSignIn();
     }
 
     private void initializeGoogleFirebaseSignIn(){
         //deviceId();
-        //googleFirebaseSignIn.init(SignUp2.this, mAuth, mFirebaseDatabase, imei);
-    }
-
-    private void signOut(){
-        if (mAuth.getCurrentUser() != null) {
-            mAuth.signOut();
-            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
-        }
+        googleFirebaseSignIn.init(SignUp2.this, firebaseHelper.getFirebaseAuth(), firebaseHelper.getFirebaseDatabase(), imei);
     }
 
     /**Initialize Views*/
@@ -172,14 +160,6 @@ public class SignUp2 extends AppCompatActivity {
         ReturnIntent = new Intent();
         user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
         password = getIntent().getStringExtra("password");
-    }
-
-    private void initDatabaseReferences(){
-        //Initialize Database
-        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-        mMobileDatabaseReference = mFirebaseDatabase.getReference().child("Mobile");
-        mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
     }
 
     private void initListeners(){
@@ -287,15 +267,8 @@ public class SignUp2 extends AppCompatActivity {
                             finishActivity(2);
                         }
 
-                        user.setName(textinputName.getText().toString().trim());
-                        user.setGender(gender);
-                        user.setDob(textinputDOB.getText().toString().trim());
-                        user.setMobile(input_mobile.getText().toString().trim());
-                        user.setLocation(input_location.getText().toString().trim());
-                        user.setImei(imei);//setting IMEI
-                        user.setPaid(false);
-                        user.setSosContacts(setSosContacts());
-                        user.setGoogleAccountLinked(false);
+                        // set user object
+                        setUser(gender);
 
                         // check if mobile number exists
                         setUidFromFirebase(user.getMobile());
@@ -312,6 +285,18 @@ public class SignUp2 extends AppCompatActivity {
         );
     }
 
+    private void setUser(String gender){
+        user.setName(textinputName.getText().toString().trim());
+        user.setGender(gender);
+        user.setDob(textinputDOB.getText().toString().trim());
+        user.setMobile(input_mobile.getText().toString().trim());
+        user.setLocation(input_location.getText().toString().trim());
+        user.setImei(imei);//setting IMEI
+        user.setPaid(false);
+        user.setSosContacts(setSosContacts());
+        user.setGoogleAccountLinked(false);
+    }
+
     private HashMap<String,String> setSosContacts(){
         HashMap<String,String> sosContacts = new HashMap<>();
         for (int i=1;i<=5;i++)
@@ -321,94 +306,74 @@ public class SignUp2 extends AppCompatActivity {
 
     private void writeDataToFirebase(FirebaseUser firebaseUser){
         //check internet connection
-
         device.setUID(firebaseUser.getUid());
 
         writeUserToFirebase(firebaseUser);
     }
 
     private void AddUser(){
-        //added conditional checking and showing respective Toast message
-        if (DBHelper.addUser(user))
-        {
-            Log.d("User Email:",user.getEmail());
-            Log.d("User imei:",user.getImei());
 
-            // create the User
-             mAuth.createUserWithEmailAndPassword(user.getEmail(), password)
-                    .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d(TAG, "createUserWithEmail:success");
-                                Log.d(TAG,"new user ? ->"+task.getResult().getAdditionalUserInfo().isNewUser());
-                                FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        Log.d("User Email:",user.getEmail());
+        Log.d("User imei:",user.getImei());
 
-                                storeAndStartNextActivity(firebaseUser);
+        // create the User
+         firebaseHelper.getFirebaseAuth().createUserWithEmailAndPassword(user.getEmail(), password)
+                .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "createUserWithEmail:success");
+                            Log.d(TAG,"new user ? ->"+task.getResult().getAdditionalUserInfo().isNewUser());
+                            FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
 
-                            } else {
-                                try{
-                                    throw task.getException();
-                                }
-                                catch (FirebaseAuthUserCollisionException e){
-                                    // user exists -> sign in the user
-                                    mAuth.signInWithEmailAndPassword(user.getEmail(), password)
-                                            .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                                    if (task.isSuccessful()) {
-                                                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                                                        storeAndStartNextActivity(firebaseUser);
-                                                    } else {
-                                                        try{
-                                                            throw task.getException();
-                                                        }
-                                                        catch (Exception e){
-                                                            Log.d(TAG,"Exception:"+e.getMessage());
-                                                            Toast.makeText(SignUp2.this, "Authentication failed.",
-                                                                    Toast.LENGTH_SHORT).show();
-                                                        }
+                            storeAndStartNextActivity(firebaseUser);
+
+                        } else {
+                            try{
+                                throw task.getException();
+                            }
+                            catch (FirebaseAuthUserCollisionException e){
+                                // user exists -> sign in the user
+                                firebaseHelper.getFirebaseAuth().signInWithEmailAndPassword(user.getEmail(), password)
+                                        .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                                if (task.isSuccessful()) {
+                                                    FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+                                                    storeAndStartNextActivity(firebaseUser);
+                                                } else {
+                                                    try{
+                                                        throw task.getException();
+                                                    }
+                                                    catch (Exception e){
+                                                        Log.d(TAG,"Exception:"+e.getMessage());
+                                                        Toast.makeText(SignUp2.this, "Authentication failed.",
+                                                                Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
-                                            });
-                                }
-                                catch (Exception e){
-                                    // If sign in fails, display a message to the user.
-                                    Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
-                                    Toast.makeText(SignUp2.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
+                                            }
+                                        });
+                            }
+                            catch (Exception e){
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
+                                Toast.makeText(SignUp2.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
                             }
                         }
-                    });
-        }
-        else
-            Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
-
+                    }
+                });
     }
 
-    private void storeAndStartNextActivity(FirebaseUser firebaseUser){
+    private void storeAndStartNextActivity(final FirebaseUser firebaseUser){
 
-        // check if user is signed in to google or facebook
-        if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
-            Log.d(TAG,"Logged in to google");
-            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
-            //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
-            //initializeGoogleFirebaseSignIn();
-            //link google acc to email acc
-            //googleFirebaseSignIn.linkGoogleAccount(acct);
-            linkGoogleAccount(acct);
-        }
-        else{
-            Log.d("isLoggedinGoogle:","Not logged in");
-            writeDataToFirebase(firebaseUser);
-        }
+        writeDataToFirebase(firebaseUser);
 
-        /*ReturnIntent.putExtra("ResultIntent",user);
-        Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
+        ReturnIntent.putExtra("ResultIntent",user);
+        //Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
         setResult(10,ReturnIntent);//to finish sing up 1 activity
-        activity.finish();*/
+        activity.finish();
 
         /*user=data.getParcelableExtra("ResultIntent");
         Intent profileActivity = new Intent(SignUp2.this,ProfileActivity.class);
@@ -417,7 +382,7 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void setUidFromFirebase(final String mobile){
-        mMobileDatabaseReference.child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
+        firebaseHelper.getMobileDatabaseReference().child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot mobileNodeDataSnapshot) {
                 Log.d("Mobile Data Snapshot:", mobileNodeDataSnapshot.toString());
@@ -427,7 +392,7 @@ public class SignUp2 extends AppCompatActivity {
                     uid = null;
                 }
                 // validate before storing details..check if mobile no is registered
-                validateBeforeStoring(mobile);
+                validateBeforeStoring();
             }
 
             @Override
@@ -437,7 +402,7 @@ public class SignUp2 extends AppCompatActivity {
         });
     }
 
-    private void validateBeforeStoring(String mobile){
+    private void validateBeforeStoring(){
 
         if (uid == null){
             // user details can be pushed to db
@@ -452,7 +417,7 @@ public class SignUp2 extends AppCompatActivity {
 
     private void writeUserToFirebase(final FirebaseUser firebaseUser){
         //push user to firebase database 'Users' node
-        mUsersDatabaseReference.child(firebaseUser.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
@@ -461,7 +426,7 @@ public class SignUp2 extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG,"User Data saved successfully.");
-                    Log.d("Pushed to db",mUsersDatabaseReference.getDatabase().toString());
+                    Log.d("Pushed to db",firebaseHelper.getUsersDatabaseReference().getDatabase().toString());
                     writeDeviceToFirebase(firebaseUser);
                 }
             }
@@ -471,7 +436,7 @@ public class SignUp2 extends AppCompatActivity {
 
     private void writeDeviceToFirebase(final FirebaseUser firebaseUser){
         //push device to firebase database 'Devices' node
-        mDevicesDatabaseReference.child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
+        firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
@@ -481,7 +446,7 @@ public class SignUp2 extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG,"Device Data saved successfully.");
-                    Log.d("Pushed to db",mDevicesDatabaseReference.getDatabase().toString());
+                    Log.d("Pushed to db",firebaseHelper.getDevicesDatabaseReference().getDatabase().toString());
                     writeEmailToFirebase(firebaseUser);
                 }
             }
@@ -491,7 +456,7 @@ public class SignUp2 extends AppCompatActivity {
     private void writeEmailToFirebase(final FirebaseUser firebaseUser){
         //push email and mobile no. on root node
         String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
-        mEmailDatabaseReference.child(emailKey).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
+        firebaseHelper.getEmailDatabaseReference().child(emailKey).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
@@ -501,7 +466,7 @@ public class SignUp2 extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG,"Email Data saved successfully.");
-                    Log.d("Pushed to db",mEmailDatabaseReference.getDatabase().toString());
+                    Log.d("Pushed to db",firebaseHelper.getEmailDatabaseReference().getDatabase().toString());
                     writeMobileToFirebase(firebaseUser);
                 }
             }
@@ -509,7 +474,7 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void writeMobileToFirebase(final FirebaseUser firebaseUser){
-        mMobileDatabaseReference.child(user.getMobile()).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
+        firebaseHelper.getMobileDatabaseReference().child(user.getMobile()).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
@@ -519,10 +484,15 @@ public class SignUp2 extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG,"Mobile Data saved successfully.");
-                    Log.d("Pushed to db",mMobileDatabaseReference.getDatabase().toString());
-                    Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                    Intent sosPage = new Intent(SignUp2.this, sos_page.class);
-                    startActivity(sosPage);
+                    Log.d("Pushed to db",firebaseHelper.getMobileDatabaseReference().getDatabase().toString());
+                    // add user in sqlite
+                    //added conditional checking and showing respective Toast message
+                    if (DBHelper.addUser(user)){
+                        Log.d(TAG,"User added successfully in sqlite");
+                    }
+                    else
+                        Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
+                    linkGoogleAccount(firebaseUser);
                 }
             }
         });
@@ -530,83 +500,58 @@ public class SignUp2 extends AppCompatActivity {
 
     private void deleteDataFromFirebase(FirebaseUser firebaseUser){
         if (firebaseUser != null){
-            mUsersDatabaseReference.child(firebaseUser.getUid()).setValue(null);
-            mDevicesDatabaseReference.child(imei).setValue(null);
+            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).setValue(null);
+            firebaseHelper.getDevicesDatabaseReference().child(imei).setValue(null);
             String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
-            mEmailDatabaseReference.child(emailKey).setValue(null);
-            mMobileDatabaseReference.child(user.getMobile()).setValue(null);
+            firebaseHelper.getEmailDatabaseReference().child(emailKey).setValue(null);
+            firebaseHelper.getMobileDatabaseReference().child(user.getMobile()).setValue(null);
         }
     }
 
-    private void linkGoogleAccount(GoogleSignInAccount acct) {
+    private void linkGoogleAccount(final FirebaseUser firebaseUser){
+        // check if user is signed in to google or facebook
+        if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
+            Log.d(TAG,"Logged in to google");
 
-        // Link the anonymous user to the email credential
-        //showProgressDialog();
-        AuthCredential credential= GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        // [START link_credential]
-        mAuth.getCurrentUser().linkWithCredential(credential)
-                .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "linkWithCredential:success");
-                            FirebaseUser firebaseUser = task.getResult().getUser();
-                            user.setGoogleAccountLinked(true);
-                            // write data to firebase
-                            writeDataToFirebase(firebaseUser);
-                            //Toast.makeText(LinkAccountActivity.this, "Account Linked Successfully", Toast.LENGTH_SHORT).show();
-                        } else {
-                            try {
-                                throw task.getException();
-                            }catch (Exception e){
-                                Log.d(TAG, "linkWithCredential:failure"+e.getMessage());
-                                Toast.makeText(SignUp2.this, "Authentication failed. Please check your connection", Toast.LENGTH_SHORT).show();
-                                signOut();
-                            }
-                        }
+            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
+            googleFirebaseSignIn.linkGoogleAccount(acct);
 
-                        // [START_EXCLUDE]
-                        //hideProgressDialog();
-                        // [END_EXCLUDE]
+            mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
+                    if (user.isGoogleAccountLinked()){
+                        firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
+
+                        Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                        // start next activity
+                        Intent sosPage = new Intent(SignUp2.this, sos_page.class);
+                        startActivity(sosPage);
+                        //closeNow();
                     }
-                });
-        // [END link_credential]
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+            // start next activity
+            Intent sosPage = new Intent(SignUp2.this, sos_page.class);
+            startActivity(sosPage);
+            //closeNow();
+        }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getEmail());
-        final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
-                            Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
-
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-
-                            // set imei and uid in firebase
-                            device = new Device();
-                            device.setUID(user.getUid());
-                            mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-                            mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-                            mDevicesDatabaseReference.child(imei).setValue(device);
-                            mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(imei);
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            //Snackbar.make(findViewById(R.layout.activity_main), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+    private void closeNow(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            finishAffinity();
+        }
+        else{
+            finish();
+        }
     }
 }
-
-
-
-
-

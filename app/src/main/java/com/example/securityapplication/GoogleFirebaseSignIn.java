@@ -1,11 +1,13 @@
 package com.example.securityapplication;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,7 +27,7 @@ import java.io.Serializable;
 public class GoogleFirebaseSignIn implements Serializable {
 
     private FirebaseAuth mAuth;
-    private MainActivity activity;
+    private Activity activity;
     private FirebaseUser user;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
@@ -37,6 +39,8 @@ public class GoogleFirebaseSignIn implements Serializable {
 
     private String mImeiNumber;
     private Device device;
+    private FirebaseHelper firebaseHelper;
+
     //private constructor
     private GoogleFirebaseSignIn(){
         //Prevent form the reflection api.
@@ -45,7 +49,7 @@ public class GoogleFirebaseSignIn implements Serializable {
         }
     }
 
-    public void init(MainActivity activity, FirebaseAuth mAuth, FirebaseDatabase firebaseDatabase, String imei){
+    public void init(Activity activity, FirebaseAuth mAuth, FirebaseDatabase firebaseDatabase, String imei){
 
         this.activity = activity;
         this.mAuth = mAuth;
@@ -87,8 +91,12 @@ public class GoogleFirebaseSignIn implements Serializable {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "linkWithCredential:success");
-                            FirebaseUser user = task.getResult().getUser();
+                            FirebaseUser firebaseUser = task.getResult().getUser();
+                            // change isGoogleAccountLinked status in firebase database to true
+                            changeLinkedStatus(firebaseUser);
+
                             //Toast.makeText(LinkAccountActivity.this, "Account Linked Successfully", Toast.LENGTH_SHORT).show();
+
                             return;
                         } else {
                             String[] exceptionSplitted = task.getException().toString().split(":");
@@ -165,13 +173,13 @@ public class GoogleFirebaseSignIn implements Serializable {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            setUser(null);
+            //setUser(null);
         }
     }
 
     private void setUser(FirebaseUser user){
         this.user = user;
-        activity.updateUI(user);
+        //activity.updateUI(user);
     }
 
     public boolean isLoggedIn(){
@@ -180,5 +188,11 @@ public class GoogleFirebaseSignIn implements Serializable {
             return true;
         else
             return false;
+    }
+
+    private void changeLinkedStatus(FirebaseUser firebaseUser){
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("isGoogleAccountLinked").setValue(true);
     }
 }

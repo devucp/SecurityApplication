@@ -30,6 +30,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -68,9 +69,7 @@ public class SignUp1Activity extends AppCompatActivity {
     private TextInputLayout pass_outer,cnfpass_outer;
     public TextView pass1,pass2;
 
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mEmailDatabaseReference;
+    private FirebaseHelper firebaseHelper;
     private String uid;
 
     private VerifyEmail verifyEmail;
@@ -81,6 +80,11 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup1);
+
+        /**  Get FirebaseHelper Instance **/
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(SignUp1Activity.this);
 
       //removed most the view castings as they're unnecessary
         textinputEmail = findViewById(R.id.textlayout_Email);
@@ -110,14 +114,6 @@ public class SignUp1Activity extends AppCompatActivity {
         }
         else
             Log.d("isLoggedinGoogle","Not logged in");
-
-        mAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        initDatabase();
-    }
-
-    private void initDatabase(){
-        mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
     }
 
     private void ShowMessage(String title,String Message){
@@ -152,13 +148,13 @@ public class SignUp1Activity extends AppCompatActivity {
 
     private void createUserAndVerifyEmail(final Hashtable<String,String> userData){
 
-        mAuth.createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
+        firebaseHelper.getFirebaseAuth().createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
                 .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
                             checkIsEmailVerified(firebaseUser,userData);
 
@@ -187,7 +183,7 @@ public class SignUp1Activity extends AppCompatActivity {
     public void signIn(final Hashtable<String,String> userData){
         Log.d(TAG,"Signing IN user with email "+userData.get("email")+" and password "+userData.get("password"));
 
-        mAuth.signInWithEmailAndPassword(userData.get("email"), userData.get("password"))
+        firebaseHelper.getFirebaseAuth().signInWithEmailAndPassword(userData.get("email"), userData.get("password"))
                 .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -195,7 +191,7 @@ public class SignUp1Activity extends AppCompatActivity {
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             checkIsEmailVerified(firebaseUser, userData);
                         } else {
                             try {
@@ -219,7 +215,7 @@ public class SignUp1Activity extends AppCompatActivity {
         if (verifyEmail.isEmailIdVerified()) {
             Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
             String emailId = firebaseUser.getEmail();
-            signOut();
+            firebaseHelper.firebaseSignOut();
             // can proceed to signUp2
             AddData(userData);
         }
@@ -227,13 +223,6 @@ public class SignUp1Activity extends AppCompatActivity {
             verifyEmail.sendVerificationEmail(SignUp1Activity.this);
         }
 
-    }
-
-    private void signOut(){
-        if (mAuth.getCurrentUser() != null) {
-            mAuth.signOut();
-            //Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void AddData(Hashtable<String,String> userData) {
@@ -281,8 +270,8 @@ public class SignUp1Activity extends AppCompatActivity {
         String email = userData.get("email");
         email = TextUtils.join(",", Arrays.asList(email.split("\\.")));
         Log.d(TAG,email);
-        Log.d(TAG,mEmailDatabaseReference.toString());
-        mEmailDatabaseReference.child(email).addListenerForSingleValueEvent(new ValueEventListener() {
+        Log.d(TAG,firebaseHelper.getEmailDatabaseReference().toString());
+        firebaseHelper.getEmailDatabaseReference().child(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
                 Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());

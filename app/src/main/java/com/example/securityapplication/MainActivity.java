@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TelephonyManager telephonyManager;
     private String mImeiNumber;
-    private FirebaseAuth mAuth;
     private TextView mStatus;
     private EditText mEmail;
     private EditText mPassword;
@@ -74,15 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String TAG = "MainActivity";
     private Button signupbttn;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    /*private DatabaseReference mDevicesDatabaseReference;
-    private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mEmailDatabaseReference;*/
     private FirebaseHelper firebaseHelper;
 
     //GoogleFirebaseSignIn
     private SignInButton mGoogleSignInButton;
-    private GoogleSignInClient mGoogleSignInClient;
     private GoogleFirebaseSignIn googleFirebaseSignIn;
     private static final int RC_SIGN_IN = 9001;
     ProgressBar pgsBar;
@@ -100,33 +94,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int RC;
 
     private static Hashtable<String,String> userData;
-    String background;
 
     public void pgbarshow()
     {
         mSignInButton.setText("");
         findViewById(R.id.pBar).setVisibility(VISIBLE);
-         mSignInButton.getBackground().setAlpha(100);
+        mSignInButton.getBackground().setAlpha(100);
 
+        mSignInButton.setClickable(false);
+        signupbttn.setClickable(false);
 
-         mSignInButton.setClickable(false);
-         signupbttn.setClickable(false);
-
-
-         mEmail.setEnabled(false);
-         mPassword.setEnabled(false);
-
-         findViewById(R.id.ForgetPassword).setEnabled(false);
-
-         findViewById(R.id.checkbox).setEnabled(false);
-
+        mEmail.setEnabled(false);
+        mPassword.setEnabled(false);
+        findViewById(R.id.ForgetPassword).setEnabled(false);
+        findViewById(R.id.checkbox).setEnabled(false);
         mGoogleSignInButton.setEnabled(false);
-
     }
 
     public void pgbarhide()
     {
-
         findViewById(R.id.pBar).setVisibility(GONE);
         mSignInButton.setText("SIGN IN");
         mSignInButton.getBackground().setAlpha(255);
@@ -136,13 +122,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mEmail.setEnabled(true);
         mPassword.setEnabled(true);
-
         findViewById(R.id.ForgetPassword).setEnabled(true);
-
         findViewById(R.id.checkbox).setEnabled(true);
-
         mGoogleSignInButton.setEnabled(true);
-
     }
 
     @Override
@@ -150,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         int i = v.getId();
         if(i== R.id.signInButton){
-            if(mAuth.getCurrentUser()==null) {
+            if(firebaseHelper.getFirebaseAuth().getCurrentUser()==null) {
                 Log.d(TAG,"Current user is null");
                 if(validateForm()){
                     userData = new Hashtable<>();
@@ -168,21 +150,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
                 }
             }
-            else {
-                // signOut user
-                if (mImeiNumber != null)
-                    firebaseHelper.firebaseSignOut(mImeiNumber);
-                else
-                    deviceId();
-                updateUI(null);
-            }
         }
         else if (i==R.id.googleSignInButton){
             Intent signInIntent = firebaseHelper.getGoogleSignInClient().getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
         else if (i==R.id.signUpButton){
-
 
             signupbttn.setText("");
             findViewById(R.id.pBar1).setVisibility(VISIBLE);
@@ -191,10 +164,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             signupbttn.getBackground().setAlpha(100);
 
             // check if imei is registered
-            if (mImeiNumber != null)
-                setDeviceForSignUp(mImeiNumber);
-            else
+            if (mImeiNumber == null)
                 deviceId();
+            setDeviceForSignUp(mImeiNumber);
 
         }
         //Added Reset Passowrd Activity
@@ -208,6 +180,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Grant Device read Permissions
+        deviceId();
 
         //initialize Activity
         initViews();
@@ -224,38 +199,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSignInButton=findViewById(R.id.signInButton);
         mGoogleSignInButton=findViewById(R.id.googleSignInButton);
         FirebaseApp.initializeApp(this);
-        mAuth=FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        /*initDataBaseReferences();*/
 
-        // get firebaseHelper
+        /**  Get FirebaseHelper Instance **/
         firebaseHelper = FirebaseHelper.getInstance();
-        firebaseHelper.initFirebase(MainActivity.this);
-        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(MainActivity.this);
 
-        //Grant Device read Permissions
-        deviceId();
+        if (mImeiNumber == null)
+            deviceId();
+        else {
+            // check if user formatted or uninstalled or cleared data from mobile
+            checkUserStatus();
+        }
 
         /**  GOOGLE LOGIN  **/
-
+        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
         findViewById(R.id.googleSignInButton).setOnClickListener(this);
-
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
         //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
         initializeGoogleFirebaseSignIn();
-
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        /*GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.server_client_id))
-                .requestEmail()
-                .requestProfile()
-                .build();
-        // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);*/
-
-        /**  END GOOGLE LOGIN  **/
 
         /** SosPlayer Service intent**/
         startService(new Intent(this, SosPlayer.class));
@@ -270,15 +233,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onStart(){
         super.onStart();
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
         updateUI(currentUser);
     }
 
     private void initializeGoogleFirebaseSignIn(){
-        if (mImeiNumber != null)
-            googleFirebaseSignIn.init(this, FirebaseAuth.getInstance(), mFirebaseDatabase, mImeiNumber);
-        else
+        if (mImeiNumber == null)
             deviceId();
+        googleFirebaseSignIn.init(this, FirebaseAuth.getInstance(), firebaseHelper.getFirebaseDatabase(), mImeiNumber);
     }
 
     public void initViews(){
@@ -293,17 +255,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.signInButton).setOnClickListener(this);
     }
 
-    /*private void initDataBaseReferences(){
-        //Initialize Database
-        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-        mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
-    }*/
-
     private void checkUserStatus(){
         if (mImeiNumber == null)
             deviceId();
-        if (mAuth.getCurrentUser() == null){
+        if (firebaseHelper.getFirebaseAuth().getCurrentUser() == null){
             firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull final DataSnapshot deviceDataSnapshot) {
@@ -342,8 +297,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
                             });
 
-                            Log.d(TAG,"Current user:"+mAuth.getCurrentUser());
-                            updateUI(mAuth.getCurrentUser());
+                            Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser());
+                            updateUI(firebaseHelper.getFirebaseAuth().getCurrentUser());
                         }
                     }
                 }
@@ -370,8 +325,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else {
                 mImeiNumber = telephonyManager.getDeviceId();
             }
-            // check if user formatted or uninstalled or cleared data from mobile
-            checkUserStatus();
         }
 
         //Log.d("MAinActivity","SMS intent");
@@ -405,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case 101:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     deviceId();
-                } else {
+                } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
                     closeNow();
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
@@ -414,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
     private boolean validateForm() {
         boolean valid = true;
 
@@ -471,10 +425,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 boolean hasBackPressed = data.getBooleanExtra("hasBackPressed",true);
                 Log.d(TAG,"hasBackPressed:"+hasBackPressed);
                 if (hasBackPressed){
-                    if (mImeiNumber != null)
-                        firebaseHelper.firebaseSignOut(mImeiNumber);
-                    else
-                        deviceId();
+                    LogOutUser();
 
                     pgsBar1.setVisibility(GONE);
                     signupbttn.getBackground().setAlpha(255);
@@ -497,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void signIn(final String email, final String password){
          Log.d(TAG,"Signing IN user with email "+email+" and password "+password);
 
-         mAuth.signInWithEmailAndPassword(email, password)
+         firebaseHelper.getFirebaseAuth().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -505,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
-                            final FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            final FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             Log.d(TAG, firebaseHelper.getDevicesDatabaseReference().toString());
 
                             deviceId();
@@ -540,8 +491,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 throw task.getException();
                             }
                             catch (FirebaseAuthInvalidCredentialsException e){
-
-
                                 Log.d(TAG,"Exception:"+e.getMessage());
                                 Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
                             }
@@ -554,32 +503,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    /*private void signOut(){
-
-        // first make uid under imei null in Devices and imei under uid null in Users
-        deviceId();
-        device = new Device();
-        device.setUID("null");
-        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-
-        //Firebase signOut
-        if (mAuth.getCurrentUser() != null) {
-            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
-            mAuth.signOut();
-            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
-        }
-        //Google signOut
-        if(GoogleSignIn.getLastSignedInAccount(this) != null) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            //updateUI(null);
-                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }*/
+    private void LogOutUser(){
+        if (mImeiNumber == null)
+            deviceId();
+        firebaseHelper.firebaseSignOut(mImeiNumber);
+        firebaseHelper.googleSignOut(MainActivity.this);
+    }
 
     public void updateUI(FirebaseUser firebaseUser){
         if(firebaseUser==null){
@@ -590,13 +519,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGoogleSignInButton.setVisibility(VISIBLE);
         }
         else if(firebaseUser!=null){
-            //mStatus.setText(R.string.logged);
-            //mSignInButton.setText(R.string.sign_out_text);
-            //mEmail.setVisibility(GONE);
-            ///mPassword.setVisibility(GONE);
-            //mGoogleSignInButton.setVisibility(GONE);
-            //mFaceBookLoginButton.setVisibility(GONE);
-
             Intent mHomeIntent = new Intent(this,navigation.class);
             startActivity(mHomeIntent);
             try {
@@ -606,14 +528,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
             }
             pgbarhide();
-
-
         }
         Log.d(TAG,"UI updated successfully");
     }
 
     private void crossValidateUserData(){
-        String email=null, password = null;
+        String email, password = null;
         String SignInType = userData.get("SignInType");
 
         if (SignInType.equals("email"))
@@ -627,9 +547,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Case2:prompt user that this device is stored under other user ...ask previous user to logout
 
                 if (SignInType.equals("google")){
-                    // logout user
-                    deviceId();
-                    firebaseHelper.firebaseSignOut(mImeiNumber);
+                    // logout user from google
                     firebaseHelper.googleSignOut(MainActivity.this);
                 }
 
@@ -776,9 +694,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             Log.d(TAG, "User is LoggedIn in other device");
                                             Toast.makeText(MainActivity.this,
                                                     "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                            deviceId();
-                                            firebaseHelper.firebaseSignOut(mImeiNumber);
-                                            firebaseHelper.googleSignOut(MainActivity.this);
+                                            LogOutUser();
                                         }
                                     } else {
                                         //user can login
@@ -809,7 +725,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         pgbarhide();
 
-
                     } else {
                         user = null;
                         Log.d(TAG,"User is null");
@@ -818,7 +733,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
 
                     // Getting User failed, log a message
                     Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
@@ -844,7 +758,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // or other user may have formatted the mobile without logging out
                 // implemented in checkUserStatus() function
                 pgbarhide();
-                Log.d(TAG,"Current user:"+mAuth.getCurrentUser());
+                Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser());
             }
         } else {
             Log.d(TAG, "Imei not registered");

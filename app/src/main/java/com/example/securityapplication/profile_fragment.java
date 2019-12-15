@@ -28,7 +28,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import static android.support.v4.content.ContextCompat.getSystemService;
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class profile_fragment extends Fragment {
 
@@ -104,7 +103,7 @@ public class profile_fragment extends Fragment {
                 //finishing the navigation activity
                 getActivity().finish();
                 //Clear the back stack and re-directing to the sign-up page
-                Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+                Intent mLogOutAndRedirect= new Intent(getContext(),MainActivity.class);
                 mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mLogOutAndRedirect);
 
@@ -119,13 +118,12 @@ public class profile_fragment extends Fragment {
 
     }
 
-
     private void FetchAllData(){
         int i =0;
         Cursor res;
         res = mydb.getAllData();
         if (res.getCount() == 0){
-            Toast toast = Toast.makeText(getApplicationContext(),
+            Toast toast = Toast.makeText(getContext(),
                     "No User Data Found",
                     Toast.LENGTH_LONG);
             toast.show();

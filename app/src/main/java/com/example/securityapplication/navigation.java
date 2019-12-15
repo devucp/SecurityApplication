@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 public class navigation extends AppCompatActivity {
 
@@ -100,15 +103,32 @@ public class navigation extends AppCompatActivity {
                 Log.d("checking","oncreate option menu 2 is running");
                 test=true;
             }
-            }
+        }
+
+        // check if first sos contact is added
+        checkFirstSosContact();
 
     }
 
-    /*private void initDataBaseReferences(){
-        //Initialize Database references
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-    }*/
+    private void checkFirstSosContact(){
+        // check if first sos contact is added
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+                HashMap<String,String> sosContacts = user.getSosContacts();
+                if (sosContacts == null){
+                    Intent sosPage = new Intent(navigation.this, sos_page.class);
+                    startActivityForResult(sosPage,1);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     public void getData(final int check){
         final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
@@ -230,7 +250,8 @@ public class navigation extends AppCompatActivity {
 
                     return true;
                 }
-            };
+    };
+
     @Override
     public void onBackPressed(){
         AlertDialog.Builder a_builder = new AlertDialog.Builder(navigation.this);
@@ -251,6 +272,18 @@ public class navigation extends AppCompatActivity {
         AlertDialog alert = a_builder.create();
         alert.setTitle("Message");
         alert.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==10 && requestCode==1)
+            try {
+                closeNow();
+            }catch (Exception e){
+                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                finish();
+            }
     }
 
     public void sos(View view) {

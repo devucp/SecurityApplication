@@ -293,16 +293,16 @@ public class SignUp2 extends AppCompatActivity {
         user.setLocation(input_location.getText().toString().trim());
         user.setImei(imei);//setting IMEI
         user.setPaid(false);
-        user.setSosContacts(setSosContacts());
+        //user.setSosContacts(setSosContacts());
         user.setGoogleAccountLinked(false);
     }
 
-    private HashMap<String,String> setSosContacts(){
+    /*private HashMap<String,String> setSosContacts(){
         HashMap<String,String> sosContacts = new HashMap<>();
         for (int i=1;i<=5;i++)
             sosContacts.put("c"+i,"null");
         return sosContacts;
-    }
+    }*/
 
     private void writeDataToFirebase(FirebaseUser firebaseUser){
         //check internet connection

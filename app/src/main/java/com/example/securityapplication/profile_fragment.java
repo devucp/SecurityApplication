@@ -30,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,9 +64,8 @@ public class profile_fragment extends Fragment {
     Spinner spinner;
     DatePickerDialog datePickerDialog;
 
-
-
     navigation nv=new navigation();
+    private FirebaseHelper firebaseHelper;
 
     @Nullable
     @Override
@@ -98,7 +98,6 @@ public class profile_fragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        user = navigation.newUser;
 
         initObjects();
         initviews();
@@ -111,12 +110,17 @@ public class profile_fragment extends Fragment {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         initDataBaseReferences();
 
+        /**  Get FirebaseHelper Instance **/
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(getActivity());
 
     }
 
     private void initObjects() {
 
 //        user = getIntent().getParcelableExtra("User");
+        user = new User();
         mydb = new SQLiteDBHelper(getContext());
     }
 
@@ -404,16 +408,6 @@ public class profile_fragment extends Fragment {
             mAuth.signOut();
             Toast.makeText(getContext(), "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
-        //Google signOut
-        /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            //updateUI(null);
-                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }*/
+        firebaseHelper.googleSignOut(getActivity());
     }
 }

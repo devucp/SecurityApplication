@@ -2,6 +2,7 @@ package com.example.securityapplication;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class GoogleFirebaseSignIn implements Serializable {
     private String mImeiNumber;
     private Device device;
     private FirebaseHelper firebaseHelper;
+    private boolean isFirebaseAuthWithGoogle;
 
     //private constructor
     private GoogleFirebaseSignIn(){
@@ -80,7 +82,7 @@ public class GoogleFirebaseSignIn implements Serializable {
     }
 
     public void linkGoogleAccount(GoogleSignInAccount acct) {
-
+        Log.d(TAG,"Inside linkGoogleAccount");
         // Link the anonymous user to the email credential
         //showProgressDialog();
         AuthCredential credential= GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -114,6 +116,8 @@ public class GoogleFirebaseSignIn implements Serializable {
     }
 
     public void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG,"Inside firebaseAuthWithGoogle");
+        isFirebaseAuthWithGoogle =  false;
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getEmail());
         final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -121,6 +125,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            isFirebaseAuthWithGoogle = true;
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
@@ -135,14 +140,6 @@ public class GoogleFirebaseSignIn implements Serializable {
                             mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
                             mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
                             mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
-
-                            /*Log.d(TAG,mAuth.getUid());
-                            Log.d(TAG,mAuth.getCurrentUser().getUid());
-                            Log.d(TAG,mAuth.getCurrentUser().getDisplayName());
-                            Log.d(TAG,mAuth.getCurrentUser().getEmail());
-                            //Log.d(TAG,(mAuth.getCurrentUser().getPhoneNumber().isEmpty())?mAuth.getCurrentUser().getPhoneNumber():"No number");
-                            Log.d(TAG,mAuth.getCurrentUser().getProviderId());
-                            Log.d(TAG,mAuth.getCurrentUser().getProviderData().toString());*/
                             setUser(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -179,15 +176,23 @@ public class GoogleFirebaseSignIn implements Serializable {
 
     private void setUser(FirebaseUser user){
         this.user = user;
-        //activity.updateUI(user);
+        Intent mHomeIntent = new Intent(activity,navigation.class);
+        activity.startActivity(mHomeIntent);
+        try {
+            closeNow();
+        }catch (Exception e){
+            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+            activity.finish();
+        }
     }
 
-    public boolean isLoggedIn(){
-        //hideProgressDialog();
-        if(this.user != null)
-            return true;
-        else
-            return false;
+    private void closeNow(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            activity.finishAffinity();
+        }
+        else{
+            activity.finish();
+        }
     }
 
     private void changeLinkedStatus(FirebaseUser firebaseUser){

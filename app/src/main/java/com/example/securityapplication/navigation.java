@@ -84,10 +84,11 @@ public class navigation extends AppCompatActivity {
                     Log.d("FirebaseUsername",newUser.getName()+" 1 "+newUser.getEmail());
                     db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
                 }
-                else if(check==2)
-                {Log.d("FirebaseUsername",newUser.getName()+" 2 "+newUser.getEmail());
-                        db.updateUser(newUser);}
-            }
+                else if(check==2) {
+                    Log.d("FirebaseUsername",newUser.getName()+" 2 "+newUser.getEmail());
+                    db.updateUser(newUser);}
+                    db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 

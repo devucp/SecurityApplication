@@ -249,6 +249,8 @@ public class profile_fragment extends Fragment {
         deviceId();
         device = new Device();
         device.setUID("null");
+        //delete user records from SQLite
+        mydb.deleteDatabase(getApplicationContext());
         mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
 
         //Firebase signOut

@@ -1,9 +1,12 @@
 package com.example.securityapplication;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 
 import android.os.Bundle;
@@ -17,7 +20,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +36,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Objects;
+
 import static android.support.v4.content.ContextCompat.getSystemService;
+import static com.example.securityapplication.R.layout.spinner_layout;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class profile_fragment extends Fragment {
 
-    private TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
+    private EditText textName,textEmail,textPhone,textGender,textDob;
+    private AutoCompleteTextView textAddress;
     private Button btn_edit;
     private Button btn_logout;
     SQLiteDBHelper mydb ;
@@ -47,6 +62,9 @@ public class profile_fragment extends Fragment {
     private String mImeiNumber;
     private int RC;
     private String TAG = "ProfileActivity";
+    Spinner spinner;
+    DatePickerDialog datePickerDialog;
+
 
 
     navigation nv=new navigation();
@@ -54,12 +72,35 @@ public class profile_fragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_profile,container,false);
+        View v= inflater.inflate(R.layout.fragment_profile,container,false);
+
+        String [] values =
+                {"Male","Female","Others"};
+        spinner = (Spinner) v.findViewById(R.id.text_Gender);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), spinner_layout, values);
+        adapter.setDropDownViewResource(spinner_layout);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                Toast.makeText(parent.getContext(),
+                        "OnItemSelectedListener : " + parent.getItemAtPosition(position).toString(),
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        return v;
     }
+
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        user = new User();
+        user = navigation.newUser;
 
         initObjects();
         initviews();
@@ -67,9 +108,12 @@ public class profile_fragment extends Fragment {
         DisplayData();
         initListeners();
 
+
         mAuth= FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         initDataBaseReferences();
+
+
     }
 
     private void initObjects() {
@@ -79,12 +123,66 @@ public class profile_fragment extends Fragment {
     }
 
     private void initListeners() {
+        textDob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Calendar c= java.util.Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR); // current year
+                int mMonth = c.get(Calendar.MONTH); // current month
+                int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
+                // date picker dialog
+                datePickerDialog = new DatePickerDialog(getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // set day of month , month and year value in the edit text
+                                textDob.setText(dayOfMonth + "/"
+                                        + (monthOfYear + 1) + "/" + year);
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+                datePickerDialog.getDatePicker().setMaxDate(c.getTimeInMillis());
+            }
+        });
+
         btn_edit.setOnClickListener(new View.OnClickListener() {
                                         @Override public void onClick(View view) {
+
                                             if (IsInternet.isNetworkAvaliable(getContext())) {
-                                                Intent intent = new Intent(getContext(), EditProfileActivity.class);
-                                                intent.putExtra("User", user);
-                                                startActivityForResult(intent, 1);
+
+                                                if(btn_edit.getText().equals("edit"))
+                                                {btn_edit.setText("Save");
+                                                    enable();
+                                                alphaa(1.0f);}
+                                                else {
+                                                    if(!validate())
+                                                    {
+                                                        Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                    else {
+                                                        //save code will come here
+                                                        user.setName(textName.getText().toString());
+                                                        user.setDob(textDob.getText().toString());
+                                                        user.setLocation(textAddress.getText().toString());
+                                                        user.setMobile(textPhone.getText().toString());
+                                                        if (spinner.getSelectedItemPosition() == 0)
+                                                            user.setGender("male");
+                                                        else if (spinner.getSelectedItemPosition() == 1)
+                                                            user.setGender("female");
+                                                        else
+                                                            user.setGender("others");
+
+                                                        mydb.updateUser(user);
+
+
+                                                        btn_edit.setText("edit");
+                                                        alphaa(0.6f);
+                                                        disable();
+                                                    }
+                                                }
                                             }//Sending Data to EditProfileActivity
                                             else {
                                                 Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
@@ -110,6 +208,13 @@ public class profile_fragment extends Fragment {
 
             }
         });
+    }
+
+    private boolean validate() {
+        if(textName.getText().toString().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10)
+            return true;
+        else
+            return false;
     }
 
     private void initDataBaseReferences(){
@@ -150,12 +255,41 @@ public class profile_fragment extends Fragment {
         textName.setText(user.getName());
 //        textAadhaar.setText(ansAadhaar);
         textDob.setText(user.getDob());
-        textGender.setText(user.getGender());
+        int kk=0;
+        if(user.getGender().equalsIgnoreCase("male"))
+            kk=0;
+        else if(user.getGender().equalsIgnoreCase("female"))
+            kk=1;
+        else
+            kk=2;
+        spinner.setSelection(kk);
         textAddress.setText(user.getLocation());
         textEmail.setText(user.getEmail());
         textPhone.setText(user.getMobile());
 
         Log.d("Profile","DATA displayed on profile Successfully");
+    }
+    private void disable(){
+        textName.setEnabled(false);
+        spinner.setEnabled(false);
+        textEmail.setEnabled(false);
+        textPhone.setEnabled(false);
+        textAddress.setEnabled(false);
+        textDob.setEnabled(false);
+    }
+    private void alphaa(float k){
+        spinner.setAlpha(k);
+        textName.setAlpha(k);
+        textPhone.setAlpha(k);
+        textAddress.setAlpha(k);
+        textDob.setAlpha(k);
+    }
+    private void enable(){
+        spinner.setEnabled(true);
+        textName.setEnabled(true);
+        textPhone.setEnabled(true);
+        textAddress.setEnabled(true);
+        textDob.setEnabled(true);
     }
 
     private void initviews() {
@@ -163,11 +297,27 @@ public class profile_fragment extends Fragment {
         textEmail = getActivity().findViewById(R.id.text_Email);
         textPhone = getActivity().findViewById(R.id.text_Phone);
         textAddress = getActivity().findViewById(R.id.text_Address);
-        textGender = getActivity().findViewById(R.id.text_Gender);
+        //textGender = getActivity().findViewById(R.id.text_Gender);
         textDob = getActivity().findViewById(R.id.text_DOB);
         btn_edit = getActivity().findViewById(R.id.btn_Edit);
         btn_logout = getActivity().findViewById(R.id.btn_Logout);
+        Resources res = getResources();
+        String[] Locality = res.getStringArray(R.array.Locality);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,Locality);
+        textAddress.setAdapter(adapter);
+        disable();
+
 //        textAadhaar = findViewById(R.id.text_Aadhaar);
+//        String[] gender = new String[]{
+//                "Male",
+//                "Female",
+//                "Others"
+//        };
+//        Spinner sp=getActivity().findViewById(R.id.text_Gender);
+//       spinnerArrayAdapter = new ArrayAdapter<String>(
+//                this.getActivity(), spinner_layout, gender);
+//        spinnerArrayAdapter.setDropDownViewResource(spinner_layout);
+//        sp.setAdapter(spinnerArrayAdapter);
     }
 
     @Override

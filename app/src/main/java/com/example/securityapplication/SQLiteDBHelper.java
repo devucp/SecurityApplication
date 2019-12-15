@@ -184,13 +184,13 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(COLUMN_NAME, user.getName());
-        contentValues.put(COLUMN_EMAIL, user.getEmail());
+//        contentValues.put(COLUMN_EMAIL, user.getEmail());
 //        contentValues.put(COLUMN_PASSWORD, user.getPassword());
-//        contentValues.put(COLUMN_GENDER, user.getGender());
+        contentValues.put(COLUMN_GENDER, user.getGender());
         contentValues.put(COLUMN_MOBILE,user.getMobile());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
 //        contentValues.put(COLUMN_IMEI, user.getImei());
-//        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
+        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
 
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?", //Changed from Column_Email to Column_ID
                 new String[]{"1"});

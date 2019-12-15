@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/back"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:padding="5dp">
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -42,9 +43,11 @@
                 android:layout_marginTop="15dp"
 
                 android:gravity="center"
-                android:shadowColor="#A3050101"
-                android:shadowRadius="10"
+                android:shadowColor="@color/cyan"
+                android:shadowRadius="25"
                 android:text="SIGN UP"
+                android:textAllCaps="true"
+
                 android:textAlignment="center"
                 android:textColor="#FFF8F8"
                 android:textSize="30sp"
@@ -67,8 +70,7 @@
                     android:layout_width="match_parent"
 
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ed_cus"
-                    android:ems="10"
+                    android:background="@drawable/shapeemail"
                     android:hint="Email"
                     android:inputType="textEmailAddress"
                     android:paddingStart="20dp"
@@ -76,10 +78,10 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#F8FA0707"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
-                    android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/holo_red_dark"
+                    android:textColorLink="@color/white"
+                    android:textCursorDrawable="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -87,7 +89,7 @@
                 android:id="@+id/textlayout_Pass_outer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="11dp"
                 android:clickable="true"
                 android:hapticFeedbackEnabled="true"
                 app:errorEnabled="false"
@@ -100,7 +102,7 @@
                     android:id="@+id/textlayout_Pass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ed_cus"
+                    android:background="@drawable/shapeemail"
                     android:hint="@string/password"
                     android:inputType="text|textPassword"
                     android:paddingStart="20dp"
@@ -108,8 +110,9 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#FFFFFF"
-                    android:textColorHighlight="#264FA3"
+                    android:textColorHighlight="#007399"
                     android:textColorHint="#FFFFFF"
+                    android:textCursorDrawable="@color/white"
                     android:textColorLink="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -118,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/pass_text1"
                 android:visibility="invisible"
-                android:layout_marginTop="-4dp"
+                android:layout_marginTop="-2dp"
                 android:layout_marginLeft="15dp"
                 android:text="password can't be empty"
                 android:textSize="12sp"
@@ -130,7 +133,7 @@
                 android:id="@+id/textlayout_CnfPass_outer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="15dp"
                 app:errorEnabled="false"
                 app:hintEnabled="false"
                 app:passwordToggleEnabled="true"
@@ -140,7 +143,7 @@
                     android:id="@+id/textlayout_CnfPass"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ed_cus"
+                    android:background="@drawable/shapeemail"
                     android:hint="@string/confirm_password"
                     android:inputType="textPassword"
                     android:paddingStart="20dp"
@@ -148,7 +151,9 @@
                     android:paddingEnd="5dp"
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
-                    android:textColorHighlight="#264FA3"
+                    android:textColorHighlight="#007399"
+                    android:textCursorDrawable="@color/white"
+
                     android:textColorHint="#FFFFFF"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>

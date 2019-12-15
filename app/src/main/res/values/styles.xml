@@ -9,6 +9,11 @@
 
 
     </style>
+
+    <style name="datepicker" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:datePickerDialogTheme">@color/colorPrimary</item>
+
+    </style>
     <style name="sos" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>

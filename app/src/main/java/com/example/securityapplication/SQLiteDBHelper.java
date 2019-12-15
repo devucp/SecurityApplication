@@ -49,15 +49,12 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_IMEI + " TEXT, " +
                     COLUMN_TESTM + " BOOLEAN DEFAULT FALSE " + ")";
 
-
-
     private static final String SOS_TABLE = "sostable";
     public static final String COLUMN_C1 = "c1";
     public static final String COLUMN_C2 = "c2";
     public static final String COLUMN_C3 = "c3";
     public static final String COLUMN_C4 = "c4";
     public static final String COLUMN_C5 = "c5";
-
 
     private static final String CREATE_SOSTABLE_QUERY =
             "CREATE TABLE "+ SOS_TABLE +"(" +
@@ -67,7 +64,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_C4 + " TEXT ," +
                     COLUMN_C5 + " TEXT " +")";
     private User user;
-
 
     /**Constructor*/
 
@@ -97,8 +93,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db=this.getReadableDatabase();
         int numRows= (int) DatabaseUtils.queryNumEntries(db,TABLE_NAME);
         Log.d("SQL","No. of rows in sql "+numRows);
+        db.close();//Added close stmt
         return numRows;
-
     }
 
     /**Adding user*/
@@ -165,6 +161,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         else {
             Log.d("Database","No Sos contact records Found");
         }
+        db.close();//Added close stmt
         return cursor;
     }
 
@@ -202,12 +199,14 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     /**Checking if user is present*/
     public boolean getTestmode(){
+        SQLiteDatabase db = this.getReadableDatabase();
         String str="false";
-        Cursor cursor = getReadableDatabase().rawQuery("select "+ COLUMN_TESTM +" FROM "+TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("select "+ COLUMN_TESTM +" FROM "+TABLE_NAME, null);
         if(cursor.getCount()!=0){
             while (cursor.moveToNext()){
                 str = cursor.getString(0);
             }
+            db.close();//Added close stmt
             if(str.equals("1"))
                 return true;
         }
@@ -243,13 +242,15 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     //Fetch data for ProfileActivity
     public Cursor getAllData() {
-        Cursor cursor = getReadableDatabase().rawQuery("select * from "+TABLE_NAME, null);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from "+TABLE_NAME, null);
         if (cursor.getCount()!=0) {
             Log.d("Database", "Details loaded in Cursor");
         }
         else {
             Log.d("Database","No records Found");
         }
+        db.close();//Added close stmt
         return cursor;
     }
 
@@ -277,8 +278,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
     //forcefully deletes database using context to ensure creation of tables
     public void deleteDatabase(Context ctx){
-        ctx.deleteDatabase(DB_name);
-        Log.d("SQLiteDBHelper","on deleteDatabse: Deleted databse");
 
+        ctx.deleteDatabase(DB_name);
+        Log.d("SQLite","on deleteDatabase : no. of rows = "+numberOfRows());
+        Log.d("SQLiteDBHelper","on deleteDatabase: Deleted database");
     }
 }

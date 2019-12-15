@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -17,6 +18,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Objects;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -66,6 +69,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
     }
 
 
+
+
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,17 +92,19 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         btn_reset.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 String email= emailEditText.getEditableText().toString().trim();
                 if(validate.validateEmail(emailEditText)){
                     pgbarshow();
                     mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+                            InputMethodManager inputManager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                            inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
                             if(task.isSuccessful()){
                                 Toast.makeText(ResetPasswordActivity.this,"EMAIL SENT. PLEASE CHECK YOUR MAIL",Toast.LENGTH_SHORT).show();
                                 //startActivity(new Intent(ResetPasswordActivity.this,MainActivity.class));
-                                pgbarhide();
 
 
 
@@ -106,13 +113,15 @@ public class ResetPasswordActivity extends AppCompatActivity {
                             {
                                 String error = task.getException().getMessage().split("\\.")[0];
                                 Toast.makeText(ResetPasswordActivity.this,error,Toast.LENGTH_LONG).show();
-                                pgbarhide();
 
                             }
-
+                            pgbarhide();
                         }
                     });
+
+
                 }
+
             }
         });
 

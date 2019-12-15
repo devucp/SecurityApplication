@@ -42,16 +42,20 @@
                 android:layout_marginTop="15dp"
                 />
 
-            <TextView
+            <EditText
                 android:id="@+id/text_Name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="15dp"
-                android:text="user"
-                android:textColor="#fff"
-                android:textSize="35sp"
+                android:layout_gravity="center"
+                android:alpha="0.6"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:hint="Name"
+                android:paddingStart="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:textCursorDrawable="@drawable/cursor_color"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
 
@@ -72,15 +76,20 @@
                         android:layout_height="36dp"
                         android:src="@drawable/ic_email_black_24dp" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/text_Email"
-                        android:layout_width="257dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:alpha="0.6"
+                        android:hint="Email"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
-                        android:text="UserAccountmail.com"
-                        android:textSize="20sp"
+                        android:paddingRight="0dp"
+                        android:textColor="#000000"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -97,15 +106,20 @@
                         android:layout_height="36dp"
                         android:src="@drawable/ic_local_phone_black_24dp" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/text_Phone"
-                        android:layout_width="209dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:alpha="0.6"
+                        android:hint="Phone Number"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
-                        android:text="Phone Number"
-                        android:textSize="20sp"
+                        android:paddingRight="0dp"
+                        android:textColor="#000000"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -122,16 +136,20 @@
                         android:layout_height="36dp"
                         android:src="@drawable/ic_home_black_24dp" />
 
-                    <TextView
+                    <AutoCompleteTextView
                         android:id="@+id/text_Address"
-                        android:layout_width="155dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:alpha="0.6"
+                        android:hint="Locality"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:text="Address"
-                        android:textSize="20sp"
+                        android:textColor="#000000"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -148,17 +166,30 @@
                         android:layout_height="36dp"
                         android:src="@drawable/ic_wc_black_24dp" />
 
-                    <TextView
+                    <Spinner
                         android:id="@+id/text_Gender"
-                        android:layout_width="241dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:paddingStart="20dp"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="0dp"
-                        android:text="Gender"
-                        android:textSize="20sp"
+                        android:alpha="0.6"
+                        android:paddingStart="15dp"
+                        android:spinnerMode="dropdown"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/text_Gender"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                       -->
+<!--                        android:hint="Gender"-->
+<!--                        android:inputType="textCapSentences|textMultiLine"-->
+<!--                        android:paddingStart="20dp"-->
+<!--                        android:paddingLeft="20dp"-->
+<!--                        android:paddingRight="0dp"-->
+<!--                        android:textCursorDrawable="@drawable/cursor_color"-->
+<!--                        />-->
                 </LinearLayout>
 
                 <LinearLayout
@@ -174,16 +205,21 @@
                         android:layout_height="36dp"
                         android:src="@drawable/ic_date_range_black_24dp" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/text_DOB"
-                        android:layout_width="262dp"
+                        android:focusable="false"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:alpha="0.6"
+                        android:hint="Date of Birth"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:text="Date Of Birth"
-                        android:textSize="20sp"
+                        android:textColor="#000000"
+                        android:textCursorDrawable="@drawable/cursor_color"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>

@@ -409,6 +409,17 @@ public class profile_fragment extends Fragment {
             mAuth.signOut();
             Toast.makeText(getContext(), "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
+
+        try{
+            Intent mStopSosPlayer=new Intent(getApplicationContext(),SosPlayer.class);
+            mStopSosPlayer.putExtra("stop",1);
+            getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
+            Log.d("Profile Fr","Service sosplayer new startIntent...");
+            Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
+        }
+        catch(Exception e) {
+            Log.d("Profile Fr","Service SOSplayer is not running");
+        }
         //Google signOut
         /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
             mGoogleSignInClient.signOut()

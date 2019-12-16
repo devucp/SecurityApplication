@@ -98,16 +98,24 @@ public class FirebaseHelper {
         mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
     }
 
-    public void firebaseSignOut(String imei){
-        Log.d(TAG,"Firebase SignOut(String imei) called");
+    public void makeDeviceImeiNull(String imei){
         // first make uid under imei null in Devices and imei under uid null in Users
         device = new Device();
         device.setUID("null");
         mDevicesDatabaseReference.child(imei).setValue(device);
+    }
+
+    public void makeUserImeiNull(){
+        mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
+    }
+
+    public void firebaseSignOut(String imei){
+        Log.d(TAG,"Firebase SignOut(String imei) called");
+        makeDeviceImeiNull(imei);
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
-            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
+            makeUserImeiNull();
             mAuth.signOut();
             Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }

@@ -97,7 +97,7 @@ public class SignUp2 extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private TextInputEditText textinputName,textinputDOB,date; // was earlier TextInputLayout
     private String password;
-    public static   ProgressBar Spinner;
+    public static ProgressBar Spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -149,8 +149,8 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void initializeGoogleFirebaseSignIn(){
-        //deviceId();
-        googleFirebaseSignIn.init(SignUp2.this, firebaseHelper.getFirebaseAuth(), firebaseHelper.getFirebaseDatabase(), imei);
+        //deviceId();firebaseHelper.
+                googleFirebaseSignIn.init(SignUp2.this, imei);
     }
 
     /**Initialize Views*/
@@ -332,6 +332,15 @@ public class SignUp2 extends AppCompatActivity {
         user.setPaid(false);
         //user.setSosContacts(setSosContacts());
         user.setGoogleAccountLinked(false);
+        Log.d(TAG,user.getName());
+        Log.d(TAG,user.getEmail());
+        Log.d(TAG,user.getGender());
+        Log.d(TAG,user.getDob());
+        Log.d(TAG,user.getImei());
+        Log.d(TAG,user.getLocation());
+        Log.d(TAG,user.getMobile());
+        Log.d(TAG,"isGoogleAccLinked?:"+user.isGoogleAccountLinked());
+        Log.d(TAG,"isPaid?:"+user.isPaid());
     }
 
     /*private HashMap<String,String> setSosContacts(){
@@ -343,7 +352,6 @@ public class SignUp2 extends AppCompatActivity {
 
     private void writeDataToFirebase(FirebaseUser firebaseUser){
         //check internet connection
-        device.setUID(firebaseUser.getUid());
 
         writeUserToFirebase(firebaseUser);
     }
@@ -477,6 +485,7 @@ public class SignUp2 extends AppCompatActivity {
 
     private void writeDeviceToFirebase(final FirebaseUser firebaseUser){
         //push device to firebase database 'Devices' node
+        device.setUID(firebaseUser.getUid());
         firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -567,7 +576,6 @@ public class SignUp2 extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
                         // start next activity
                         startNextActivity();
-                        //closeNow();
                     }
                 }
 
@@ -581,7 +589,6 @@ public class SignUp2 extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
             // start next activity
             startNextActivity();
-            //closeNow();
         }
     }
 
@@ -609,15 +616,6 @@ public class SignUp2 extends AppCompatActivity {
         input_location.setAlpha((float) 0.6);
         btn_submit.setAlpha((float) 0.6);
         text_view.setAlpha((float)0.6);
-    }
-
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            finishAffinity();
-        }
-        else{
-            finish();
-        }
     }
 
     private void startNextActivity(){

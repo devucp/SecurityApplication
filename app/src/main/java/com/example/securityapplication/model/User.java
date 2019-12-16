@@ -21,9 +21,9 @@ public class User implements Parcelable {
     private String location;
     private String imei;
     private String dob;
-    private boolean isPaid;
+    private Boolean paid;
     private HashMap<String,String> sosContacts;
-    private boolean isGoogleAccountLinked;
+    private Boolean googleAccountLinked;
    private String sosc1;
     private String sosc2;
     private String sosc3;
@@ -197,9 +197,9 @@ public class User implements Parcelable {
         dest.writeString(dob);
     }
 
-    public boolean IsPaid(){ return isPaid; }
+    public boolean isPaid(){ return paid; }
 
-    public void setPaid(boolean isPaid){ this.isPaid = isPaid; }
+    public void setPaid(Boolean paid){ this.paid = paid; }
 
     public HashMap<String,String> getSosContacts(){ return sosContacts; }
 
@@ -207,7 +207,7 @@ public class User implements Parcelable {
         this.sosContacts = sosContacts;
     }
 
-    public boolean isGoogleAccountLinked(){ return isGoogleAccountLinked; }
+    public boolean isGoogleAccountLinked(){ return googleAccountLinked; }
 
-    public void setGoogleAccountLinked(boolean isGoogleAccountLinked){ this.isGoogleAccountLinked = isGoogleAccountLinked; }
+    public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
 }

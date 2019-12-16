@@ -62,7 +62,7 @@ public class navigation extends AppCompatActivity {
     /*private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
     private DatabaseReference mDevicesDatabaseReference;*/
-    private User user;
+    //private User user;
     private Device device;
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
@@ -109,9 +109,6 @@ public class navigation extends AppCompatActivity {
             }
         }
 
-        // check if first sos contact is added
-        checkFirstSosContact();
-
         tmode1=(TextView)findViewById(R.id.testmode);
 
         tmode1.setOnClickListener(new View.OnClickListener() {
@@ -133,32 +130,18 @@ public class navigation extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
-    private void checkFirstSosContact(){
+    private void checkFirstSosContact(HashMap<String,String> sosContacts){
         // check if first sos contact is added
-        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-                HashMap<String,String> sosContacts = user.getSosContacts();
-                if (sosContacts == null){
-                    Intent sosPage = new Intent(navigation.this, sos_page.class);
-                    startActivityForResult(sosPage,1);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        if (sosContacts == null){
+            Intent sosPage = new Intent(navigation.this, sos_page.class);
+            startActivityForResult(sosPage,1);
+        }
     }
 
     public void getData(final int check){
-        final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+  //      final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
             //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -169,10 +152,7 @@ public class navigation extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
                     // check if user signed in from two devices
-                    if (FirebaseAuth.getInstance().getCurrentUser() != null)
-                        if (!dataSnapshot.getValue(User.class).getImei().equals("null"))
-                            recheckUserAuthentication(FirebaseAuth.getInstance().getCurrentUser());
-
+                    recheckUserAuthentication();
                     if (check == 1) {
                         db.addUser(newUser);
                         Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
@@ -359,39 +339,34 @@ public class navigation extends AppCompatActivity {
         }
     }
 
-    private void recheckUserAuthentication(final FirebaseUser firebaseUser){
-    Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
-    Log.d(TAG,firebaseUser.getEmail());
-    Log.d(TAG,"Inside recheckUserAuthentication");
-    getImei();
-    firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-            Log.d("User Data Snapshot:", userDataSnapshot.toString());
-            if (userDataSnapshot.exists()) {
-                user = userDataSnapshot.getValue(User.class);
-                Log.d(TAG,"Imei of device:"+mImeiNumber);
-                Log.d(TAG,"Imei from firebase:"+user.getImei());
-                if (!user.getImei().equals(mImeiNumber)){
-                    // same user trying to login from multiple devices -> logout the user
-                    Log.d(TAG, "User is LoggedIn in other device");
-                    Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                    LogOutAndStartMainActivity();
-                }
-                else{/* nothing to do*/}
-            } else {/* this should not be the case*/}
+    private void recheckUserAuthentication(){
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+            return;
+        Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        Log.d(TAG,firebaseUser.getEmail());
+        Log.d(TAG,"Inside recheckUserAuthentication");
+        getImei();
+        Log.d(TAG,"Imei of device:"+mImeiNumber);
+        Log.d(TAG,"Imei from firebase:"+newUser.getImei());
+        if (!newUser.getImei().equals(mImeiNumber)){
+            // same user trying to login from multiple devices -> logout the user
+            Log.d(TAG, "User is LoggedIn in other device");
+            Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+            LogOutAndStartMainActivity();
         }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
+        else{
+            if (newUser != null)
+                checkFirstSosContact(newUser.getSosContacts());
         }
-    });
     }
 
     public void LogOutAndStartMainActivity(){
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);
         firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
-        firebaseHelper.firebaseSignOut(mImeiNumber);
+        firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+        firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(navigation.this);
+
         Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);
         mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mLogOutAndRedirect);

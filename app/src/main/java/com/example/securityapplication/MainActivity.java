@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initializeGoogleFirebaseSignIn(){
         if (mImeiNumber == null)
             deviceId();
-        googleFirebaseSignIn.init(this, FirebaseAuth.getInstance(), firebaseHelper.getFirebaseDatabase(), mImeiNumber);
+        googleFirebaseSignIn.init(this, mImeiNumber);
     }
 
     public void initViews(){

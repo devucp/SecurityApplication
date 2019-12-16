@@ -27,12 +27,7 @@ import java.io.Serializable;
 
 public class GoogleFirebaseSignIn implements Serializable {
 
-    private FirebaseAuth mAuth;
     private Activity activity;
-    private FirebaseUser user;
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mDevicesDatabaseReference;
     private static final String TAG = "GoogleSignIn";
     //private static final int RC_SIGN_IN = 9001;
 
@@ -41,7 +36,7 @@ public class GoogleFirebaseSignIn implements Serializable {
     private String mImeiNumber;
     private Device device;
     private FirebaseHelper firebaseHelper;
-    private boolean isFirebaseAuthWithGoogle;
+    private FirebaseUser firebaseUser;
 
     //private constructor
     private GoogleFirebaseSignIn(){
@@ -51,12 +46,12 @@ public class GoogleFirebaseSignIn implements Serializable {
         }
     }
 
-    public void init(Activity activity, FirebaseAuth mAuth, FirebaseDatabase firebaseDatabase, String imei){
+    public void init(Activity activity, String imei){
 
         this.activity = activity;
-        this.mAuth = mAuth;
-        this.mFirebaseDatabase = firebaseDatabase;
         this.mImeiNumber = imei;
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
     }
 
     public static GoogleFirebaseSignIn getInstance() {
@@ -83,11 +78,13 @@ public class GoogleFirebaseSignIn implements Serializable {
 
     public void linkGoogleAccount(GoogleSignInAccount acct) {
         Log.d(TAG,"Inside linkGoogleAccount");
+        if (acct == null)
+            return;
         // Link the anonymous user to the email credential
         //showProgressDialog();
         AuthCredential credential= GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         // [START link_credential]
-        mAuth.getCurrentUser().linkWithCredential(credential)
+        firebaseHelper.getFirebaseAuth().getCurrentUser().linkWithCredential(credential)
                 .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -117,29 +114,25 @@ public class GoogleFirebaseSignIn implements Serializable {
 
     public void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG,"Inside firebaseAuthWithGoogle");
-        isFirebaseAuthWithGoogle =  false;
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getEmail());
         final AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
+        firebaseHelper.getFirebaseAuth().signInWithCredential(credential)
                 .addOnCompleteListener(activity, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            isFirebaseAuthWithGoogle = true;
                             boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
                             Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
 
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            FirebaseUser user = firebaseHelper.getFirebaseAuth().getCurrentUser();
 
                             // set imei and uid in firebase
                             device = new Device();
                             device.setUID(user.getUid());
-                            mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-                            mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-                            mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-                            mUsersDatabaseReference.child(user.getUid()).child("imei").setValue(mImeiNumber);
+                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device);
+                            firebaseHelper.getUsersDatabaseReference().child(user.getUid()).child("imei").setValue(mImeiNumber);
                             setUser(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -174,15 +167,17 @@ public class GoogleFirebaseSignIn implements Serializable {
         }
     }
 
-    private void setUser(FirebaseUser user){
-        this.user = user;
-        Intent mHomeIntent = new Intent(activity,navigation.class);
-        activity.startActivity(mHomeIntent);
-        try {
-            closeNow();
-        }catch (Exception e){
-            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-            activity.finish();
+    private void setUser(FirebaseUser firebaseUser){
+        this.firebaseUser = firebaseUser;
+        if (firebaseUser != null){
+            Intent mHomeIntent = new Intent(activity,navigation.class);
+            activity.startActivity(mHomeIntent);
+            try {
+                closeNow();
+            }catch (Exception e){
+                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                activity.finish();
+            }
         }
     }
 
@@ -198,6 +193,6 @@ public class GoogleFirebaseSignIn implements Serializable {
     private void changeLinkedStatus(FirebaseUser firebaseUser){
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
-        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("isGoogleAccountLinked").setValue(true);
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("googleAccountLinked").setValue(true);
     }
 }

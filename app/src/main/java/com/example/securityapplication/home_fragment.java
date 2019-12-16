@@ -150,6 +150,9 @@ public class home_fragment extends Fragment {
 
                if(isMyServiceRunning(BackgroundSosPlayerService.class))
                {
+                   //stopping the sosplay variable and resetting count in SosPlayer.java
+                   SosPlayer.stopPlaying();
+
                    Intent stopemergency = new Intent(getContext(),BackgroundSosPlayerService.class);
                    if (c3 != null) {
                        c3.stopService(stopemergency);

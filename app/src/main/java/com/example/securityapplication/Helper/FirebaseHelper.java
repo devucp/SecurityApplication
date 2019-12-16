@@ -158,4 +158,32 @@ public class FirebaseHelper {
     public FirebaseAuth getFirebaseAuth() { return mAuth; }
 
     public  FirebaseDatabase getFirebaseDatabase() { return mFirebaseDatabase; }
+
+    public void addsos_infirebase(String uid,String c1,String c2,String c3,String c4,String c5){
+        DatabaseReference dr= mUsersDatabaseReference.child(uid).child("sosContacts");
+        DatabaseReference dr1=mUsersDatabaseReference.child(uid).child("sosContacts").child("c1");
+        DatabaseReference dr2=mUsersDatabaseReference.child(uid).child("sosContacts").child("c2");
+        DatabaseReference dr3=mUsersDatabaseReference.child(uid).child("sosContacts").child("c3");
+        DatabaseReference dr4=mUsersDatabaseReference.child(uid).child("sosContacts").child("c4");
+        DatabaseReference dr5=mUsersDatabaseReference.child(uid).child("sosContacts").child("c5");
+        dr1.setValue(c1);
+        dr2.setValue(c2);
+        dr3.setValue(c3);
+        dr4.setValue(c4);
+        dr5.setValue(c5);
+
+    }
+    public void updateuser_infirebase(String uid,User user){
+        DatabaseReference dr1=mUsersDatabaseReference.child(uid).child("dob");
+        DatabaseReference dr2=mUsersDatabaseReference.child(uid).child("gender");
+        DatabaseReference dr3=mUsersDatabaseReference.child(uid).child("location");
+        DatabaseReference dr4=mUsersDatabaseReference.child(uid).child("mobile");
+        DatabaseReference dr5=mUsersDatabaseReference.child(uid).child("name");
+        dr1.setValue(user.getDob());
+        dr2.setValue(user.getGender());
+        dr3.setValue(user.getLocation());
+        dr4.setValue(user.getMobile());
+        dr5.setValue(user.getName());
+
+    }
 }

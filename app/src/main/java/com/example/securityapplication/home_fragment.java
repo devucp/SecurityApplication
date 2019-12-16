@@ -37,13 +37,16 @@ public class home_fragment extends Fragment {
     public Button emergency;
     public Button informsafety;
     int RC;
-    Boolean is_paid = false;
+    static Boolean is_paid = false;
     public static Boolean test = true;
     //NOTE: Button bt has been removed. Now using Button emergency. Event listeners also moved to emergency
 
-
+    public static void setpaid(Boolean b){
+        is_paid=b;
+    }
     @Nullable
     @Override
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }

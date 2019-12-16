@@ -141,6 +141,7 @@ public class navigation extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
+                    Log.d("Paid12345","schin1"+newUser.getName()+newUser.IsPaid());
                     // check if user signed in from two devices
                     if (FirebaseAuth.getInstance().getCurrentUser() != null)
                         if (!dataSnapshot.getValue(User.class).getImei().equals("null"))
@@ -152,6 +153,14 @@ public class navigation extends AppCompatActivity {
                     } else if (check == 2) {
                         Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
                         db.updateUser(newUser);
+                    }
+                    Log.d("Paid12345","schin"+newUser.getName()+newUser.IsPaid());
+                    if(String.valueOf(dataSnapshot.child("isPaid").getValue()).equals("true")){
+                        Log.d("Paid12345","i am here");
+                        home_fragment.setpaid(true);
+                    }
+                    else{
+                        home_fragment.setpaid(false);
                     }
                 }
 

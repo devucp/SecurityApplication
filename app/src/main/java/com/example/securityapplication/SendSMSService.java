@@ -14,9 +14,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class SendSMSService extends Service {
-    private String[] contactList=null; //TODO: stores the number of the emergency contacts
+    private static String[] contactList=null; //TODO: stores the number of the emergency contacts
     private String senderName;
     private String location;
     private Integer alert;
@@ -70,7 +73,36 @@ public class SendSMSService extends Service {
         registerReceiver(deliveryReceiver,new IntentFilter(DELIVERED));
         Log.d("SOS SMS","onCreate");
     }
+
+    /**Initialise the SOS contacts**/
+    public static void initContacts(){
+        Log.d("SendSMSService","initContacts:");
+
+        HashMap<String,String> sosContacts=navigation.newUser.getSosContacts();
+        Log.d("SendSMSServcie","SosContacts size:"+sosContacts.size());
+
+        if(sosContacts.size()!=0) {
+            contactList = new String[sosContacts.size()];
+            Iterator sosContactsIterator = sosContacts.entrySet().iterator();
+            int i = 0;
+            while (sosContactsIterator.hasNext()) {
+                Map.Entry contactEntry = (Map.Entry) sosContactsIterator.next();
+                String contact = (String) contactEntry.getValue();
+                Log.d("SendSMSService","contact.get("+i+"):"+contact);
+                if (!contact.equals("null") && contact.length() == 10) {
+                    contactList[i] = contact;
+                    Log.d("SendSMSService", "contactList[" + i + "]:" + contactList[i]);
+
+                }
+                i++;
+
+            }
+        }
+
+    }
     public void initiateMessage(){
+        initContacts(); //added code to initialise contacts
+
         updateLocation();
 
         Log.d("SOS SMS","Location is"+location);
@@ -89,7 +121,9 @@ public class SendSMSService extends Service {
 
 
             for(int i=0;i<contactList.length;i++){
-
+                if(contactList[i]==null){
+                    continue;
+                }
                 if(location==null)
                     sendMessage(contactList[i],"Location unavailable");
                 else
@@ -154,9 +188,16 @@ public class SendSMSService extends Service {
         deliverList.add(deliveredPI);
 
 
+        try {
+            SmsManager.getDefault().sendMultipartTextMessage(number, null, parts, sendList, deliverList);
 
-        SmsManager.getDefault().sendMultipartTextMessage(number, null, parts, sendList,deliverList);
-        Log.d("SOS SMS","sendMessage() end");
+        }
+        catch (IllegalArgumentException e){
+            e.printStackTrace();
+            Log.d("SOS SMS", "sendMessage() exception");
+            Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
+        }
+        Log.d("SOS SMS", "sendMessage() end");
     }
 
     @Override

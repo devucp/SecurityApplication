@@ -411,7 +411,7 @@ public class profile_fragment extends Fragment {
         firebaseHelper.googleSignOut(getActivity());
 
         try{
-            Intent mStopSosPlayer=new Intent(getApplicationContext(),SosPlayer.class);
+            Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);
             mStopSosPlayer.putExtra("stop",1);
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
             Log.d("Profile Fr","Service sosplayer new startIntent...");

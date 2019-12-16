@@ -523,6 +523,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else if(firebaseUser!=null){
 
+            /** SosPlayer Service intent**/
+            startService(new Intent(this, SosPlayer.class));
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
             try {

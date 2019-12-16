@@ -10,22 +10,44 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.awt.font.TextAttribute;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class SosPlayer extends Service {
     private MediaSessionCompat mediaSession;
-    private int soskeyscount;
-    private  boolean sosplay;
+    private static int soskeyscount; //was previously non static
+    private  static boolean sosplay; //was previously non static
     private int prev_direction;
     private boolean timerStarted;
     private CountDownTimer wtimer;
     public int counter=0;
 
+    private int stop=0;
+    private String TAG="SOS Player";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         startWaitTimer();
+
+        stop= intent.getIntExtra("stop",0);
+        Log.d(TAG,"Inside onStartCOmmand : Stop ="+stop);
+
+        if(stop==1){
+            stopPlaying();
+            //stopping BackgroundSOSPlayer in case it was running
+            Intent stopSirenIntent= new Intent(this,BackgroundSosPlayerService.class);
+            boolean stoppedSiren=stopService(stopSirenIntent);
+            Log.d(TAG,"Stop=1 stopping BackgroundSOSPlayer service in case it was running :"+stoppedSiren);
+
+            boolean stopped=stopService(new Intent(getApplicationContext(),SosPlayer.class)); //stops the service when calling intent has stop=1
+            Log.d(TAG,"Stop=1 so calling stopService() :"+stopped);
+
+        }
+        else{
+            //initialise the VolumeProviderCompact
+            detectSosPattern();
+        }
         return START_STICKY;
     }
 
@@ -41,6 +63,12 @@ public class SosPlayer extends Service {
 
         timerStarted=false;
 
+        //code moved to detectSosPattern which is now called from onStartCommand if stop==0
+
+    }
+
+    public void detectSosPattern(){
+        Log.d(TAG,"detectSOSPattern initialised");
         mediaSession = new MediaSessionCompat(this, "SosPlayer");
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -58,14 +86,13 @@ public class SosPlayer extends Service {
                 1 -- volume up
                 0 -- volume button released
                  */
-                    Log.v("Player","Direction is:"+direction);
-                    updateCount(direction);
+                        Log.v("Player","Direction is:"+direction);
+                        updateCount(direction);
                     }
                 };
 
         mediaSession.setPlaybackToRemote(myVolumeProvider);
         mediaSession.setActive(true);
-
 
     }
     public void startWaitTimer(){
@@ -89,16 +116,20 @@ public class SosPlayer extends Service {
         }.start();
     }
 
-    public void resetCount(){
+    public static void resetCount(){
         soskeyscount=0;
     }
 
     public void updateCount(int direction){
-        if(soskeyscount==5 && !checkPlaying()){
+        Log.d(TAG,"updateCount:");
+        if(soskeyscount>=5 && !checkPlaying()){
+            Log.d(TAG,"STARTING siren and sms...");
             startPlaying();
             sendSosSMS();
         }
         if(soskeyscount==0 && prev_direction==0){
+            Log.d(TAG,"Initialsing prev_direction");
+
             prev_direction=direction;
             return;
         }
@@ -122,11 +153,12 @@ public class SosPlayer extends Service {
                     wtimer=null;
                 }
             }
-            prev_direction=direction;
+
             Log.d("New soskeycount","Count"+soskeyscount+" Direction"+direction+" Prev direction"+prev_direction);
+            prev_direction=direction;
         }
 
-        Log.d("Sos service","Passing on 0 direction");
+        Log.d(TAG,"Passing on 0 direction");
     }
 
     private void sendSosSMS( ){
@@ -141,7 +173,8 @@ public class SosPlayer extends Service {
         return d_p_direction!=d_n_direction;
     }
     public boolean checkPlaying(){
-        return sosplay;
+        Log.d(TAG,"checkPlaying : "+SosPlayer.sosplay);
+        return SosPlayer.sosplay;
     }
 
     public void startPlaying(){
@@ -150,13 +183,23 @@ public class SosPlayer extends Service {
         sosplay=true;
     }
 
+    public static void stopPlaying(){
+        Log.d("SosPlayer","stopPlaying");
+        sosplay=false;
+        resetCount();
+
+    }
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         Log.i("SOSPlayer Service", "onTaskRemoved called");
         // restart the never ending service
-        Intent broadcastIntent = new Intent(this,RestartServiceBroadcastReceiver.class);
-        sendBroadcast(broadcastIntent);
+        if(stop==0) {
+
+            Log.d("SOS PLAYER","Stop==0 so calling Restartservice");
+            Intent broadcastIntent = new Intent(this, RestartServiceBroadcastReceiver.class);
+            sendBroadcast(broadcastIntent);
+        }
         // do not call stoptimertask because on some phones it is called asynchronously
         // after you swipe out the app and therefore sometimes
         // it will stop the timer after it was restarted
@@ -208,9 +251,15 @@ public class SosPlayer extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        Log.i("EXIT", "ondestroy!");
-        Intent broadcastIntent = new Intent(this, RestartServiceBroadcastReceiver.class);
-        sendBroadcast(broadcastIntent);
+        Log.i("SOS PLAYER", "ondestroy!");
+
+        sosplay=false;
+
+        if(stop==0) {
+            Log.d("SOS PLAYER","Stop==0 so calling Restartservice");
+            Intent broadcastIntent = new Intent(this, RestartServiceBroadcastReceiver.class);
+            sendBroadcast(broadcastIntent);
+        }
         stoptimertask();
 
         mediaSession.release();

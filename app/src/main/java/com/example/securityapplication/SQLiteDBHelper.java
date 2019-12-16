@@ -99,6 +99,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     /**Adding user*/
     public boolean addUser(User user){
+        Log.d("SQL12","Add User is started");
         newU=user;
         this.user = user;
         try{SQLiteDatabase db = this.getWritableDatabase();
@@ -189,9 +190,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_GENDER, user.getGender());
         contentValues.put(COLUMN_MOBILE,user.getMobile());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
-//        contentValues.put(COLUMN_IMEI, user.getImei());
+        contentValues.put(COLUMN_IMEI, user.getImei());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
-
+        contentValues.put(COLUMN_EMAIL, user.getEmail());
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?", //Changed from Column_Email to Column_ID
                 new String[]{"1"});
         db.close();

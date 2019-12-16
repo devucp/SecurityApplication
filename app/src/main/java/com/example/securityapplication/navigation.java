@@ -51,9 +51,10 @@ public class navigation extends AppCompatActivity {
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
         //sqlite db code here
+        Log.d("SQL12","No. of rows in navigation1 "+db.numberOfRows());
         if((aa=db.numberOfRows())==0)
         {  getData(1);
-        Log.d("SQL","No. of rows in navigation "+aa);}
+            Log.d("SQL","No. of rows in navigation "+aa);}
         else
         {
             Log.d("checking","oncreate option menu 3 is running");

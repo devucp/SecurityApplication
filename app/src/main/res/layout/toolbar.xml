@@ -4,9 +4,23 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/cyan"
+    app:title="TRATRA"
+    app:titleTextColor="@color/white"
     android:elevation="4dp"
-
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
+        <TextView
+            android:id="@+id/testmode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/cyan"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+           android:textAlignment="textEnd"
+            android:text="TEST MODE : OFF"
+
+            />
 
 </android.support.v7.widget.Toolbar>

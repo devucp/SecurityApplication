@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -23,8 +24,10 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -62,8 +65,12 @@ import static java.security.AccessController.getContext;
 public class SignUp1Activity extends AppCompatActivity {
 
     Validation val = new Validation();
+    public static Button Btn_Submit;
     //Added user object to send to next
     private User user;
+//spinner added
+    public static ProgressBar spinner;
+    private Button b1;
 
     private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
     private TextInputLayout pass_outer,cnfpass_outer;
@@ -76,6 +83,8 @@ public class SignUp1Activity extends AppCompatActivity {
 
     private String TAG = "SignUp1";
 
+    public static TextInputEditText t1,t2,t3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +94,9 @@ public class SignUp1Activity extends AppCompatActivity {
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(SignUp1Activity.this);
+
+        spinner = (ProgressBar)findViewById(R.id.progress_bar);
+        spinner.setVisibility(View.GONE);
 
       //removed most the view castings as they're unnecessary
         textinputEmail = findViewById(R.id.textlayout_Email);
@@ -96,6 +108,12 @@ public class SignUp1Activity extends AppCompatActivity {
         pass1=findViewById(R.id.pass_text1);
         pass2=findViewById(R.id.pass_text2);
 
+        //gender_grp = findViewById(R.id.radiogrp);
+        Btn_Submit = findViewById(R.id.btn_sub);
+
+        t1= findViewById(R.id.textlayout_Email);
+         t2=  findViewById(R.id.textlayout_Pass);
+          t3 = findViewById(R.id.textlayout_CnfPass);
         user=new User();
 
         // check if user is signed in to google or facebook
@@ -142,6 +160,8 @@ public class SignUp1Activity extends AppCompatActivity {
         //
         Hashtable<String,String> userData = Validater();
         if (userData != null){
+            spinner.setVisibility(View.VISIBLE);
+            disable();
             setUidFromFirebase(userData);
         }
     }
@@ -151,24 +171,38 @@ public class SignUp1Activity extends AppCompatActivity {
         firebaseHelper.getFirebaseAuth().createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
                 .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        if (task.isSuccessful())
+                        {
 
                             FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
                             checkIsEmailVerified(firebaseUser,userData);
 
-                        } else {
-                            try {
+                        } else
+                            {
+                            try
+                            {
                                 throw task.getException();
-                            } catch (FirebaseAuthUserCollisionException e){
+                            } catch (FirebaseAuthUserCollisionException e)
+                            {
                                 //signIn the user
                                 signIn(userData);
-                            } catch (FirebaseAuthInvalidCredentialsException e){
+                            } catch (FirebaseAuthInvalidCredentialsException e)
+                            {
+                                // stop spinner
+                                spinner.setVisibility(View.GONE);
+                                Enable();
                                 Log.d(TAG,e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,
                                         "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
-                            } catch (Exception e){
+                            }
+                            catch (Exception e)
+                            {
+                                // stop spinner user interaction enabled
+                                spinner.setVisibility(View.GONE);
+                                Enable();
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -197,10 +231,24 @@ public class SignUp1Activity extends AppCompatActivity {
                             try {
                                 throw task.getException();
                             }catch (FirebaseAuthInvalidCredentialsException e){
+                                // stop spinner
+                                spinner.setVisibility(View.GONE);
+                                Enable();
+/*                                textinputEmail.setAlpha(1);
+                                textinputPass.setAlpha(1);
+                                textinputCnfPass.setAlpha(1);
+                                verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG,e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,
                                         "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
                             }catch (Exception e){
+                                // stop spinner
+                                spinner.setVisibility(View.GONE);
+                                Enable();
+ /*                               textinputEmail.setAlpha(1);
+                                textinputPass.setAlpha(1);
+                                textinputCnfPass.setAlpha(1);
+                                verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
                                 Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
                             }
@@ -215,7 +263,10 @@ public class SignUp1Activity extends AppCompatActivity {
         if (verifyEmail.isEmailIdVerified()) {
             Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
             String emailId = firebaseUser.getEmail();
+
             firebaseHelper.firebaseSignOut();
+            spinner.setVisibility(View.GONE);
+            Enable();
             // can proceed to signUp2
             AddData(userData);
         }
@@ -302,27 +353,56 @@ public class SignUp1Activity extends AppCompatActivity {
         }
         else{
             Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
+            spinner.setVisibility(View.GONE);
+            Enable();
         }
 
     }
+
+
 
    public static void setError(String s,TextView t1)
    {
        if(s!=null) {
            t1.setText(s);
            t1.setVisibility(View.VISIBLE);
+           t1.setTextColor(Color.parseColor("#FFFFFF"));
        }
        else{
-           t1.setVisibility(View.INVISIBLE);
+           t1.setVisibility(View.GONE);
        }
    }
 
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+    private void closeNow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             finishAffinity();
-        }
-        else{
+        } else {
             finish();
         }
     }
+
+   //screen enable disable
+
+    public  void Enable()
+    {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        t1.setAlpha(1);
+        t2.setAlpha(1);
+        t3.setAlpha(1);
+        Btn_Submit.setAlpha(1);
+        Btn_Submit.setText("PROCEED");
+    }
+    public void disable()
+    {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        t1.setAlpha((float) 0.6);
+        t2.setAlpha((float) 0.6);
+        t3.setAlpha((float) 0.6);
+        Btn_Submit.setAlpha((float) 0.6);
+        Btn_Submit.setText("");
+    }
 }
+
+
+  

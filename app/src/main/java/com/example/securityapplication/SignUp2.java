@@ -20,10 +20,12 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -60,6 +62,8 @@ import java.util.Map;
 import java.util.Set;
 
 
+
+
 public class SignUp2 extends AppCompatActivity {
     private final AppCompatActivity activity = SignUp2.this;
 
@@ -93,11 +97,17 @@ public class SignUp2 extends AppCompatActivity {
     private DatePickerDialog datePickerDialog;
     private TextInputEditText textinputName,textinputDOB,date; // was earlier TextInputLayout
     private String password;
+    public static   ProgressBar Spinner;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup2);
+        Spinner = (ProgressBar)findViewById(R.id.progress_bar);
+        Spinner.setVisibility(View.INVISIBLE);
 
         initViews();
         initListeners();
@@ -118,7 +128,8 @@ public class SignUp2 extends AppCompatActivity {
 //        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
         // check if user is signed in to google or facebook
-        if (GoogleSignIn.getLastSignedInAccount(this) != null){
+        if (GoogleSignIn.getLastSignedInAccount(this) != null)
+        {
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
                 String personName = acct.getDisplayName();
@@ -128,7 +139,9 @@ public class SignUp2 extends AppCompatActivity {
             }
         }
         else
+        {
             Log.d("isLoggedinGoogle","Not logged in");
+        }
 
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
         googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
@@ -190,7 +203,9 @@ public class SignUp2 extends AppCompatActivity {
 
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
+
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
                     return;
@@ -205,6 +220,7 @@ public class SignUp2 extends AppCompatActivity {
                     if (!inputValidation.isMinLength(input_mobile, 10, getString(R.string.no_phone)) || !inputValidation.is_numeric(input_mobile)) {
 
                         input_mobile.setError(getString(R.string.no_phone));
+;
 
                     }
                     else {
@@ -215,6 +231,11 @@ public class SignUp2 extends AppCompatActivity {
 
                 if (input_location.getText().toString().isEmpty()) {
                     input_location.setError(getString(R.string.no_location));
+
+                    Spinner.setVisibility(View.GONE);
+                    Enable();
+                    btn_submit.setText("SIGNUP");
+
                 }
                 else{
                     valid_location = true;
@@ -240,11 +261,16 @@ public class SignUp2 extends AppCompatActivity {
 
                 //NOTE: Allow database entry only if not empty AND valid
                 if(!empty && valid){
+                    Spinner.setVisibility(View.VISIBLE);
+                    disable();
+                    btn_submit.setText("");
+
                     imei = null;
                     TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
                     String permission = Manifest.permission.READ_PHONE_STATE;
                     int res = getApplicationContext().checkCallingOrSelfPermission(permission);
-                    if (res == PackageManager.PERMISSION_GRANTED) {
+                    if (res == PackageManager.PERMISSION_GRANTED)
+                    {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             imei = tm.getImei(0);
                             Log.d("IMEI", "IMEI Number of slot 1 is:" + imei);
@@ -255,6 +281,9 @@ public class SignUp2 extends AppCompatActivity {
 
                         }
                     } else {
+                        Spinner.setVisibility(View.GONE);
+                        Enable();
+                        btn_submit.setText("SIGNUP");
                         Log.d("SIgnUP2", "PERMISSION FOR READ STATE NOT GRANTED, REQUESTING PERMSISSION...");
                         ActivityCompat.requestPermissions(activity,
                                 new String[]{Manifest.permission.READ_PHONE_STATE}, RC);
@@ -263,6 +292,10 @@ public class SignUp2 extends AppCompatActivity {
                     if (DBHelper.checkUser(input_mobile.getText().toString().trim()) ){
 
                         if (user.getEmail() == null || password == null){
+                            Spinner.setVisibility(View.GONE);
+                            Enable();
+                            btn_submit.setText("SIGNUP");
+
                             // go back to signUp1
                             finishActivity(2);
                         }
@@ -277,6 +310,10 @@ public class SignUp2 extends AppCompatActivity {
                     } else {
                         Log.d("SignUp2", "User exists ");
                         Toast.makeText(getApplicationContext(), "MOBILE NO. ALREADY EXISTS", Toast.LENGTH_LONG).show();
+                        Spinner.setVisibility(View.GONE);
+                        Enable();
+                        btn_submit.setText("SIGNUP");
+
                     }
                 }
                 }
@@ -343,27 +380,30 @@ public class SignUp2 extends AppCompatActivity {
                                                     FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                                                     storeAndStartNextActivity(firebaseUser);
                                                 } else {
-                                                    try{
+                                                    try {
                                                         throw task.getException();
-                                                    }
-                                                    catch (Exception e){
-                                                        Log.d(TAG,"Exception:"+e.getMessage());
+                                                    } catch (Exception e) {
+                                                        Log.d(TAG, "Exception:" + e.getMessage());
                                                         Toast.makeText(SignUp2.this, "Authentication failed.",
                                                                 Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             }
                                         });
-                            }
-                            catch (Exception e){
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
-                                Toast.makeText(SignUp2.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+                                }
+                                catch (Exception e){
+                                    Spinner.setVisibility(View.GONE);
+                                    Enable();
+                                    btn_submit.setText("SIGNUP");
+
+                                    // If sign in fails, display a message to the user.
+                                    Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
+                                    Toast.makeText(SignUp2.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
-                    }
-                });
+                    });
     }
 
     private void storeAndStartNextActivity(final FirebaseUser firebaseUser){
@@ -375,6 +415,8 @@ public class SignUp2 extends AppCompatActivity {
         profileActivity.putExtra("User",user);
         startActivity(profileActivity);*/
     }
+
+
 
     private void setUidFromFirebase(final String mobile){
         firebaseHelper.getMobileDatabaseReference().child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -404,6 +446,10 @@ public class SignUp2 extends AppCompatActivity {
             AddUser();
         }
         else{
+            Spinner.setVisibility(View.GONE);
+            Enable();
+            btn_submit.setText("SIGNUP");
+
             // prompt user to enter different mobile no.
             Log.d(TAG, "Mobile no. already registered in firebase");
             Toast.makeText(SignUp2.this, "Mobile no. already registered. Enter different mobile number",Toast.LENGTH_LONG).show();
@@ -537,6 +583,32 @@ public class SignUp2 extends AppCompatActivity {
             startNextActivity();
             //closeNow();
         }
+    }
+
+    //screen enable/disable
+
+    public  void Enable()
+    {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        textinputName.setAlpha(1);
+        gender_grp.setAlpha(1);
+        textinputDOB.setAlpha(1);
+        input_mobile.setAlpha(1);
+        input_location.setAlpha(1);
+        btn_submit.setAlpha(1);
+        text_view.setAlpha(1);
+    }
+    public void disable()
+    {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        textinputName.setAlpha((float) 0.6);
+        gender_grp.setAlpha((float) 0.6);
+        textinputDOB.setAlpha((float) 0.6);
+        input_mobile.setAlpha((float) 0.6);
+        input_location.setAlpha((float) 0.6);
+        btn_submit.setAlpha((float) 0.6);
+        text_view.setAlpha((float)0.6);
     }
 
     private void closeNow(){

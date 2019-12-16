@@ -268,8 +268,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /**  END GOOGLE LOGIN  **/
 
-        /** SosPlayer Service intent**/
-        startService(new Intent(this, SosPlayer.class));
 
         /** DATABASE FORCEFUL CREATION**/
         //uncomment to forcefully delete database
@@ -539,10 +537,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ///mPassword.setVisibility(GONE);
             //mGoogleSignInButton.setVisibility(GONE);
             //mFaceBookLoginButton.setVisibility(GONE);
+            /** SosPlayer Service intent**/
+            startService(new Intent(this, SosPlayer.class));
 
             Intent mHomeIntent = new Intent(this,navigation.class);
             startActivity(mHomeIntent);
             finish();
+
+
 
 
         }

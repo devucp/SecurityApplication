@@ -113,6 +113,7 @@
                         android:layout_gravity="center_vertical"
                         android:alpha="0.6"
                         android:hint="Phone Number"
+                        android:maxLength="10"
                         android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"

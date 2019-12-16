@@ -178,6 +178,7 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("others");
 
                                                         mydb.updateUser(user);
+                                                        firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
 
                                                         btn_edit.setText("edit");

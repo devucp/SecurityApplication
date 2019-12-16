@@ -33,9 +33,12 @@ public class SendSMSService extends Service {
     private sentReceiver sentReceiver;
     private deliveryReceiver deliveryReceiver;
 
+
     //code for checking if delivery proper
     String SENT = "SMS_SENT";
     String DELIVERED = "SMS_DELIVERED";
+
+    private static boolean contactsFetched=false; //checks whether sos contacts have been initialised
 
     public SendSMSService() {
     }
@@ -99,6 +102,7 @@ public class SendSMSService extends Service {
             }
         }
 
+        contactsFetched=true; //sets contacts fetched to true to indicate that init has been called
     }
     public void initiateMessage(){
         initContacts(); //added code to initialise contacts

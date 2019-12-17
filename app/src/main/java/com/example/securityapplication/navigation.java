@@ -149,20 +149,23 @@ public class navigation extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
-                    Log.d("Paid12345","schin1"+newUser.getName()+newUser.IsPaid());
+                    Log.d("Paid12345","schin1"+newUser.getName()+newUser
+                            .isPaid());
                     // check if user signed in from two devices
                     recheckUserAuthentication();
                     if (check == 1) {
                         db.addUser(newUser);
                         Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
-                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
+                        if (newUser.getSosContacts() != null)
+                            db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
                     } else if (check == 2) {
                         Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
                         db.updateUser(newUser);
-                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                        if (newUser.getSosContacts() != null)
+                            db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
                         SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
                     }
-                    Log.d("Paid12345","schin"+newUser.getName()+newUser.IsPaid());
+                    Log.d("Paid12345","schin"+newUser.getName()+newUser.isPaid());
                     if(String.valueOf(dataSnapshot.child("isPaid").getValue()).equals("true")){
                         Log.d("Paid12345","i am here");
                         home_fragment.setpaid(true);

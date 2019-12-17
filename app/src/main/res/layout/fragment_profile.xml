@@ -114,7 +114,7 @@
                         android:alpha="0.6"
                         android:hint="Phone Number"
                         android:maxLength="10"
-                        android:inputType="textCapSentences|textMultiLine"
+                        android:inputType="number"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
@@ -259,6 +259,7 @@
                         android:textSize="22sp" />
                 </LinearLayout>
                 <TextView
+                    android:id="@+id/text_changePassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/change_password"

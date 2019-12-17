@@ -34,8 +34,11 @@ import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,10 +49,11 @@ import static com.example.securityapplication.R.layout.spinner_layout;
 
 public class profile_fragment extends Fragment {
 
-    private EditText textName,textEmail,textPhone,textGender,textDob;
+    private EditText textName,textEmail,textPhone,textDob;
     private AutoCompleteTextView textAddress;
     private Button btn_edit;
     private Button btn_logout;
+    private TextView text_changePassword;
     SQLiteDBHelper mydb ;
     User user;
     Device device;
@@ -165,11 +169,13 @@ public class profile_fragment extends Fragment {
                                                         Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
                                                     }
                                                     else {
+                                                        // start progress bar
+
+
                                                         //save code will come here
                                                         user.setName(textName.getText().toString());
                                                         user.setDob(textDob.getText().toString());
                                                         user.setLocation(textAddress.getText().toString());
-                                                        user.setMobile(textPhone.getText().toString());
                                                         if (spinner.getSelectedItemPosition() == 0)
                                                             user.setGender("male");
                                                         else if (spinner.getSelectedItemPosition() == 1)
@@ -177,13 +183,8 @@ public class profile_fragment extends Fragment {
                                                         else
                                                             user.setGender("others");
 
-                                                        mydb.updateUser(user);
-                                                        firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
-
-
-                                                        btn_edit.setText("edit");
-                                                        alphaa(0.6f);
-                                                        disable();
+                                                        // check mobile number in firebase
+                                                        checkMobileInFirebase(textPhone.getText().toString());
                                                     }
                                                 }
                                             }//Sending Data to EditProfileActivity
@@ -209,6 +210,14 @@ public class profile_fragment extends Fragment {
                 mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mLogOutAndRedirect);
 
+            }
+        });
+
+        text_changePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent forgetPasswordIntent = new Intent(getActivity(),ResetPasswordActivity.class);
+                startActivity(forgetPasswordIntent);
             }
         });
     }
@@ -307,9 +316,10 @@ public class profile_fragment extends Fragment {
         String[] Locality = res.getStringArray(R.array.Locality);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,Locality);
         textAddress.setAdapter(adapter);
+        text_changePassword = getActivity().findViewById(R.id.text_changePassword);
         disable();
 
-//        textAadhaar = findViewById(R.id.text_Aadhaar);
+
 //        String[] gender = new String[]{
 //                "Male",
 //                "Female",
@@ -423,5 +433,61 @@ public class profile_fragment extends Fragment {
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");
         }
+    }
+
+    private void checkMobileInFirebase(final String newMobile){
+        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                final User oldUser = userDataSnapshot.getValue(User.class);
+                if (oldUser.getMobile().equals(newMobile)){
+                    // update user in sqlite and firebase
+                    updateUser();
+                }else {
+                    firebaseHelper.getMobileDatabaseReference().child(newMobile).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot mobileNodeDataSnapshot) {
+                            Log.d("Mobile Data Snapshot:", mobileNodeDataSnapshot.toString());
+                            if (mobileNodeDataSnapshot.exists()) {
+                                // stop progress bar
+
+                                // prompt user to enter different mobile number
+                                Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
+
+                            } else {
+                                // delete previous mobile number and add new number
+                                firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null);
+                                firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid());
+                                updateUser();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void updateUser(){
+
+        // stop progress bar
+
+        user.setMobile(textPhone.getText().toString());
+
+        mydb.updateUser(user);
+        firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
+
+        btn_edit.setText("edit");
+        alphaa(0.6f);
+        disable();
     }
 }

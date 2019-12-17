@@ -208,6 +208,9 @@ public class SignUp2 extends AppCompatActivity {
             public void onClick(View view)
             {
 
+                if (!IsInternet.checkInternet(SignUp2.this))
+                    return;
+
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
                     return;
@@ -626,4 +629,18 @@ public class SignUp2 extends AppCompatActivity {
         Intent sosPage = new Intent(SignUp2.this, sos_page.class);
         startActivity(sosPage);
     }
+
+    /*@Override
+    public void onBackPressed() {
+        Log.d(TAG,"Inside onbackpressed function");
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("hasBackPressed",true);
+        setResult(Activity.RESULT_OK,returnIntent);
+        try {
+            closeNow();
+        }catch (Exception e){
+            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+            finish();
+        }
+    }*/
 }

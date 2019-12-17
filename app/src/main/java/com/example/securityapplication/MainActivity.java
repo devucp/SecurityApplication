@@ -133,9 +133,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         int i = v.getId();
         if(i== R.id.signInButton){
+
             if(firebaseHelper.getFirebaseAuth().getCurrentUser()==null) {
                 Log.d(TAG,"Current user is null");
                 if(validateForm()){
+                    if (!IsInternet.checkInternet(MainActivity.this))
+                        return;
+
                     userData = new Hashtable<>();
 
                     pgbarshow();
@@ -153,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         else if (i==R.id.googleSignInButton){
+            if (!IsInternet.checkInternet(MainActivity.this))
+                return;
+
             Intent signInIntent = firebaseHelper.getGoogleSignInClient().getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
@@ -164,10 +171,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             signupbttn.getBackground().setAlpha(100);
 
-            // check if imei is registered
-            if (mImeiNumber == null)
-                deviceId();
-            setDeviceForSignUp(mImeiNumber);
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+            startActivityForResult(signUpIntent,1);
 
         }
         //Added Reset Passowrd Activity
@@ -401,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
+
             pgbarshow();
             // The Task returned from this call is always completed, no need to attach
             // a listener.
@@ -521,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mGoogleSignInButton.setVisibility(VISIBLE);
             pgbarhide();
         }
-        else if(firebaseUser!=null){
+        else {
 
             /** SosPlayer Service intent**/
             startService(new Intent(this, SosPlayer.class));
@@ -586,27 +592,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     device = null;
                 }
                 validateBeforeSignIn();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG,databaseError.getDetails());
-            }
-        });
-    }
-
-    private void setDeviceForSignUp(String imei){
-        Log.d(TAG,"Inside setDeviceForSignUp");
-        firebaseHelper.getDevicesDatabaseReference().child(imei).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
-                Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
-                if (deviceDataSnapshot.exists()) {
-                    device = deviceDataSnapshot.getValue(Device.class);
-                } else {
-                    device = null;
-                }
-                validateBeforeSignUp1();
             }
 
             @Override
@@ -769,27 +754,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "Imei not registered");
             //to check if email is registered
             setUidFromFirebaseForSignIn();
-        }
-    }
-
-    private void validateBeforeSignUp1(){
-
-        if (device == null){
-            // go for signUp1
-            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-            startActivityForResult(signUpIntent,1);
-        }
-        else {
-            final String uid = device.getUID();
-            if (uid.equals("null")){
-                // go for signUp1
-                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-                startActivityForResult(signUpIntent,1);
-            }
-            else {
-                //
-                Toast.makeText(MainActivity.this,"Please wait or check your connection",Toast.LENGTH_LONG).show();
-            }
         }
     }
 

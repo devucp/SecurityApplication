@@ -93,6 +93,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
         btn_reset.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(final View v) {
+
+                if (!IsInternet.checkInternet(ResetPasswordActivity.this))
+                    return;
+
                 String email= emailEditText.getEditableText().toString().trim();
                 if(validate.validateEmail(emailEditText)){
                     pgbarshow();

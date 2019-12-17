@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.net.InetAddress;
 
@@ -33,6 +34,17 @@ public class IsInternet extends AppCompatActivity {
                 .getState() == NetworkInfo.State.CONNECTED)) {
             return true;
         } else {
+            return false;
+        }
+    }
+
+    // check internet connectivity
+    public static Boolean checkInternet(Context context){
+        if (IsInternet.isNetworkAvaliable(context)) {
+            return true;
+        }
+        else {
+            Toast.makeText(context, "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
             return false;
         }
     }

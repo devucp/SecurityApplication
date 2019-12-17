@@ -631,23 +631,6 @@ public class sos_page extends AppCompatActivity {
         ReturnIntent.putExtra("ResultIntent",user);
         //Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
         setResult(10,ReturnIntent);//to finish sing up 1 activity
-        AlertDialog.Builder a_builder = new AlertDialog.Builder(sos_page.this);
-        a_builder.setMessage("Do you want to exit?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.cancel();
-                    }
-                });
-        AlertDialog alert = a_builder.create();
-        alert.setTitle("Message");
-        alert.show();
+        finish();
     }
 }

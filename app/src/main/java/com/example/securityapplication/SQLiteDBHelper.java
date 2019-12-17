@@ -133,7 +133,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
     public boolean addsosContacts(HashMap<String,String> SosC){
         SQLiteDatabase db = this.getWritableDatabase();
-       ContentValues contentValues = new ContentValues();
+        ContentValues contentValues = new ContentValues();
 
         contentValues.put(COLUMN_C1, SosC.get("c1"));
         contentValues.put(COLUMN_C2, SosC.get("c2"));

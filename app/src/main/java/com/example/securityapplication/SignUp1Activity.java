@@ -156,13 +156,15 @@ public class SignUp1Activity extends AppCompatActivity {
 
     public void signUp(View view){
 
-        // disable screen and show spinner
-        //
+        if (!IsInternet.checkInternet(SignUp1Activity.this))
+            return;
 
         Hashtable<String,String> userData = Validater();
         if (userData != null){
+            // disable screen and show spinner
             spinner.setVisibility(View.VISIBLE);
             disable();
+            createUserAndVerifyEmail(userData);
         }
     }
 

@@ -89,6 +89,7 @@ public class navigation extends AppCompatActivity {
                     Log.d("FirebaseUsername",newUser.getName()+" 2 "+newUser.getEmail());
                     db.updateUser(newUser);}
                     db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                    SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
                 }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {

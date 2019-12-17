@@ -64,17 +64,19 @@ import static java.security.AccessController.getContext;
 */
 public class SignUp1Activity extends AppCompatActivity {
 
-    Validation val = new Validation();
     public static Button Btn_Submit;
+
+    Validation val = new Validation();
+
     //Added user object to send to next
     private User user;
 //spinner added
     public static ProgressBar spinner;
-    private Button b1;
 
-    private TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
-    private TextInputLayout pass_outer,cnfpass_outer;
-    public TextView pass1,pass2;
+    public static TextInputEditText textinputEmail,textinputPass,textinputCnfPass; // was earlier TextInputLayout
+    public static TextInputEditText t1,t2,t3;
+    public static TextInputLayout pass_outer,cnfpass_outer;
+    public static TextView pass1,pass2;
 
     private FirebaseHelper firebaseHelper;
     private String uid;
@@ -82,8 +84,6 @@ public class SignUp1Activity extends AppCompatActivity {
     private VerifyEmail verifyEmail;
 
     private String TAG = "SignUp1";
-
-    public static TextInputEditText t1,t2,t3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,8 +112,8 @@ public class SignUp1Activity extends AppCompatActivity {
         Btn_Submit = findViewById(R.id.btn_sub);
 
         t1= findViewById(R.id.textlayout_Email);
-         t2=  findViewById(R.id.textlayout_Pass);
-          t3 = findViewById(R.id.textlayout_CnfPass);
+        t2=  findViewById(R.id.textlayout_Pass);
+        t3 = findViewById(R.id.textlayout_CnfPass);
         user=new User();
 
         // check if user is signed in to google or facebook
@@ -158,11 +158,11 @@ public class SignUp1Activity extends AppCompatActivity {
 
         // disable screen and show spinner
         //
+
         Hashtable<String,String> userData = Validater();
         if (userData != null){
             spinner.setVisibility(View.VISIBLE);
             disable();
-            setUidFromFirebase(userData);
         }
     }
 
@@ -170,6 +170,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
         firebaseHelper.getFirebaseAuth().createUserWithEmailAndPassword(userData.get("email"), userData.get("password"))
                 .addOnCompleteListener(SignUp1Activity.this, new OnCompleteListener<AuthResult>() {
+
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
                     {
@@ -189,12 +190,12 @@ public class SignUp1Activity extends AppCompatActivity {
                             {
                                 //signIn the user
                                 signIn(userData);
-                            } catch (FirebaseAuthInvalidCredentialsException e)
+                            }catch (FirebaseAuthInvalidCredentialsException e)
                             {
-                                // stop spinner
+                                // stop spinner user interaction enabled
                                 spinner.setVisibility(View.GONE);
                                 Enable();
-                                Log.d(TAG,e.getMessage());
+
                                 Toast.makeText(SignUp1Activity.this,
                                         "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
                             }
@@ -257,6 +258,7 @@ public class SignUp1Activity extends AppCompatActivity {
                 });
     }
 
+
     private void checkIsEmailVerified(FirebaseUser firebaseUser, Hashtable<String,String> userData){
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
@@ -272,11 +274,15 @@ public class SignUp1Activity extends AppCompatActivity {
         }
         else {
             verifyEmail.sendVerificationEmail(SignUp1Activity.this);
+
         }
 
     }
 
     private void AddData(Hashtable<String,String> userData) {
+       // stop spinner
+        spinner.setVisibility(View.GONE);
+        Enable();
 
         user.setEmail(userData.get("email"));
         //starting signup activity
@@ -352,6 +358,8 @@ public class SignUp1Activity extends AppCompatActivity {
             Log.d(TAG,"Email not stored in email node in firebase db");
         }
         else{
+            spinner.setVisibility(View.GONE);
+            Enable();
             Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
             spinner.setVisibility(View.GONE);
             Enable();
@@ -379,6 +387,7 @@ public class SignUp1Activity extends AppCompatActivity {
         } else {
             finish();
         }
+
     }
 
    //screen enable disable

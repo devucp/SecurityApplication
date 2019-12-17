@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ProgressBar;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
+import com.example.securityapplication.Helper.KeyboardHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -159,6 +161,7 @@ public class SignUp1Activity extends AppCompatActivity {
         if (!IsInternet.checkInternet(SignUp1Activity.this))
             return;
 
+        KeyboardHelper.hideSoftKeyboard(SignUp1Activity.this, view);
         Hashtable<String,String> userData = Validater();
         if (userData != null){
             // disable screen and show spinner

@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
+import com.example.securityapplication.Helper.KeyboardHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 //import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
@@ -139,6 +140,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(validateForm()){
                     if (!IsInternet.checkInternet(MainActivity.this))
                         return;
+
+                    KeyboardHelper.hideSoftKeyboard(MainActivity.this, v);
 
                     userData = new Hashtable<>();
 

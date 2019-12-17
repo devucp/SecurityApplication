@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 
 import com.example.securityapplication.Helper.FirebaseHelper;
+import com.example.securityapplication.Helper.KeyboardHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -212,6 +213,8 @@ public class SignUp2 extends AppCompatActivity {
 
                 if (!IsInternet.checkInternet(SignUp2.this))
                     return;
+
+                KeyboardHelper.hideSoftKeyboard(SignUp2.this, view);
 
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();

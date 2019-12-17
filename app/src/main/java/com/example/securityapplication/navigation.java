@@ -149,6 +149,7 @@ public class navigation extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
+                    Log.d("Paid12345","schin1"+newUser.getName()+newUser.IsPaid());
                     // check if user signed in from two devices
                     recheckUserAuthentication();
                     if (check == 1) {
@@ -160,6 +161,14 @@ public class navigation extends AppCompatActivity {
                         db.updateUser(newUser);
                         db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
                         SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
+                    }
+                    Log.d("Paid12345","schin"+newUser.getName()+newUser.IsPaid());
+                    if(String.valueOf(dataSnapshot.child("isPaid").getValue()).equals("true")){
+                        Log.d("Paid12345","i am here");
+                        home_fragment.setpaid(true);
+                    }
+                    else{
+                        home_fragment.setpaid(false);
                     }
                 }
 

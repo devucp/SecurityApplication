@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import static com.example.securityapplication.SignUp1Activity.Btn_Submit;
-
 import static com.example.securityapplication.SignUp1Activity.spinner;
 import static com.example.securityapplication.SignUp1Activity.t1;
 import static com.example.securityapplication.SignUp1Activity.t2;

@@ -167,7 +167,7 @@ public class SignUp1Activity extends AppCompatActivity {
             // disable screen and show spinner
             spinner.setVisibility(View.VISIBLE);
             disable();
-            createUserAndVerifyEmail(userData);
+            setUidFromFirebase(userData);
         }
     }
 

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/cyan"
-    app:title="TRATRA"
+    app:title="TRATA"
     app:titleTextColor="@color/white"
     android:elevation="4dp"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">

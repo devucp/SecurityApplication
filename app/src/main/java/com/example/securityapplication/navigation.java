@@ -145,21 +145,30 @@ public class navigation extends AppCompatActivity {
   //      final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
-            //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-            //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            //DatabaseReference databaseReference = firebaseDatabase.getReference();
             mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     newUser = dataSnapshot.getValue(User.class);
+                    Log.d("Paid12345","schin1"+newUser.getName()+newUser.IsPaid());
                     // check if user signed in from two devices
                     recheckUserAuthentication();
                     if (check == 1) {
                         db.addUser(newUser);
                         Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
+                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
                     } else if (check == 2) {
                         Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
                         db.updateUser(newUser);
+                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                        SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
+                    }
+                    Log.d("Paid12345","schin"+newUser.getName()+newUser.IsPaid());
+                    if(String.valueOf(dataSnapshot.child("isPaid").getValue()).equals("true")){
+                        Log.d("Paid12345","i am here");
+                        home_fragment.setpaid(true);
+                    }
+                    else{
+                        home_fragment.setpaid(false);
                     }
                 }
 

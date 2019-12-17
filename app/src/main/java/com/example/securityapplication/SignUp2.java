@@ -96,8 +96,10 @@ public class SignUp2 extends AppCompatActivity {
     private RadioButton Radio_Gender;
     private DatePickerDialog datePickerDialog;
     private TextInputEditText textinputName,textinputDOB,date; // was earlier TextInputLayout
+
     private String password;
     public static ProgressBar Spinner;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -423,8 +425,6 @@ public class SignUp2 extends AppCompatActivity {
         profileActivity.putExtra("User",user);
         startActivity(profileActivity);*/
     }
-
-
 
     private void setUidFromFirebase(final String mobile){
         firebaseHelper.getMobileDatabaseReference().child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {

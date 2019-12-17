@@ -178,6 +178,7 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("others");
 
                                                         mydb.updateUser(user);
+                                                        firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
 
                                                         btn_edit.setText("edit");
@@ -401,7 +402,7 @@ public class profile_fragment extends Fragment {
         device = new Device();
         device.setUID("null");
         //delete user records from SQLite
-        mydb.deleteDatabase(getApplicationContext());
+        mydb.deleteDatabase(getContext());
         mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
 
         //Firebase signOut

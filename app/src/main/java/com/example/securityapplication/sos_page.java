@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -39,6 +40,7 @@ public class sos_page extends AppCompatActivity {
     private Button btn_SosEdit, btn_SosSave;
 
     private HashMap<String,String> SosContacts;
+    FirebaseHelper firebaseHelper;
     private TextInputEditText c1, c2, c3, c4, c5,current;
     private TextInputLayout cc1,cc2,cc3,cc4,cc5;
     private final static int CONTACT_PICKER_RESULT = 1001;
@@ -57,7 +59,11 @@ public class sos_page extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos_page);
-
+      
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(getApplicationContext());
+      
         values = new ContentValues();
         mydb = new SQLiteDBHelper(this);
         user = new User();
@@ -78,7 +84,7 @@ public class sos_page extends AppCompatActivity {
         btn_SosSave.setEnabled(false);
 
         ReturnIntent = new Intent();
-      
+        btn_SosSave.setEnabled(false);
     }
 
     private void initViews() {
@@ -441,7 +447,7 @@ public class sos_page extends AppCompatActivity {
                     if (c1added || c2added || c3added || c4added || c5added) {
 
                         user.setSosContacts(SosContacts);
-                        Log.d("SosActivity", "HashMap updated in User object c1=" + user.sosContacts.get("c1"));
+                        Log.d("SosActivity", "HashMap updated in User object c1=" + user.getSosContacts().get("c1"));
 
                         if (mydb.addsosContacts(SosContacts)) {
                             Log.d("SosActivity", "SOS contacts was added in database");

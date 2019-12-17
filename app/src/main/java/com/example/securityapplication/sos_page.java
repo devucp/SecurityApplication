@@ -59,11 +59,11 @@ public class sos_page extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos_page);
-
+      
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(getApplicationContext());
-
+      
         values = new ContentValues();
         mydb = new SQLiteDBHelper(this);
         user = new User();
@@ -81,9 +81,9 @@ public class sos_page extends AppCompatActivity {
         c3.setEnabled(false);
         c4.setEnabled(false);
         c5.setEnabled(false);
+        btn_SosSave.setEnabled(false);
 
         ReturnIntent = new Intent();
-
         btn_SosSave.setEnabled(false);
     }
 

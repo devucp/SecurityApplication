@@ -24,7 +24,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.User;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class sos_page extends AppCompatActivity {
 
@@ -32,7 +34,7 @@ public class sos_page extends AppCompatActivity {
     public  static final int RequestPermissionCode  = 1 ;
     Button btn_SosEdit, btn_SosSave;
 
-
+    FirebaseHelper firebaseHelper;
     private TextInputEditText c1, c2, c3, c4, c5,current;
     private TextInputLayout cc1,cc2,cc3,cc4,cc5;
     private final static int CONTACT_PICKER_RESULT = 1001;
@@ -53,6 +55,9 @@ public class sos_page extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos_page);
 
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(getApplicationContext());
 
         values = new ContentValues();
         mydb = new SQLiteDBHelper(this);
@@ -476,7 +481,8 @@ public class sos_page extends AppCompatActivity {
                            c4.setEnabled(false);
                            c5.setEnabled(false);
                            btn_SosSave.setEnabled(false);
-
+                           firebaseHelper.addsos_infirebase(FirebaseAuth.getInstance().getUid(),c1.getText().toString(),c2.getText().toString(),c3.getText().toString(),c4.getText().toString(),
+                                   c5.getText().toString());
                            Toast.makeText(sos_page.this,"DATA saved successfully ",Toast.LENGTH_SHORT).show();
                             startActivity(intent);
                         }

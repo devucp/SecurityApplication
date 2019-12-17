@@ -126,14 +126,16 @@ public class GoogleFirebaseSignIn implements Serializable {
 
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = firebaseHelper.getFirebaseAuth().getCurrentUser();
+                            FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
 
                             // set imei and uid in firebase
                             device = new Device();
-                            device.setUID(user.getUid());
+                            device.setUID(firebaseUser.getUid());
                             firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device);
-                            firebaseHelper.getUsersDatabaseReference().child(user.getUid()).child("imei").setValue(mImeiNumber);
-                            setUser(user);
+                            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber);
+                            // change isGoogleAccountLinked status in firebase database to true
+                            changeLinkedStatus(firebaseUser);
+                            setUser(firebaseUser);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());

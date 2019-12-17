@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -14,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -630,17 +632,26 @@ public class SignUp2 extends AppCompatActivity {
         startActivity(sosPage);
     }
 
-    /*@Override
+    @Override
     public void onBackPressed() {
-        Log.d(TAG,"Inside onbackpressed function");
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("hasBackPressed",true);
-        setResult(Activity.RESULT_OK,returnIntent);
-        try {
-            closeNow();
-        }catch (Exception e){
-            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-            finish();
+        Log.d(TAG,"Inside onBackPressed");
+        if (!(btn_submit.getAlpha()==1)){
+            Log.d(TAG,"Inside if condition");
+            // give alert to wait
+            AlertDialog.Builder a_builder = new AlertDialog.Builder(SignUp2.this);
+            a_builder.setMessage("Please wait")
+                    .setCancelable(false)
+                    .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+
+            AlertDialog alert = a_builder.create();
+            alert.show();
         }
-    }*/
+        else
+            super.onBackPressed();
+    }
 }

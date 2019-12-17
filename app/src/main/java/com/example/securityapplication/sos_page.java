@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -50,6 +51,8 @@ public class sos_page extends AppCompatActivity {
     private User user;
     boolean c1added,c2added,c3added,c4added,c5added;
 
+    private Intent ReturnIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +76,9 @@ public class sos_page extends AppCompatActivity {
         c4.setEnabled(false);
         c5.setEnabled(false);
         btn_SosSave.setEnabled(false);
+
+        ReturnIntent = new Intent();
+      
     }
 
     private void initViews() {
@@ -614,4 +620,28 @@ public class sos_page extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed(){
+        ReturnIntent.putExtra("ResultIntent",user);
+        //Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
+        setResult(10,ReturnIntent);//to finish sing up 1 activity
+        AlertDialog.Builder a_builder = new AlertDialog.Builder(sos_page.this);
+        a_builder.setMessage("Do you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        AlertDialog alert = a_builder.create();
+        alert.setTitle("Message");
+        alert.show();
+    }
 }

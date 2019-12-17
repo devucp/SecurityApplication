@@ -30,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +43,6 @@ import java.util.Objects;
 
 import static android.support.v4.content.ContextCompat.getSystemService;
 import static com.example.securityapplication.R.layout.spinner_layout;
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class profile_fragment extends Fragment {
 
@@ -51,7 +51,6 @@ public class profile_fragment extends Fragment {
     private Button btn_edit;
     private Button btn_logout;
     SQLiteDBHelper mydb ;
-    Database_Helper dbHelper;
     User user;
     Device device;
     private FirebaseDatabase mFirebaseDatabase;
@@ -65,9 +64,8 @@ public class profile_fragment extends Fragment {
     Spinner spinner;
     DatePickerDialog datePickerDialog;
 
-
-
     navigation nv=new navigation();
+    private FirebaseHelper firebaseHelper;
 
     @Nullable
     @Override
@@ -100,7 +98,6 @@ public class profile_fragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        user = navigation.newUser;
 
         initObjects();
         initviews();
@@ -113,12 +110,17 @@ public class profile_fragment extends Fragment {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         initDataBaseReferences();
 
+        /**  Get FirebaseHelper Instance **/
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(getActivity());
 
     }
 
     private void initObjects() {
 
 //        user = getIntent().getParcelableExtra("User");
+        user = new User();
         mydb = new SQLiteDBHelper(getContext());
     }
 
@@ -202,7 +204,7 @@ public class profile_fragment extends Fragment {
                 //finishing the navigation activity
                 getActivity().finish();
                 //Clear the back stack and re-directing to the sign-up page
-                Intent mLogOutAndRedirect= new Intent(getApplicationContext(),MainActivity.class);
+                Intent mLogOutAndRedirect= new Intent(getContext(),MainActivity.class);
                 mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mLogOutAndRedirect);
 
@@ -224,13 +226,12 @@ public class profile_fragment extends Fragment {
 
     }
 
-
     private void FetchAllData(){
         int i =0;
         Cursor res;
         res = mydb.getAllData();
         if (res.getCount() == 0){
-            Toast toast = Toast.makeText(getApplicationContext(),
+            Toast toast = Toast.makeText(getContext(),
                     "No User Data Found",
                     Toast.LENGTH_LONG);
             toast.show();
@@ -409,9 +410,10 @@ public class profile_fragment extends Fragment {
             mAuth.signOut();
             Toast.makeText(getContext(), "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
+        firebaseHelper.googleSignOut(getActivity());
 
         try{
-            Intent mStopSosPlayer=new Intent(getApplicationContext(),SosPlayer.class);
+            Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);
             mStopSosPlayer.putExtra("stop",1);
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
             Log.d("Profile Fr","Service sosplayer new startIntent...");
@@ -420,16 +422,5 @@ public class profile_fragment extends Fragment {
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");
         }
-        //Google signOut
-        /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            //updateUI(null);
-                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }*/
     }
 }

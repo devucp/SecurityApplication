@@ -1,17 +1,24 @@
 package com.example.securityapplication;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +27,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.Helper.FirebaseHelper;
+import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,17 +51,49 @@ public class navigation extends AppCompatActivity {
 
     SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
     public static Boolean test=false;
+    public static TextView tmode;
+    public static TextView tmode1;
 
+    private int flag=0;
     Menu optionsMenu;
+
+    //private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
+    /*private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mDevicesDatabaseReference;*/
+    //private User user;
+    private Device device;
+    private String TAG = "NavigatonFragment";
+    private String mImeiNumber;
+    private TelephonyManager telephonyManager;
+
+    private ValueEventListener mUsersDatabaseReferenceListener;
+    private FirebaseHelper firebaseHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getImei();
+
         setContentView(R.layout.activity_navigation);
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
+
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(navigation.this);
+        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
+        /*mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();*/
+        firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+        // initialise database references
+        //initDataBaseReferences();
+
         //sqlite db code here
         Log.d("SQL12","No. of rows in navigation1 "+db.numberOfRows());
         if((aa=db.numberOfRows())==0)
@@ -65,40 +109,70 @@ public class navigation extends AppCompatActivity {
                 test=true;
             }
         }
-    }
 
+        tmode1=(TextView)findViewById(R.id.testmode);
 
-    public void getData(final int check){
-        FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
-        String uid=firebaseUser.getUid();
-        FirebaseAuth firebaseAuth=FirebaseAuth.getInstance();
-        FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference=firebaseDatabase.getReference();
-        DatabaseReference childref = databaseReference.child("Users").child(uid);
-        databaseReference.child("Users").child(uid).addValueEventListener(new ValueEventListener() {
+        tmode1.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                newUser=dataSnapshot.getValue(User.class);
+            public void onClick(View view) {
+                if (flag==0){
+                    flag=1;
+                    tmode1.setText("TEST MODE : ON");
 
-                if(check==1) {
-                    db.addUser(newUser);
-                    Log.d("FirebaseUsername",newUser.getName()+" 1 "+newUser.getEmail());
-                    db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
+                  //  tmode1.setPadding(0,0,10,0);
+                    tmode1.setTextColor(Color.GREEN);
                 }
-                else if(check==2) {
-                    Log.d("FirebaseUsername",newUser.getName()+" 2 "+newUser.getEmail());
-                    db.updateUser(newUser);}
-                    db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
-                }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                else {
+                    flag=0;
+                    tmode1.setTextColor(Color.WHITE);
+                    tmode1.setText("TEST MODE : OFF");
+                   // tmode.setTextColor(Color.WHITE);
 
+                }
             }
         });
     }
 
+    private void checkFirstSosContact(HashMap<String,String> sosContacts){
+        // check if first sos contact is added
+        if (sosContacts == null){
+            Intent sosPage = new Intent(navigation.this, sos_page.class);
+            startActivityForResult(sosPage,1);
+        }
+    }
 
-    @Override
+    public void getData(final int check){
+  //      final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            String uid = firebaseUser.getUid();
+            //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+            //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            //DatabaseReference databaseReference = firebaseDatabase.getReference();
+            mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    newUser = dataSnapshot.getValue(User.class);
+                    // check if user signed in from two devices
+                    recheckUserAuthentication();
+                    if (check == 1) {
+                        db.addUser(newUser);
+                        Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
+                    } else if (check == 2) {
+                        Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
+                        db.updateUser(newUser);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.top_menu,menu);
         optionsMenu=menu;
@@ -110,7 +184,7 @@ public class navigation extends AppCompatActivity {
         else
             titem.setChecked(false);
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -184,7 +258,8 @@ public class navigation extends AppCompatActivity {
 
                     return true;
                 }
-            };
+    };
+
     @Override
     public void onBackPressed(){
         AlertDialog.Builder a_builder = new AlertDialog.Builder(navigation.this);
@@ -207,7 +282,101 @@ public class navigation extends AppCompatActivity {
         alert.show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==10 && requestCode==1)
+            try {
+                closeNow();
+            }catch (Exception e){
+                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                finish();
+            }
+    }
+
     public void sos(View view) {
         startActivity(new Intent(this,sos_page.class));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getImei();
+                } else {
+                    closeNow();
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void closeNow(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            finishAffinity();
+        }
+        else{
+            finish();
+        }
+    }
+
+    private void getImei(){
+        telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+            return;
+        }
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mImeiNumber = telephonyManager.getImei(0);
+                Log.d("IMEI", "IMEI Number of slot 1 is:" + mImeiNumber);
+            } else {
+                mImeiNumber = telephonyManager.getDeviceId();
+            }
+        }
+    }
+
+    private void recheckUserAuthentication(){
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+            return;
+        Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        Log.d(TAG,firebaseUser.getEmail());
+        Log.d(TAG,"Inside recheckUserAuthentication");
+        getImei();
+        Log.d(TAG,"Imei of device:"+mImeiNumber);
+        Log.d(TAG,"Imei from firebase:"+newUser.getImei());
+        if (!newUser.getImei().equals(mImeiNumber)){
+            // same user trying to login from multiple devices -> logout the user
+            Log.d(TAG, "User is LoggedIn in other device");
+            Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+            LogOutAndStartMainActivity();
+        }
+        else{
+            if (newUser != null)
+                checkFirstSosContact(newUser.getSosContacts());
+        }
+    }
+
+    public void LogOutAndStartMainActivity(){
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);
+        firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
+        firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+        firebaseHelper.firebaseSignOut();
+        firebaseHelper.googleSignOut(navigation.this);
+
+        Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);
+        mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mLogOutAndRedirect);
+        //finishing the navigation activity
+        try {
+            closeNow();
+            Log.d(TAG,"closed activity successfully");
+        }catch (Exception e){
+            Log.d(TAG,"Closing app exception:"+e.getMessage());
+            finish();
+        }
     }
 }

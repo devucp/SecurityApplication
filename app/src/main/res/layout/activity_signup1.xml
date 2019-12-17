@@ -41,7 +41,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-
                 android:gravity="center"
                 android:shadowColor="@color/cyan"
                 android:shadowRadius="25"
@@ -89,7 +88,7 @@
                 android:id="@+id/textlayout_Pass_outer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="11dp"
+                android:layout_marginTop="10dp"
                 android:clickable="true"
                 android:hapticFeedbackEnabled="true"
                 app:errorEnabled="false"
@@ -104,6 +103,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/shapeemail"
                     android:hint="@string/password"
+
                     android:inputType="text|textPassword"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
@@ -123,7 +123,7 @@
                 android:visibility="invisible"
                 android:layout_marginTop="-2dp"
                 android:layout_marginLeft="15dp"
-                android:text="password can't be empty"
+                android:text="@string/password_can_t_be_empty"
                 android:textSize="12sp"
                 android:textColor="#ff2222"
                 >
@@ -145,6 +145,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/shapeemail"
                     android:hint="@string/confirm_password"
+
                     android:inputType="textPassword"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
@@ -170,37 +171,35 @@
                 >
             </TextView>
 
-            <Button
-                android:id="@+id/btn_verify"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:layout_marginBottom="30dp"
-                android:background="@drawable/shapelogin"
-                android:onClick="verifyEmailId"
-                android:paddingTop="9dp"
-                android:paddingBottom="9dp"
-                android:text="@string/verify_email"
-                android:textColor="#000000"
-                android:textColorHint="#ffffff"
-                android:textSize="15sp"
-
-                />
-
+                android:layout_height="wrap_content">
             <Button
                 android:id="@+id/btn_sub"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="0dp"
                 android:background="@drawable/shapelogin"
                 android:onClick="signUp"
-                android:paddingTop="9dp"
-                android:paddingBottom="9dp"
-                android:text="@string/proceed"
+                android:padding="15dp"
+                android:shadowColor="@android:color/transparent"
                 android:textColor="#000000"
+                android:text="@string/proceed"
                 android:textColorHint="#ffffff"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:layout_marginTop="20dp"
+                />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:indeterminateDrawable="@drawable/cpb"
+                    android:indeterminateTintMode="src_atop"
+                    android:foregroundGravity="center"
+                    android:layout_marginTop="20dp"
+ />
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

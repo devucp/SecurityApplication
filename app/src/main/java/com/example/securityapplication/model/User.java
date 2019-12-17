@@ -13,15 +13,15 @@ import android.os.Parcelable;
 public class User implements Parcelable {
     private String name;
     private String email;
-    private String password;
+    //private String password;
     private String gender;
     private String mobile;
     private String location;
     private String imei;
     private String dob;
-    private boolean isPaid;
-    public HashMap<String,String> sosContacts;
-    private boolean isGoogleAccountLinked;
+    private Boolean paid;
+    private HashMap<String,String> sosContacts;
+    private Boolean googleAccountLinked;
 
     public String getDob() {
         return dob;
@@ -38,7 +38,7 @@ public class User implements Parcelable {
         //id = in.readInt();
         name = in.readString();
         email = in.readString();
-        password = in.readString();
+        //password = in.readString();
         gender = in.readString();
         mobile = in.readString();
 //        aadhar = in.readString();
@@ -84,13 +84,13 @@ public class User implements Parcelable {
         this.email = email;
     }
 
-    public String getPassword() {
+    /*public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
+    }*/
 
     public String getGender() {
         return gender;
@@ -134,7 +134,7 @@ public class User implements Parcelable {
 //        dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(email);
-        dest.writeString(password);
+        //dest.writeString(password);
         dest.writeString(gender);
         dest.writeString(mobile);
 //        dest.writeString(aadhar);
@@ -143,9 +143,9 @@ public class User implements Parcelable {
         dest.writeString(dob);
     }
 
-    public boolean IsPaid(){ return isPaid; }
+    public boolean isPaid(){ return paid; }
 
-    public void setPaid(boolean isPaid){ this.isPaid = isPaid; }
+    public void setPaid(Boolean paid){ this.paid = paid; }
 
     public HashMap<String,String> getSosContacts(){ return sosContacts; }
 
@@ -153,7 +153,7 @@ public class User implements Parcelable {
         this.sosContacts = sosContacts;
     }
 
-    public boolean isGoogleAccountLinked(){ return isGoogleAccountLinked; }
+    public boolean isGoogleAccountLinked(){ return googleAccountLinked; }
 
-    public void setGoogleAccountLinked(boolean isGoogleAccountLinked){ this.isGoogleAccountLinked = isGoogleAccountLinked; }
+    public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
 }

@@ -44,8 +44,10 @@
     <string name="reset_password">RESET PASSWORD</string>
     <string name="reset_password_desc">By clicking RESET PASSWORD an email will be sent to your registered email address to reset the password</string>
     <string name="dbname">Security_app2.db</string>
-    <string name="verify_email">verify email</string>
     <string name="proceed">proceed</string>
+    <string name="password_can_t_be_empty">password can\'t be empty</string>
+    <string name="locality">Locality</string>
+    <string name="change_password">change password ?</string>
 
     <!-- TODO: Add AutoComplete Functionality -->
     <string-array name="Locality">

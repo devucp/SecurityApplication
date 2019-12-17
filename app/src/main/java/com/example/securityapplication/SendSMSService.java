@@ -14,9 +14,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class SendSMSService extends Service {
-    private String[] contactList=null; //TODO: stores the number of the emergency contacts
+    private static String[] contactList=null; //TODO: stores the number of the emergency contacts
     private String senderName;
     private String location;
     private Integer alert;
@@ -30,9 +33,12 @@ public class SendSMSService extends Service {
     private sentReceiver sentReceiver;
     private deliveryReceiver deliveryReceiver;
 
+
     //code for checking if delivery proper
     String SENT = "SMS_SENT";
     String DELIVERED = "SMS_DELIVERED";
+
+    private static boolean contactsFetched=false; //checks whether sos contacts have been initialised
 
     public SendSMSService() {
     }
@@ -70,7 +76,43 @@ public class SendSMSService extends Service {
         registerReceiver(deliveryReceiver,new IntentFilter(DELIVERED));
         Log.d("SOS SMS","onCreate");
     }
+
+    /**Initialise the SOS contacts**/
+    public static void initContacts(){
+        Log.d("SendSMSService","initContacts:");
+        //check if HashMap was initialised on call
+        try {
+            HashMap<String, String> sosContacts = navigation.newUser.getSosContacts();
+            Log.d("SendSMSServcie", "SosContacts size:" + sosContacts.size());
+            if (sosContacts.size() != 0) {
+                contactList = new String[sosContacts.size()];
+                Iterator sosContactsIterator = sosContacts.entrySet().iterator();
+                int i = 0;
+                while (sosContactsIterator.hasNext()) {
+                    Map.Entry contactEntry = (Map.Entry) sosContactsIterator.next();
+                    String contact = (String) contactEntry.getValue();
+                    Log.d("SendSMSService", "contact.get(" + i + "):" + contact);
+                    if (!contact.equals("null") && contact.length() == 10) {
+                        contactList[i] = contact;
+                        Log.d("SendSMSService", "contactList[" + i + "]:" + contactList[i]);
+
+                    }
+                    i++;
+
+                }
+            }
+        }catch(NullPointerException e){
+            e.printStackTrace();
+            Log.d("SendSMSServcie", "HashMap not initialised exception" );
+
+        }
+
+
+        contactsFetched=true; //sets contacts fetched to true to indicate that init has been called
+    }
     public void initiateMessage(){
+        initContacts(); //added code to initialise contacts
+
         updateLocation();
 
         Log.d("SOS SMS","Location is"+location);
@@ -89,11 +131,14 @@ public class SendSMSService extends Service {
 
 
             for(int i=0;i<contactList.length;i++){
-
+                if(contactList[i]==null){ //checking if array was initialised but no contacts were iniitialised as all contacts from firebase were null
+                    continue;
+                }
                 if(location==null)
                     sendMessage(contactList[i],"Location unavailable");
                 else
                     sendMessage(contactList[i],location);
+
             }
         }
         String toastmsg;
@@ -114,36 +159,44 @@ public class SendSMSService extends Service {
         this.stopSelf();//FINISH the service
     }
 
-    public void sendMessage(String number,String location){
+    /**Prepares the text message depending on the intent extras**/
+    public String initSMSText(String location){
+        String messageToSend=SOS_MESSAGE;
         //modified message depending on the extra received from calling intent
         if(alert==1)
         {
-            SOS_MESSAGE+="I'm feeling UNSAFE. ";
+            messageToSend+="I'm feeling UNSAFE. ";
         }
         else if(safe==1)
         {
-            SOS_MESSAGE+="Just wanted to let you know that I'm SAFE. ";
+            messageToSend+="Just wanted to let you know that I'm SAFE. ";
         }
         else
         {
-            SOS_MESSAGE+="PLEASE HELP ME. ";
+            messageToSend+="PLEASE HELP ME. ";
 
         }
 
-        SOS_MESSAGE+="This is my approximate location ";
+        messageToSend+="This is my approximate location ";
 
-        String messageToSend= SOS_MESSAGE; //removed senderName
         if(location!=null && location!="Location unavailable")
-                messageToSend+="\nhttps://www.google.com/maps/place/";
+            messageToSend+="\nhttps://www.google.com/maps/place/";
         messageToSend+=location;
 
+        return messageToSend;
 
+    }
+    public void sendMessage(String number,String location){
+
+        String messageToSend= initSMSText(location); //refactored the code into initSMSText()
 
         PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
                 new Intent(SENT), 0);
 
         PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
                 new Intent(DELIVERED), 0);
+
+        Log.d("SendSMSServcie", "message to be sent is: "+messageToSend );
 
         ArrayList<String> parts = SmsManager.getDefault().divideMessage(messageToSend);
 
@@ -154,9 +207,16 @@ public class SendSMSService extends Service {
         deliverList.add(deliveredPI);
 
 
+        try {
+            SmsManager.getDefault().sendMultipartTextMessage(number, null, parts, sendList, deliverList);
 
-        SmsManager.getDefault().sendMultipartTextMessage(number, null, parts, sendList,deliverList);
-        Log.d("SOS SMS","sendMessage() end");
+        }
+        catch (IllegalArgumentException e){
+            e.printStackTrace();
+            Log.d("SOS SMS", "sendMessage() exception");
+            Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
+        }
+        Log.d("SOS SMS", "sendMessage() end");
     }
 
     @Override

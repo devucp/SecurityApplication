@@ -45,7 +45,7 @@ import java.util.HashMap;
 
 public class navigation extends AppCompatActivity {
 
-    int count=0;
+    int count=0,aa;
     static User newUser=new User();
     Boolean is_home=true;
 
@@ -95,9 +95,10 @@ public class navigation extends AppCompatActivity {
         //initDataBaseReferences();
 
         //sqlite db code here
-        Log.d("cchecking","Oncreate : Loaded"+is_home);
-        if(db.numberOfRows()==0)
-            getData(1);
+        Log.d("SQL12","No. of rows in navigation1 "+db.numberOfRows());
+        if((aa=db.numberOfRows())==0)
+        {  getData(1);
+            Log.d("SQL","No. of rows in navigation "+aa);}
         else
         {
             Log.d("checking","oncreate option menu 3 is running");
@@ -144,9 +145,6 @@ public class navigation extends AppCompatActivity {
   //      final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
-            //FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-            //FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            //DatabaseReference databaseReference = firebaseDatabase.getReference();
             mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -156,9 +154,12 @@ public class navigation extends AppCompatActivity {
                     if (check == 1) {
                         db.addUser(newUser);
                         Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
+                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
                     } else if (check == 2) {
                         Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
                         db.updateUser(newUser);
+                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                        SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
                     }
                 }
 
@@ -168,7 +169,6 @@ public class navigation extends AppCompatActivity {
                 }
             });
         }
-
     }
 
 

@@ -63,7 +63,7 @@ import static java.security.AccessController.getContext;
         * and the functions TextInputLayout.getEditText() have been replaced to just TextInputEditText.getText()
 */
 public class SignUp1Activity extends AppCompatActivity {
-
+  
     Validation val = new Validation();
     public static Button Btn_Submit;
     //Added user object to send to next

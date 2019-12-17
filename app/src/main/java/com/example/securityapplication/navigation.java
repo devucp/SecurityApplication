@@ -45,7 +45,7 @@ import java.util.HashMap;
 
 public class navigation extends AppCompatActivity {
 
-    int count=0;
+    int count=0,aa;
     static User newUser=new User();
     Boolean is_home=true;
 
@@ -95,9 +95,10 @@ public class navigation extends AppCompatActivity {
         //initDataBaseReferences();
 
         //sqlite db code here
-        Log.d("cchecking","Oncreate : Loaded"+is_home);
-        if(db.numberOfRows()==0)
-            getData(1);
+        Log.d("SQL12","No. of rows in navigation1 "+db.numberOfRows());
+        if((aa=db.numberOfRows())==0)
+        {  getData(1);
+            Log.d("SQL","No. of rows in navigation "+aa);}
         else
         {
             Log.d("checking","oncreate option menu 3 is running");
@@ -168,7 +169,6 @@ public class navigation extends AppCompatActivity {
                 }
             });
         }
-
     }
 
 

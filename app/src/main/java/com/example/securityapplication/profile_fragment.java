@@ -56,11 +56,6 @@ public class profile_fragment extends Fragment {
     private TextView text_changePassword;
     SQLiteDBHelper mydb ;
     User user;
-    Device device;
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDevicesDatabaseReference;
-    private DatabaseReference mUsersDatabaseReference;
-    private FirebaseAuth mAuth;
     private TelephonyManager telephonyManager;
     private String mImeiNumber;
     private int RC;
@@ -108,11 +103,6 @@ public class profile_fragment extends Fragment {
         FetchAllData();
         DisplayData();
         initListeners();
-
-
-        mAuth= FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        initDataBaseReferences();
 
         /**  Get FirebaseHelper Instance **/
         firebaseHelper = FirebaseHelper.getInstance();
@@ -229,13 +219,6 @@ public class profile_fragment extends Fragment {
             return true;
         else
             return false;
-    }
-
-    private void initDataBaseReferences(){
-        //Initialize Database
-        mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
-
     }
 
     private void FetchAllData(){

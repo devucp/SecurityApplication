@@ -109,7 +109,7 @@ public class sos_page extends AppCompatActivity {
             res = mydb.getSosContacts();
             if (res.getCount() == 0){
                 Toast.makeText(getApplicationContext(),
-                        "No SOS Contact records Found",
+                        "Please enter atleast 1 contact for emergency",
                         Toast.LENGTH_LONG).show();
                 Log.d("SOS Activity","No Contact Data found ");
                 //Removed initvalues as it was not required anymore

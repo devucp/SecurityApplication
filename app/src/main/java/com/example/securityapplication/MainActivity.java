@@ -194,16 +194,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initViews();
         initOnClickListeners();
 
-        pgsBar = findViewById(R.id.pBar);
-        pgsBar1= findViewById(R.id.pBar1);
-
-
-        signupbttn = findViewById(R.id.signUpButton);
-        mEmail=findViewById(R.id.editEmail);
-        mPassword=findViewById(R.id.editPassword);
-        mStatus= findViewById(R.id.status);
-        mSignInButton=findViewById(R.id.signInButton);
-        mGoogleSignInButton=findViewById(R.id.googleSignInButton);
         FirebaseApp.initializeApp(this);
 
         /**  Get FirebaseHelper Instance **/
@@ -254,6 +244,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mStatus= findViewById(R.id.status);
         mSignInButton=findViewById(R.id.signInButton);
         mGoogleSignInButton=findViewById(R.id.googleSignInButton);
+        signupbttn = findViewById(R.id.signUpButton);
+        pgsBar = findViewById(R.id.pBar);
+        pgsBar1= findViewById(R.id.pBar1);
     }
 
     public void initOnClickListeners(){
@@ -480,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            updateUI(firebaseUser);
+                                            storeData(firebaseUser);
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -517,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void LogOutUser(){
         if (mImeiNumber == null)
             deviceId();
-        firebaseHelper.firebaseSignOut(mImeiNumber);
+        firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(MainActivity.this);
     }
 
@@ -779,5 +772,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.i("Mainactivity destroyed", "onDestroy!");
         super.onDestroy();
 
+    }
+
+    public void storeData(final FirebaseUser firebaseUser){
+        if (firebaseUser != null) {
+            final String uid = firebaseUser.getUid();
+            firebaseHelper.getUsersDatabaseReference().child(uid).addListenerForSingleValueEvent(new ValueEventListener(){
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    user = dataSnapshot.getValue(User.class);
+                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+                    SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
+
+                    db.addUser(user);
+                    if (user.getSosContacts() != null)
+                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+
+                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
+                    if(dataSnapshot.getValue(User.class).isPaid()){
+                        Log.d("Paid12345","i am here");
+                        home_fragment.setpaid(true);
+                    }
+                    else{
+                        home_fragment.setpaid(false);
+                    }
+                    updateUI(firebaseUser);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

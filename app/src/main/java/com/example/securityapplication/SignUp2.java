@@ -211,11 +211,6 @@ public class SignUp2 extends AppCompatActivity {
             public void onClick(View view)
             {
 
-                if (!IsInternet.checkInternet(SignUp2.this))
-                    return;
-
-                KeyboardHelper.hideSoftKeyboard(SignUp2.this, view);
-
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
                     return;
@@ -271,6 +266,11 @@ public class SignUp2 extends AppCompatActivity {
 
                 //NOTE: Allow database entry only if not empty AND valid
                 if(!empty && valid){
+                    if (!IsInternet.checkInternet(SignUp2.this))
+                        return;
+
+                    KeyboardHelper.hideSoftKeyboard(SignUp2.this, view);
+
                     Spinner.setVisibility(View.VISIBLE);
                     disable();
                     btn_submit.setText("");

@@ -118,7 +118,9 @@ public class profile_fragment extends Fragment {
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(getActivity());
+        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
 
+        deviceId();
     }
 
     private void initObjects() {
@@ -407,21 +409,17 @@ public class profile_fragment extends Fragment {
 
     private void signOut(){
         Log.d(TAG,"Inside signout");
-        // first make uid under imei null in Devices and imei under uid null in Users
-        deviceId();
-        device = new Device();
-        device.setUID("null");
+        if (mImeiNumber == null) {
+            deviceId();
+            return;
+        }
+
+        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .removeEventListener(navigation.mUsersDatabaseReferenceListener);
+        firebaseHelper.firebaseSignOut(mImeiNumber);
+        firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite
         mydb.deleteDatabase(getContext());
-        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-
-        //Firebase signOut
-        if (mAuth.getCurrentUser() != null) {
-            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
-            mAuth.signOut();
-            Toast.makeText(getContext(), "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
-        }
-        firebaseHelper.googleSignOut(getActivity());
 
         try{
             Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);
@@ -481,9 +479,11 @@ public class profile_fragment extends Fragment {
 
         // stop progress bar
 
+        Log.d(TAG,"Updating user...");
+
         user.setMobile(textPhone.getText().toString());
 
-        mydb.updateUser(user);
+        //mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
         btn_edit.setText("edit");

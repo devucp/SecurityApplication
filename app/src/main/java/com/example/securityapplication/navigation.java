@@ -68,7 +68,7 @@ public class navigation extends AppCompatActivity {
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
 
-    private ValueEventListener mUsersDatabaseReferenceListener;
+    public static ValueEventListener mUsersDatabaseReferenceListener;
     private FirebaseHelper firebaseHelper;
 
     @Override
@@ -88,26 +88,16 @@ public class navigation extends AppCompatActivity {
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(navigation.this);
         firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
-        /*mAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();*/
+
         firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
-        // initialise database references
-        //initDataBaseReferences();
 
         //sqlite db code here
-        Log.d("SQL12","No. of rows in navigation1 "+db.numberOfRows());
-        if((aa=db.numberOfRows())==0)
-        {  getData(1);
-            Log.d("SQL","No. of rows in navigation "+aa);}
-        else
+        Log.d("checking","oncreate option menu 3 is running");
+        getData();
+        if(db.getTestmode())
         {
-            Log.d("checking","oncreate option menu 3 is running");
-            getData(2);
-            if(db.getTestmode())
-            {
-                Log.d("checking","oncreate option menu 2 is running");
-                test=true;
-            }
+            Log.d("checking","oncreate option menu 2 is running");
+            test=true;
         }
 
         tmode1=(TextView)findViewById(R.id.testmode);
@@ -133,16 +123,20 @@ public class navigation extends AppCompatActivity {
         });
     }
 
-    private void checkFirstSosContact(HashMap<String,String> sosContacts){
+    private void checkFirstSosContact(){
         // check if first sos contact is added
-        if (sosContacts == null){
+        SQLiteDBHelper mydb = new SQLiteDBHelper(navigation.this);
+        Cursor res=mydb.getSosContacts();
+        if (res.getCount() == 0){
+            //Toast.makeText(getApplicationContext(), "No SOS Contact records Found", Toast.LENGTH_LONG).show();
+            Log.d("SOS Activity","No Contact Data found ");
             Intent sosPage = new Intent(navigation.this, sos_page.class);
             startActivityForResult(sosPage,1);
         }
     }
 
-    public void getData(final int check){
-  //      final FirebaseUser firebaseUser= FirebaseAuth.getInstance().getCurrentUser();
+    public void getData(){
+
         if (firebaseUser != null) {
             String uid = firebaseUser.getUid();
             mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
@@ -153,26 +147,11 @@ public class navigation extends AppCompatActivity {
                             .isPaid());
                     // check if user signed in from two devices
                     recheckUserAuthentication();
-                    if (check == 1) {
-                        db.addUser(newUser);
-                        Log.d("FirebaseUsername", newUser.getName() + " 1 " + newUser.getEmail());
-                        if (newUser.getSosContacts() != null)
-                            db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase
-                    } else if (check == 2) {
-                        Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
-                        db.updateUser(newUser);
-                        if (newUser.getSosContacts() != null)
-                            db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
-                        SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
-                    }
-                    Log.d("Paid12345","schin"+newUser.getName()+newUser.isPaid());
-                    if(String.valueOf(dataSnapshot.child("isPaid").getValue()).equals("true")){
-                        Log.d("Paid12345","i am here");
-                        home_fragment.setpaid(true);
-                    }
-                    else{
-                        home_fragment.setpaid(false);
-                    }
+                    Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
+                    db.updateUser(newUser);
+                    if (newUser.getSosContacts() != null)
+                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                    SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
                 }
 
                 @Override
@@ -180,6 +159,8 @@ public class navigation extends AppCompatActivity {
 
                 }
             });
+
+            checkFirstSosContact();
         }
     }
 
@@ -366,18 +347,15 @@ public class navigation extends AppCompatActivity {
             Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
             LogOutAndStartMainActivity();
         }
-        else{
-            if (newUser != null)
-                checkFirstSosContact(newUser.getSosContacts());
-        }
     }
 
     public void LogOutAndStartMainActivity(){
         firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);
-        firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
         firebaseHelper.makeDeviceImeiNull(mImeiNumber);
         firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(navigation.this);
+        //delete user records from SQLite
+        db.deleteDatabase(navigation.this);
 
         Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);
         mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

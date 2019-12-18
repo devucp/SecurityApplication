@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
+import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
@@ -20,8 +21,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 
@@ -135,7 +139,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                             firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber);
                             // change isGoogleAccountLinked status in firebase database to true
                             changeLinkedStatus(firebaseUser);
-                            setUser(firebaseUser);
+                            storeData(firebaseUser);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -196,5 +200,38 @@ public class GoogleFirebaseSignIn implements Serializable {
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
         firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("googleAccountLinked").setValue(true);
+    }
+
+    private void storeData(final FirebaseUser firebaseUser){
+        if (firebaseUser != null) {
+            final String uid = firebaseUser.getUid();
+            firebaseHelper.getUsersDatabaseReference().child(uid).addListenerForSingleValueEvent(new ValueEventListener(){
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+                    SQLiteDBHelper db=new SQLiteDBHelper(activity);
+
+                    db.addUser(user);
+                    if (user.getSosContacts() != null)
+                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+
+                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
+                    if(dataSnapshot.getValue(User.class).isPaid()){
+                        Log.d("Paid12345","i am here");
+                        home_fragment.setpaid(true);
+                    }
+                    else{
+                        home_fragment.setpaid(false);
+                    }
+                    setUser(firebaseUser);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 }

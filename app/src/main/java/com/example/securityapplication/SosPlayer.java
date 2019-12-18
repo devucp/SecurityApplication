@@ -261,7 +261,11 @@ public class SosPlayer extends Service {
             sendBroadcast(broadcastIntent);
         }
         stoptimertask();
-
-        mediaSession.release();
+        //added try-catch as app crashes if paid set to true
+        try {
+            mediaSession.release();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

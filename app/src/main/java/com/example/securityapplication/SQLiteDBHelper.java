@@ -93,11 +93,17 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
     //it return number of rows in the table
     public int numberOfRows(){
-        SQLiteDatabase db=this.getReadableDatabase();
-        int numRows= (int) DatabaseUtils.queryNumEntries(db,TABLE_NAME);
-        Log.d("SQL","No. of rows in sql "+numRows);
-        db.close();//Added close stmt
-        return numRows;
+        try {
+            SQLiteDatabase db = db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
+            Cursor cursor = db.rawQuery("select * FROM user", null);
+            //Cursor cursor2 = db.rawQuery("select * FROM sostable", null);
+            Log.d("SQL", "innumberofrow" + cursor.getCount());
+            db.close();//Added close stmt
+            return cursor.getCount();
+        }catch (Exception e){
+            Log.d("message",e.getMessage());
+        }
+        return 0;
     }
 
     /**Adding user*/

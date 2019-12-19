@@ -215,8 +215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
         initializeGoogleFirebaseSignIn();
 
-        /** SosPlayer Service intent**/
-        startService(new Intent(this, SosPlayer.class));
 
         /** DATABASE FORCEFUL CREATION**/
         //uncomment to forcefully delete database
@@ -288,14 +286,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-
+                                            Log.d(TAG,e.getMessage());
+                                            Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
+                                    Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
                                 }
                             });
 
@@ -308,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
+                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -593,6 +593,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -620,7 +621,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -640,9 +642,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
-            /*  case1: user tries to sign in from same device
-                case2:user tries to sign in from other device and maybe registered or not
-                Solution for both is same:
+            /* user tries to sign in from other device and maybe registered or not
                check if user logged out from previous device
                find imei of previous device: Email node->email->uid->imei
                if uid under Devices node of previous device is null then logged out..else prompt user to log out
@@ -706,7 +706,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                    Log.d(TAG,databaseError.getDetails());
+                                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
                                 }
                             });
                         }
@@ -785,6 +786,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
 
                     db.addUser(user);
+                    db.setUser(user);
                     if (user.getSosContacts() != null)
                         db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
 
@@ -801,7 +803,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.d(TAG,databaseError.getDetails());
+                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
                 }
             });
         }

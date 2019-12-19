@@ -170,6 +170,7 @@ public class home_fragment extends Fragment {
         });
 
 
+
 //        if (navigation.test) {
 //
 //            TextView tv = getActivity().findViewById(R.id.textView3);
@@ -178,6 +179,9 @@ public class home_fragment extends Fragment {
 //            TextView tv = getActivity().findViewById(R.id.textView3);
 //            tv.setVisibility(View.INVISIBLE);
 //        }
+
+        //removed earlier test mode from here
+
 
     }
 

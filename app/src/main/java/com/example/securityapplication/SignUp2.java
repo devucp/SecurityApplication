@@ -546,6 +546,7 @@ public class SignUp2 extends AppCompatActivity {
                     // add user in sqlite
                     //added conditional checking and showing respective Toast message
                     if (DBHelper.addUser(user)){
+                        DBHelper.setUser(user);
                         Log.d(TAG,"User added successfully in sqlite");
                     }
                     else

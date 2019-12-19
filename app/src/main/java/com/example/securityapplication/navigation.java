@@ -121,7 +121,7 @@ public class navigation extends AppCompatActivity{
                     flag=1;
                     tmode1.setText("TEST MODE : ON");
                     db.updatetestmode(true);
-                  //  tmode1.setPadding(0,0,10,0);
+                    //  tmode1.setPadding(0,0,10,0);
                     tmode1.setTextColor(Color.GREEN);
                     Log.d("checking11", "oncreate onc "+db.getTestmode());
                 }
@@ -130,7 +130,7 @@ public class navigation extends AppCompatActivity{
                     tmode1.setTextColor(Color.WHITE);
                     tmode1.setText("TEST MODE : OFF");
                     db.updatetestmode(false);
-                   // tmode.setTextColor(Color.WHITE);
+                    // tmode.setTextColor(Color.WHITE);
 
                 }
             }
@@ -247,7 +247,7 @@ public class navigation extends AppCompatActivity{
 
                     return true;
                 }
-    };
+            };
 
     @Override
     public void onBackPressed(){
@@ -366,13 +366,13 @@ public class navigation extends AppCompatActivity{
         }
     }
     public class AsycTaskRunner extends AsyncTask<String,String,String>{
-    ProgressDialog progressDialog;
-    String resp;
+        ProgressDialog progressDialog;
+        String resp;
         @Override
         protected String doInBackground(String... strings) {
             //
             try {
-               // Thread.sleep(1000);
+                // Thread.sleep(1000);
                 if (firebaseUser != null) {
                     String uid = firebaseUser.getUid();
                     mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
@@ -397,7 +397,7 @@ public class navigation extends AppCompatActivity{
                         }
                     });
 
-                   //Thread.sleep(1000);
+                    //Thread.sleep(1000);
                 }
             }catch (Exception e){
 
@@ -408,7 +408,7 @@ public class navigation extends AppCompatActivity{
 
         @Override
         protected void onPreExecute() {
-           progressDialog=ProgressDialog.show(navigation.this,"","Fetching data....");
+            progressDialog=ProgressDialog.show(navigation.this,"","Fetching data....");
         }
 
         @Override

@@ -104,7 +104,7 @@ public class profile_fragment extends Fragment {
 
         initObjects();
         initviews();
-        FetchAllData();
+        //FetchAllData();
         DisplayData();
         initListeners();
 
@@ -120,7 +120,7 @@ public class profile_fragment extends Fragment {
     private void initObjects() {
 
 //        user = getIntent().getParcelableExtra("User");
-        user = new User();
+        user = UserObject.user;
         mydb = new SQLiteDBHelper(getContext());
     }
 
@@ -197,6 +197,7 @@ public class profile_fragment extends Fragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
+                mydb.delete_table();
                 signOut();
 
                 //finishing the navigation activity
@@ -448,9 +449,7 @@ public class profile_fragment extends Fragment {
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.d(TAG,databaseError.getDetails());
-                            Toast.makeText(getActivity(), databaseError.getDetails(),Toast.LENGTH_LONG).show();
-                            changeToEdit();
+
                         }
                     });
                 }
@@ -458,9 +457,7 @@ public class profile_fragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(getActivity(), databaseError.getDetails(),Toast.LENGTH_LONG).show();
-                changeToEdit();
+
             }
         });
     }
@@ -476,10 +473,6 @@ public class profile_fragment extends Fragment {
         //mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
-        changeToEdit();
-    }
-
-    private void changeToEdit(){
         btn_edit.setText("edit");
         alphaa(0.6f);
         disable();

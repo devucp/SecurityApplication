@@ -286,15 +286,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Log.d(TAG,e.getMessage());
-                                            Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+
                                         }
                                     });
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+
                                 }
                             });
 
@@ -307,7 +306,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -593,7 +591,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -621,8 +618,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+
             }
         });
     }
@@ -642,7 +638,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
-            /* user tries to sign in from other device and maybe registered or not
+            /*  case1: user tries to sign in from same device
+                case2:user tries to sign in from other device and maybe registered or not
+                Solution for both is same:
                check if user logged out from previous device
                find imei of previous device: Email node->email->uid->imei
                if uid under Devices node of previous device is null then logged out..else prompt user to log out
@@ -706,8 +704,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    Log.d(TAG,databaseError.getDetails());
-                                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+
                                 }
                             });
                         }
@@ -782,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
-                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+//                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
 
                     db.addUser(user);
@@ -790,21 +787,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (user.getSosContacts() != null)
                         db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
 
-                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
-                    if(dataSnapshot.getValue(User.class).isPaid()){
-                        Log.d("Paid12345","i am here");
-                        home_fragment.setpaid(true);
-                    }
-                    else{
-                        home_fragment.setpaid(false);
-                    }
+//                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
+//                    if(dataSnapshot.getValue(User.class).isPaid()){
+//                        Log.d("Paid12345","i am here");
+//                        home_fragment.setpaid(true);
+//                    }
+//                    else{
+//                        home_fragment.setpaid(false);
+//                    }
                     updateUI(firebaseUser);
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+
                 }
             });
         }

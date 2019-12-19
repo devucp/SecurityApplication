@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.example.securityapplication.model.User;
 
+import java.io.File;
 import java.util.HashMap;
 
 import static android.icu.text.MessagePattern.ArgType.SELECT;
@@ -22,7 +23,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     private static final int DB_version = 1;
     User newU;
     private static final String TABLE_NAME = "user";
-
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_EMAIL = "email";
@@ -34,12 +34,14 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_IMEI = "imei";
     public static final String COLUMN_DOB = "dob";
     public static final String COLUMN_TESTM = "testmode";
+    public static final String COLUMN_PAID = "paid";
+    private static String DB_PATH = "/data/data/com.example.securityapplication/databases/";
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
-                    COLUMN_ID + " INTEGER DEFAULT 1 , " +
+                    COLUMN_ID + " INTEGER DEFAULT 1 PRIMARY KEY, " +
                     COLUMN_NAME + " TEXT, "+
-                    COLUMN_EMAIL + " TEXT PRIMARY KEY, " +
+                    COLUMN_EMAIL + " TEXT, " +
                     COLUMN_GENDER + " TEXT, " +
 //                    COLUMN_PASSWORD + " TEXT, " +
                     COLUMN_MOBILE + " TEXT, " +
@@ -47,7 +49,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_LOCATION + " TEXT, " +
                     COLUMN_DOB + " TEXT, " +
                     COLUMN_IMEI + " TEXT, " +
-                    COLUMN_TESTM + " BOOLEAN DEFAULT FALSE " + ")";
+                    COLUMN_TESTM + " BOOLEAN DEFAULT FALSE, "+
+                    COLUMN_PAID  + " BOOLEAN DEFAULT FALSE "+ ")";
 
     private static final String SOS_TABLE = "sostable";
     public static final String COLUMN_C1 = "c1";
@@ -90,11 +93,17 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
     //it return number of rows in the table
     public int numberOfRows(){
-        SQLiteDatabase db=this.getReadableDatabase();
-        int numRows= (int) DatabaseUtils.queryNumEntries(db,TABLE_NAME);
-        Log.d("SQL","No. of rows in sql "+numRows);
-        db.close();//Added close stmt
-        return numRows;
+        try {
+            SQLiteDatabase db = db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
+            Cursor cursor = db.rawQuery("select * FROM user", null);
+            //Cursor cursor2 = db.rawQuery("select * FROM sostable", null);
+            Log.d("SQL", "innumberofrow" + cursor.getCount());
+            db.close();//Added close stmt
+            return cursor.getCount();
+        }catch (Exception e){
+            Log.d("message",e.getMessage());
+        }
+        return 0;
     }
 
     /**Adding user*/
@@ -112,6 +121,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 //        contentValues.put(COLUMN_AADHAR, user.getAadhar());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
         contentValues.put(COLUMN_IMEI, user.getImei());
+            contentValues.put(COLUMN_PAID, user.isPaid());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
         long result = db.insert(TABLE_NAME,null, contentValues);
         db.close();
@@ -183,7 +193,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         newU=user;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-
         contentValues.put(COLUMN_NAME, user.getName());
 //        contentValues.put(COLUMN_EMAIL, user.getEmail());
 //        contentValues.put(COLUMN_PASSWORD, user.getPassword());
@@ -193,8 +202,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_IMEI, user.getImei());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
         contentValues.put(COLUMN_EMAIL, user.getEmail());
+        contentValues.put(COLUMN_PAID, user.isPaid());
+        Log.d("Paid1234hellow","inupdate"+user.isPaid());
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?", //Changed from Column_Email to Column_ID
                 new String[]{"1"});
+        Log.d("Paid1234hellow","inupdate"+user.isPaid());
         db.close();
     }
 
@@ -211,8 +223,42 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             if(str.equals("1"))
                 return true;
         }
-        Log.d("checking4",str);
+        Log.d("checking44",str);
         return false;
+    }
+    public User getdb_user(){
+        SQLiteDatabase db = null;
+        User newuser = new User();
+        try {
+            db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
+            Cursor cursor = db.rawQuery("select * FROM user", null);
+            Cursor cursor2 = db.rawQuery("select * FROM sostable", null);
+            Log.d("Paid1234hello9", "noofrow" + cursor.getCount());
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    newuser.setName(cursor.getString(cursor.getColumnIndex("name")));
+                    newuser.setDob(cursor.getString(cursor.getColumnIndex("dob")));
+                    newuser.setEmail(cursor.getString(cursor.getColumnIndex("email")));
+                    newuser.setGender(cursor.getString(cursor.getColumnIndex("gender")));
+                    newuser.setLocation(cursor.getString(cursor.getColumnIndex("location")));
+                    newuser.setMobile(cursor.getString(cursor.getColumnIndex("mobile")));
+                    newuser.setPaid(cursor.getString(cursor.getColumnIndex("paid")).equals("1"));
+                     Log.d("Paid1234hello2",cursor.getString(cursor.getColumnIndex("paid"))+"jj"+newuser.isPaid());
+                     db.close();
+                }
+            } else {
+                Log.d("Paid1234hello", "hello2");
+            }
+        }catch (Exception se ) {
+            Log.d("Paid1234hello", "hello3"+se.getMessage());
+        }
+        return newuser;
+    }
+    public void delete_table(){
+
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS "+SOS_TABLE);
     }
 
     public boolean checkUser(String mobile){

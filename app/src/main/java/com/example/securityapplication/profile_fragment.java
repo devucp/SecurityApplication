@@ -449,7 +449,8 @@ public class profile_fragment extends Fragment {
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                            Log.d(TAG,databaseError.getDetails());
+                            Toast.makeText(getActivity(),databaseError.getMessage(),Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -457,7 +458,8 @@ public class profile_fragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(getActivity(), databaseError.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
     }

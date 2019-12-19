@@ -401,6 +401,7 @@ public class navigation extends AppCompatActivity{
                             recheckUserAuthentication();
                             Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.isPaid());
                             db.updateUser(newUser);
+                            db.setUser(newUser);
                             if (newUser.getSosContacts() != null)
                                 db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
                             SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
@@ -408,7 +409,8 @@ public class navigation extends AppCompatActivity{
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                            Log.d(TAG,databaseError.getDetails());
+                            Toast.makeText(navigation.this, databaseError.getMessage(),Toast.LENGTH_LONG).show();
                         }
                     });
 

@@ -101,6 +101,19 @@ public class navigation extends AppCompatActivity {
         }
 
         tmode1=(TextView)findViewById(R.id.testmode);
+        //initialise testmode textview from db
+        test=db.getTestmode();
+        Log.d("checking","oncreate option menu is running"+db.getTestmode());
+        if(test)
+        {
+            tmode1.setText("TEST MODE : ON");
+            tmode1.setTextColor(Color.GREEN);
+        }
+        else
+        {
+            tmode1.setTextColor(Color.WHITE);
+            tmode1.setText("TEST MODE : OFF");
+        }
 
         tmode1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,6 +132,9 @@ public class navigation extends AppCompatActivity {
                    // tmode.setTextColor(Color.WHITE);
 
                 }
+                //update testmode value in db
+                boolean test= (flag==1);
+                db.updatetestmode(test);
             }
         });
     }
@@ -179,7 +195,7 @@ public class navigation extends AppCompatActivity {
         return true;
     }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
@@ -220,7 +236,7 @@ public class navigation extends AppCompatActivity {
             return true;
         }
 
-    }
+    }*/
     Fragment selectedFragment = null;
     private BottomNavigationView.OnNavigationItemSelectedListener navListner =
             new BottomNavigationView.OnNavigationItemSelectedListener() {

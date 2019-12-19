@@ -215,8 +215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
         initializeGoogleFirebaseSignIn();
 
-        /** SosPlayer Service intent**/
-        startService(new Intent(this, SosPlayer.class));
 
         /** DATABASE FORCEFUL CREATION**/
         //uncomment to forcefully delete database

@@ -168,7 +168,8 @@ public class navigation extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.d(TAG,databaseError.getDetails());
+                    Toast.makeText(navigation.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -368,11 +369,10 @@ public class navigation extends AppCompatActivity {
         Log.d(TAG,"Inside recheckUserAuthentication");
         if (mImeiNumber==null) {
             getImei();
-            return;
         }
         Log.d(TAG,"Imei of device:"+mImeiNumber);
         Log.d(TAG,"Imei from firebase:"+newUser.getImei());
-        if (!newUser.getImei().equals(mImeiNumber)){
+        if (mImeiNumber!=null && !newUser.getImei().equals(mImeiNumber)){
             // same user trying to login from multiple devices -> logout the user
             Log.d(TAG, "User is LoggedIn in other device");
             Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();

@@ -448,7 +448,9 @@ public class profile_fragment extends Fragment {
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                            Log.d(TAG,databaseError.getDetails());
+                            Toast.makeText(getActivity(), databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                            changeToEdit();
                         }
                     });
                 }
@@ -456,7 +458,9 @@ public class profile_fragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(getActivity(), databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                changeToEdit();
             }
         });
     }
@@ -472,6 +476,10 @@ public class profile_fragment extends Fragment {
         //mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
+        changeToEdit();
+    }
+
+    private void changeToEdit(){
         btn_edit.setText("edit");
         alphaa(0.6f);
         disable();

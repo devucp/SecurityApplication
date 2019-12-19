@@ -100,7 +100,7 @@ public class profile_fragment extends Fragment {
 
         initObjects();
         initviews();
-        FetchAllData();
+        //FetchAllData();
         DisplayData();
         initListeners();
 
@@ -116,7 +116,7 @@ public class profile_fragment extends Fragment {
     private void initObjects() {
 
 //        user = getIntent().getParcelableExtra("User");
-        user = new User();
+        user = UserObject.user;
         mydb = new SQLiteDBHelper(getContext());
     }
 
@@ -193,6 +193,7 @@ public class profile_fragment extends Fragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
+                mydb.delete_table();
                 signOut();
 
                 //finishing the navigation activity

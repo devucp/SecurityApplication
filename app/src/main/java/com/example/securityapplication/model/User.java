@@ -19,7 +19,7 @@ public class User implements Parcelable {
     private String location;
     private String imei;
     private String dob;
-    private Boolean paid;
+    private Boolean paid=false;
     private HashMap<String,String> sosContacts;
     private Boolean googleAccountLinked;
 

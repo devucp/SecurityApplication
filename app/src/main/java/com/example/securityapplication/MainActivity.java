@@ -781,21 +781,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
-                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+//                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
 
                     db.addUser(user);
                     if (user.getSosContacts() != null)
                         db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
 
-                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
-                    if(dataSnapshot.getValue(User.class).isPaid()){
-                        Log.d("Paid12345","i am here");
-                        home_fragment.setpaid(true);
-                    }
-                    else{
-                        home_fragment.setpaid(false);
-                    }
+//                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
+//                    if(dataSnapshot.getValue(User.class).isPaid()){
+//                        Log.d("Paid12345","i am here");
+//                        home_fragment.setpaid(true);
+//                    }
+//                    else{
+//                        home_fragment.setpaid(false);
+//                    }
                     updateUI(firebaseUser);
                 }
 

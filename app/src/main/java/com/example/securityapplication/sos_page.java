@@ -59,11 +59,11 @@ public class sos_page extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sos_page);
-      
+
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(getApplicationContext());
-      
+
         values = new ContentValues();
         mydb = new SQLiteDBHelper(this);
         user = new User();
@@ -572,58 +572,61 @@ public class sos_page extends AppCompatActivity {
     public void onActivityResult(int RequestCode, int ResultCode, Intent ResultIntent) {
 
         super.onActivityResult(RequestCode, ResultCode, ResultIntent);
+try {
+    switch (RequestCode) {
 
-        switch (RequestCode) {
+        case (7):
+            if (ResultCode == Activity.RESULT_OK) {
 
-            case (7):
-                if (ResultCode == Activity.RESULT_OK) {
+                Uri uri;
+                Cursor cursor1, cursor2;
+                String TempNameHolder, TempNumberHolder, TempContactID, IDresult = "";
+                int IDresultHolder;
 
-                    Uri uri;
-                    Cursor cursor1, cursor2;
-                    String TempNameHolder, TempNumberHolder, TempContactID, IDresult = "" ;
-                    int IDresultHolder ;
+                uri = ResultIntent.getData();
 
-                    uri = ResultIntent.getData();
+                cursor1 = getContentResolver().query(uri, null, null, null, null);
 
-                    cursor1 = getContentResolver().query(uri, null, null, null, null);
+                if (cursor1.moveToFirst()) {
 
-                    if (cursor1.moveToFirst()) {
+                    TempNameHolder = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
-                        TempNameHolder = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    TempContactID = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts._ID));
 
-                        TempContactID = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts._ID));
+                    IDresult = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-                        IDresult = cursor1.getString(cursor1.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+                    IDresultHolder = Integer.valueOf(IDresult);
 
-                        IDresultHolder = Integer.valueOf(IDresult) ;
+                    if (IDresultHolder == 1) {
 
-                        if (IDresultHolder == 1) {
+                        cursor2 = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + TempContactID, null, null);
 
-                            cursor2 = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + TempContactID, null, null);
+                        while (cursor2.moveToNext()) {
 
-                            while (cursor2.moveToNext()) {
-
-                                TempNumberHolder = cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                                Log.i("contact_name",TempNameHolder);
-                                TempNumberHolder=TempNumberHolder.replaceAll("\\D+","");
-                                int len=TempNumberHolder.length();
-                                if(len<10)
-                                {
-                                    current.setText("");
-                                }
-                                else{
-                                    String tmp;
-                                    tmp=TempNumberHolder.substring(len-10,len);
-                                    current.setText(tmp);
-                                }
-
+                            TempNumberHolder = cursor2.getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                            Log.i("contact_name", TempNameHolder);
+                            TempNumberHolder = TempNumberHolder.replaceAll("\\D+", "");
+                            int len = TempNumberHolder.length();
+                            if (len < 10) {
+                                current.setText("");
+                            } else {
+                                String tmp;
+                                tmp = TempNumberHolder.substring(len - 10, len);
+                                current.setText(tmp);
                             }
-                        }
 
+                        }
                     }
+
                 }
+            }
             break;
-        }
+    }
+}
+catch (Exception e)
+{
+    Toast.makeText(this, "Permission is not given", Toast.LENGTH_SHORT).show();
+}
     }
 
     @Override

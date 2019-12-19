@@ -783,6 +783,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
 
                     db.addUser(user);
+                    db.setUser(user);
                     if (user.getSosContacts() != null)
                         db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
 

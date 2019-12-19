@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -33,6 +34,8 @@ import android.widget.Toast;
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.support.v4.content.ContextCompat.getSystemService;
 import static com.example.securityapplication.R.layout.spinner_layout;
 
@@ -208,8 +212,7 @@ public class profile_fragment extends Fragment {
         text_changePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent forgetPasswordIntent = new Intent(getActivity(),ResetPasswordActivity.class);
-                startActivity(forgetPasswordIntent);
+                changePassword(firebaseHelper.getFirebaseAuth().getCurrentUser().getEmail());
             }
         });
     }
@@ -472,5 +475,32 @@ public class profile_fragment extends Fragment {
         btn_edit.setText("edit");
         alphaa(0.6f);
         disable();
+    }
+
+    private void changePassword(String email){
+        if (!IsInternet.checkInternet(getContext()))
+            return;
+
+        //pgbarshow();
+        firebaseHelper.getFirebaseAuth().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                    if(task.isSuccessful()){
+                        Toast.makeText(getActivity(),"EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD",Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        try {
+                            throw task.getException();
+                        }catch (Exception e){
+                            String error = e.getMessage().split("\\.")[0];
+                            Log.d(TAG,e.getMessage());
+                            Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    //pgbarhide();
+                }
+        });
     }
 }

@@ -57,13 +57,7 @@ public class navigation extends AppCompatActivity {
     private int flag=0;
     Menu optionsMenu;
 
-    //private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
-    /*private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mDevicesDatabaseReference;*/
-    //private User user;
-    private Device device;
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
@@ -75,14 +69,14 @@ public class navigation extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getImei();
-
         setContentView(R.layout.activity_navigation);
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListner);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
+
+        getImei();
 
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
@@ -141,8 +135,7 @@ public class navigation extends AppCompatActivity {
 
     private void checkFirstSosContact(){
         // check if first sos contact is added
-        SQLiteDBHelper mydb = new SQLiteDBHelper(navigation.this);
-        Cursor res=mydb.getSosContacts();
+        Cursor res=db.getSosContacts();
         if (res.getCount() == 0){
             //Toast.makeText(getApplicationContext(), "No SOS Contact records Found", Toast.LENGTH_LONG).show();
             Log.d("SOS Activity","No Contact Data found ");
@@ -161,12 +154,15 @@ public class navigation extends AppCompatActivity {
                     newUser = dataSnapshot.getValue(User.class);
                     Log.d("Paid12345","schin1"+newUser.getName()+newUser
                             .isPaid());
-                    // check if user signed in from two devices
-                    recheckUserAuthentication();
                     Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.getEmail());
                     db.updateUser(newUser);
+                    db.setUser(newUser);
                     if (newUser.getSosContacts() != null)
                         db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+
+                    // check if user signed in from two devices
+                    recheckUserAuthentication();
+
                     SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
                 }
 
@@ -333,6 +329,15 @@ public class navigation extends AppCompatActivity {
     }
 
     private void getImei(){
+        User user=db.getUser();
+        Log.d(TAG,"User:"+user);
+        if (user != null)
+            if (user.getImei() != null) {
+                Log.d(TAG,"Imei in db:"+user.getImei());
+                mImeiNumber = user.getImei();
+                return;
+            }
+
         telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
@@ -345,6 +350,13 @@ public class navigation extends AppCompatActivity {
             } else {
                 mImeiNumber = telephonyManager.getDeviceId();
             }
+            try{
+                user.setImei(mImeiNumber);
+                db.setUser(user);
+                db.updateUser(user);
+            }catch (Exception e){
+                Log.d(TAG,e.getMessage());
+            }
         }
     }
 
@@ -354,7 +366,10 @@ public class navigation extends AppCompatActivity {
         Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
         Log.d(TAG,firebaseUser.getEmail());
         Log.d(TAG,"Inside recheckUserAuthentication");
-        getImei();
+        if (mImeiNumber==null) {
+            getImei();
+            return;
+        }
         Log.d(TAG,"Imei of device:"+mImeiNumber);
         Log.d(TAG,"Imei from firebase:"+newUser.getImei());
         if (!newUser.getImei().equals(mImeiNumber)){

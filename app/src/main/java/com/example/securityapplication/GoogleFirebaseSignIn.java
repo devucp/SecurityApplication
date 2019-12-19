@@ -213,6 +213,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                     SQLiteDBHelper db=new SQLiteDBHelper(activity);
 
                     db.addUser(user);
+                    db.setUser(user);
                     if (user.getSosContacts() != null)
                         db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
 

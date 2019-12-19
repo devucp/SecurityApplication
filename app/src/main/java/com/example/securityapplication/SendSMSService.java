@@ -118,14 +118,8 @@ public class SendSMSService extends Service {
         Log.d("SOS SMS","Location is"+location);
         //call setContactList
         if(contactList==null){
-            //filling DUMMY values
-            String number="9082021653";
-            setSenderName("DG");
-            if(location==null){
-                location="Location unavailable";
-            }
-            sendMessage(number,location);
-
+            //removed dummy contact
+            Toast.makeText(getApplicationContext(),"No SOS Contacts were found",Toast.LENGTH_SHORT);
         }
         else{
 

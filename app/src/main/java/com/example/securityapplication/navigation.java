@@ -361,7 +361,10 @@ public class navigation extends AppCompatActivity{
     }
 
     public void LogOutAndStartMainActivity(){
-        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);
+        if (mUsersDatabaseReferenceListener != null) {
+            firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
+            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);
+        }
         firebaseHelper.makeDeviceImeiNull(mImeiNumber);
         firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(navigation.this);
@@ -380,6 +383,7 @@ public class navigation extends AppCompatActivity{
             finish();
         }
     }
+
     public class AsycTaskRunner extends AsyncTask<String,String,String>{
     ProgressDialog progressDialog;
     String resp;

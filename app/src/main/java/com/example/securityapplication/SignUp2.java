@@ -105,13 +105,12 @@ public class SignUp2 extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
 
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup2);
-        Spinner = (ProgressBar)findViewById(R.id.progress_bar);
+        Spinner = (ProgressBar) findViewById(R.id.progress_bar);
         Spinner.setVisibility(View.INVISIBLE);
 
         initViews();
@@ -128,13 +127,12 @@ public class SignUp2 extends AppCompatActivity {
 
         Resources res = getResources();
         String[] Locality = res.getStringArray(R.array.Locality);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,Locality);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, Locality);
         input_location.setAdapter(adapter);
 //        mPlaceDetectionClient = Places.getPlaceDetectionClient(this);
 
         // check if user is signed in to google or facebook
-        if (GoogleSignIn.getLastSignedInAccount(this) != null)
-        {
+        if (GoogleSignIn.getLastSignedInAccount(this) != null) {
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
             if (acct != null) {
                 String personName = acct.getDisplayName();
@@ -142,10 +140,8 @@ public class SignUp2 extends AppCompatActivity {
                     textinputName.setText(personName);
                 }
             }
-        }
-        else
-        {
-            Log.d("isLoggedinGoogle","Not logged in");
+        } else {
+            Log.d("isLoggedinGoogle", "Not logged in");
         }
 
         //get single instance of user if logged in through google from user defined class GoogleFirebaseSignIn
@@ -154,8 +150,8 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void initializeGoogleFirebaseSignIn(){
-        //deviceId();firebaseHelper.
-                googleFirebaseSignIn.init(SignUp2.this, imei);
+        //deviceId();
+        googleFirebaseSignIn.init(SignUp2.this, imei);
     }
 
     /**Initialize Views*/
@@ -210,6 +206,7 @@ public class SignUp2 extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
+                KeyboardHelper.hideSoftKeyboard(SignUp2.this, view);
 
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
@@ -332,6 +329,12 @@ public class SignUp2 extends AppCompatActivity {
         );
     }
 
+    public void onStart(){
+        super.onStart();
+        if (btn_submit != null)
+            KeyboardHelper.hideSoftKeyboard(SignUp2.this, btn_submit);
+    }
+
     private void setUser(String gender){
         user.setName(textinputName.getText().toString().trim());
         user.setGender(gender);
@@ -341,7 +344,7 @@ public class SignUp2 extends AppCompatActivity {
         user.setImei(imei);//setting IMEI
         user.setPaid(false);
         //user.setSosContacts(setSosContacts());
-        user.setGoogleAccountLinked(false);
+        //user.setGoogleAccountLinked(false);
         Log.d(TAG,user.getName());
         Log.d(TAG,user.getEmail());
         Log.d(TAG,user.getGender());
@@ -349,16 +352,9 @@ public class SignUp2 extends AppCompatActivity {
         Log.d(TAG,user.getImei());
         Log.d(TAG,user.getLocation());
         Log.d(TAG,user.getMobile());
-        Log.d(TAG,"isGoogleAccLinked?:"+user.isGoogleAccountLinked());
+        //Log.d(TAG,"isGoogleAccLinked?:"+user.isGoogleAccountLinked());
         Log.d(TAG,"isPaid?:"+user.isPaid());
     }
-
-    /*private HashMap<String,String> setSosContacts(){
-        HashMap<String,String> sosContacts = new HashMap<>();
-        for (int i=1;i<=5;i++)
-            sosContacts.put("c"+i,"null");
-        return sosContacts;
-    }*/
 
     private void writeDataToFirebase(FirebaseUser firebaseUser){
         //check internet connection
@@ -381,7 +377,8 @@ public class SignUp2 extends AppCompatActivity {
                             Log.d(TAG, "createUserWithEmail:success");
                             Log.d(TAG,"new user ? ->"+task.getResult().getAdditionalUserInfo().isNewUser());
                             FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
-
+                            // logout user and login only after successful storing of data in db
+                            firebaseHelper.firebaseSignOut();
                             storeAndStartNextActivity(firebaseUser);
 
                         } else {
@@ -396,6 +393,7 @@ public class SignUp2 extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<AuthResult> task) {
                                                 if (task.isSuccessful()) {
                                                     FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+                                                    firebaseHelper.firebaseSignOut();
                                                     storeAndStartNextActivity(firebaseUser);
                                                 } else {
                                                     try {
@@ -427,11 +425,6 @@ public class SignUp2 extends AppCompatActivity {
     private void storeAndStartNextActivity(final FirebaseUser firebaseUser){
 
         writeDataToFirebase(firebaseUser);
-
-        /*user=data.getParcelableExtra("ResultIntent");
-        Intent profileActivity = new Intent(SignUp2.this,ProfileActivity.class);
-        profileActivity.putExtra("User",user);
-        startActivity(profileActivity);*/
     }
 
     private void setUidFromFirebase(final String mobile){
@@ -450,7 +443,8 @@ public class SignUp2 extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG, databaseError.getDetails());
+                Toast.makeText(SignUp2.this, "Network disconnected. Try again", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -537,7 +531,7 @@ public class SignUp2 extends AppCompatActivity {
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
                     Log.d(TAG,"Mobile Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "Authentication failed. Please check your internet connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
                     deleteDataFromFirebase(firebaseUser);
                 }
                 else {
@@ -548,13 +542,30 @@ public class SignUp2 extends AppCompatActivity {
                     if (DBHelper.addUser(user)){
                         DBHelper.setUser(user);
                         Log.d(TAG,"User added successfully in sqlite");
+                        signIn();
                     }
-                    else
-                        Toast.makeText(getApplicationContext(), "SOMETHING WENT WRONG", Toast.LENGTH_LONG).show();
-                    linkGoogleAccount(firebaseUser);
+                    else {
+                        Toast.makeText(getApplicationContext(), "Something went wrong. Try login again", Toast.LENGTH_LONG).show();
+                        // redirect user to MainActivity
+                        redirectToMainActivity();
+                    }
                 }
             }
         });
+    }
+
+    public void redirectToMainActivity(){
+        firebaseHelper.makeDeviceImeiNull(imei);
+        firebaseHelper.firebaseSignOut();
+        firebaseHelper.googleSignOut(SignUp2.this);
+        //delete user records from SQLite
+        if (DBHelper.getdb_user() != null)
+            DBHelper.deleteDatabase(SignUp2.this);
+
+        Intent ReturnIntent = new Intent();
+        setResult(10,ReturnIntent);//to finish sing up 1 activity
+        //finishing the Signup2 activity
+        finish();
     }
 
     private void deleteDataFromFirebase(FirebaseUser firebaseUser){
@@ -567,38 +578,52 @@ public class SignUp2 extends AppCompatActivity {
         }
     }
 
-    private void linkGoogleAccount(final FirebaseUser firebaseUser){
-        // check if user is signed in to google or facebook
-        if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
-            Log.d(TAG,"Logged in to google");
+    private void signIn(){
+        firebaseHelper.getFirebaseAuth().signInWithEmailAndPassword(user.getEmail(), password)
+                .addOnCompleteListener(SignUp2.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+                            Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
+                            // start next activity
+                            // check if user is signed in to google or facebook
+                            if (GoogleSignIn.getLastSignedInAccount(SignUp2.this) != null){
+                                Log.d(TAG,"Logged in to google");
 
-            GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
-            googleFirebaseSignIn.linkGoogleAccount(acct);
+                                GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(SignUp2.this);
+                                googleFirebaseSignIn.linkGoogleAccount(acct);
 
-            mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+            /*mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
                     if (user.isGoogleAccountLinked()){
                         firebaseHelper.getUsersDatabaseReference().removeEventListener(mUsersDatabaseReferenceListener);
-
-                        Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-                        // start next activity
-                        startNextActivity();
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.d(TAG,databaseError.getDetails());
                 }
-            });
-        }
-        else {
-            Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
-            // start next activity
-            startNextActivity();
-        }
+            });*/
+                            }
+                            startNextActivity();
+
+                        } else {
+                            try {
+                                throw task.getException();
+                            } catch (Exception e) {
+                                Log.d(TAG, "Exception:" + e.getMessage());
+                                Toast.makeText(SignUp2.this, "Authentication failed. Try to login",
+                                        Toast.LENGTH_SHORT).show();
+                                // redirect user to MainActivity
+                                redirectToMainActivity();
+                            }
+                        }
+                    }
+                });
     }
 
     //screen enable/disable

@@ -104,7 +104,7 @@ public class profile_fragment extends Fragment {
 
         initObjects();
         initviews();
-        //FetchAllData();
+        FetchAllData();
         DisplayData();
         initListeners();
 
@@ -120,7 +120,8 @@ public class profile_fragment extends Fragment {
     private void initObjects() {
 
 //        user = getIntent().getParcelableExtra("User");
-        user = UserObject.user;
+        //user = UserObject.user;
+        user = new User();
         mydb = new SQLiteDBHelper(getContext());
     }
 
@@ -403,6 +404,7 @@ public class profile_fragment extends Fragment {
 
         firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .removeEventListener(navigation.mUsersDatabaseReferenceListener);
+        firebaseHelper.getUsersDatabaseReference().removeEventListener(navigation.mUsersDatabaseReferenceListener);
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite
@@ -485,7 +487,8 @@ public class profile_fragment extends Fragment {
             return;
 
         //pgbarshow();
-        firebaseHelper.getFirebaseAuth().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+        try {
+            firebaseHelper.getFirebaseAuth().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
 
@@ -497,13 +500,16 @@ public class profile_fragment extends Fragment {
                         try {
                             throw task.getException();
                         }catch (Exception e){
-                            String error = e.getMessage().split("\\.")[0];
                             Log.d(TAG,e.getMessage());
-                            Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
                         }
                     }
                     //pgbarhide();
                 }
-        });
+            });
+        }catch (Exception e){
+            Log.d(TAG, e.getMessage());
+            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
+        }
     }
 }

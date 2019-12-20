@@ -94,7 +94,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     //it return number of rows in the table
     public int numberOfRows(){
         try {
-            SQLiteDatabase db = db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
+            SQLiteDatabase db  = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
             Cursor cursor = db.rawQuery("select * FROM user", null);
             //Cursor cursor2 = db.rawQuery("select * FROM sostable", null);
             Log.d("SQL", "innumberofrow" + cursor.getCount());
@@ -243,6 +243,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     newuser.setLocation(cursor.getString(cursor.getColumnIndex("location")));
                     newuser.setMobile(cursor.getString(cursor.getColumnIndex("mobile")));
                     newuser.setPaid(cursor.getString(cursor.getColumnIndex("paid")).equals("1"));
+                    newuser.setImei(cursor.getString(cursor.getColumnIndex("imei")));
                      Log.d("Paid1234hello2",cursor.getString(cursor.getColumnIndex("paid"))+"jj"+newuser.isPaid());
                      db.close();
                 }

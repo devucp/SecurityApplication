@@ -787,7 +787,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     user = dataSnapshot.getValue(User.class);
 //                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
-
                     db.addUser(user);
                     db.setUser(user);
                     if (user.getSosContacts() != null)

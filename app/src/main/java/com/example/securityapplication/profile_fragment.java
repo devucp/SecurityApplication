@@ -400,9 +400,10 @@ public class profile_fragment extends Fragment {
             deviceId();
             return;
         }
-
-        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .removeEventListener(navigation.mUsersDatabaseReferenceListener);
+if(navigation.mUsersDatabaseReferenceListener != null) {
+    firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+            .removeEventListener(navigation.mUsersDatabaseReferenceListener);
+}
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite

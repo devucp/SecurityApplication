@@ -345,7 +345,8 @@ public class navigation extends AppCompatActivity{
     }
 
     public void LogOutAndStartMainActivity(){
-        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);
+        if(mUsersDatabaseReferenceListener!=null){
+            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);}
         firebaseHelper.makeDeviceImeiNull(mImeiNumber);
         firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(navigation.this);
@@ -371,32 +372,36 @@ public class navigation extends AppCompatActivity{
         protected String doInBackground(String... strings) {
             //
             try {
-                if (firebaseUser != null) {
-                    String uid = firebaseUser.getUid();
-                    mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            newUser = dataSnapshot.getValue(User.class);
+                if(db.get_count()) {
+                    Log.d("navigation","count"+db.get_count());
+                    if (firebaseUser != null) {
+                        String uid = firebaseUser.getUid();
+                        Thread.sleep(1000);
+                        mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                newUser = dataSnapshot.getValue(User.class);
 //                            Log.d("Paid12345", "schin2" + newUser.getName() + newUser
 //                                    .isPaid());
-                            //UserObject.paid=newUser.isPaid();
-                            // check if user signed in from two devices
-                            recheckUserAuthentication();
-                            Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.isPaid());
-                            db.updateUser(newUser);
-                            db.setUser(newUser);
-                            if (newUser.getSosContacts() != null)
-                                db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
-                            SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
-                        }
+                                //UserObject.paid=newUser.isPaid();
+                                // check if user signed in from two devices
+                                recheckUserAuthentication();
+                                Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.isPaid());
+                                db.updateUser(newUser);
+                                db.setUser(newUser);
+                                if (newUser.getSosContacts() != null)
+                                    db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                                SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
+                            }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.d(TAG,databaseError.getDetails());
-                            Toast.makeText(navigation.this, databaseError.getMessage(),Toast.LENGTH_LONG).show();
-                        }
-                    });
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Log.d(TAG, databaseError.getDetails());
+                                Toast.makeText(navigation.this, databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
 
+                    }
                 }
             }catch (Exception e){
 
@@ -415,9 +420,11 @@ public class navigation extends AppCompatActivity{
             UserObject.user=db.getdb_user();
             Log.d("Paid1234hello11","userobj"+UserObject.user.isPaid()+db.getdb_user().getName());
             Log.d("Paid1234hello111","userobj2"+UserObject.print());
+            db.set_count(false);
             progressDialog.dismiss();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
             checkFirstSosContact();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
+
 
         }
     }

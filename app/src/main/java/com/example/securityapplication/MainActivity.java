@@ -287,14 +287,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.d(TAG,e.getMessage());
-                                            Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                                            Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_LONG).show();
+                                    Log.d(TAG,e.getMessage());
+                                    Toast.makeText(MainActivity.this, e.getMessage(),Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -307,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, databaseError.getMessage(),Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -593,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, databaseError.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -622,7 +623,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, databaseError.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -642,7 +643,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
-            /* user tries to sign in from other device and maybe registered or not
+            /*  case1: user tries to sign in from same device
+                case2:user tries to sign in from other device and maybe registered or not
+                Solution for both is same:
                check if user logged out from previous device
                find imei of previous device: Email node->email->uid->imei
                if uid under Devices node of previous device is null then logged out..else prompt user to log out
@@ -707,7 +710,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
                                     Log.d(TAG,databaseError.getDetails());
-                                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                                    Toast.makeText(MainActivity.this, databaseError.getMessage(),Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -804,7 +807,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, databaseError.getDetails(),Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                    firebaseHelper.firebaseSignOut(mImeiNumber);
+                    firebaseHelper.googleSignOut(MainActivity.this);
                 }
             });
         }

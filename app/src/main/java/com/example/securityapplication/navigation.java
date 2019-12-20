@@ -121,7 +121,6 @@ public class navigation extends AppCompatActivity{
                     flag=1;
                     tmode1.setText("TEST MODE : ON");
                     db.updatetestmode(true);
-                    //  tmode1.setPadding(0,0,10,0);
                     tmode1.setTextColor(Color.GREEN);
                     Log.d("checking11", "oncreate onc "+db.getTestmode());
                 }
@@ -130,7 +129,6 @@ public class navigation extends AppCompatActivity{
                     tmode1.setTextColor(Color.WHITE);
                     tmode1.setText("TEST MODE : OFF");
                     db.updatetestmode(false);
-                    // tmode.setTextColor(Color.WHITE);
 
                 }
             }
@@ -150,11 +148,6 @@ public class navigation extends AppCompatActivity{
             startActivityForResult(sosPage,1);
         }
     }
-
-
-//    public void getData(){
-//
-//    }
 
 
     /*@Override
@@ -337,7 +330,10 @@ public class navigation extends AppCompatActivity{
         Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
         Log.d(TAG,firebaseUser.getEmail());
         Log.d(TAG,"Inside recheckUserAuthentication");
-        getImei();
+        if (mImeiNumber==null) {
+            getImei();
+            return;
+        }
         Log.d(TAG,"Imei of device:"+mImeiNumber);
         Log.d(TAG,"Imei from firebase:"+newUser.getImei());
         if (!newUser.getImei().equals(mImeiNumber)){
@@ -375,7 +371,6 @@ public class navigation extends AppCompatActivity{
         protected String doInBackground(String... strings) {
             //
             try {
-                // Thread.sleep(1000);
                 if (firebaseUser != null) {
                     String uid = firebaseUser.getUid();
                     mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
@@ -389,6 +384,7 @@ public class navigation extends AppCompatActivity{
                             recheckUserAuthentication();
                             Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.isPaid());
                             db.updateUser(newUser);
+                            db.setUser(newUser);
                             if (newUser.getSosContacts() != null)
                                 db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
                             SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
@@ -396,11 +392,11 @@ public class navigation extends AppCompatActivity{
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                            Log.d(TAG,databaseError.getDetails());
+                            Toast.makeText(navigation.this, databaseError.getMessage(),Toast.LENGTH_LONG).show();
                         }
                     });
 
-                    //Thread.sleep(1000);
                 }
             }catch (Exception e){
 
@@ -412,8 +408,8 @@ public class navigation extends AppCompatActivity{
         @Override
         protected void onPreExecute() {
             progressDialog=ProgressDialog.show(navigation.this,"","Fetching data....");
-        }
 
+        }
         @Override
         protected void onPostExecute(String s) {
             UserObject.user=db.getdb_user();
@@ -426,3 +422,4 @@ public class navigation extends AppCompatActivity{
         }
     }
 }
+

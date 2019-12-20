@@ -633,6 +633,7 @@ public class SignUp2 extends AppCompatActivity {
         setResult(10,ReturnIntent);//to finish sing up 1 activity
         activity.finish();
         Intent sosPage = new Intent(SignUp2.this, sos_page.class);
+        sosPage.putExtra("btn","1");
         startActivity(sosPage);
     }
 

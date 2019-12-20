@@ -146,6 +146,7 @@ public class navigation extends AppCompatActivity{
             //Toast.makeText(getApplicationContext(), "No SOS Contact records Found", Toast.LENGTH_LONG).show();
             Log.d("SOS Activity","No Contact Data found ");
             Intent sosPage = new Intent(navigation.this, sos_page.class);
+            sosPage.putExtra("btn","1");
             startActivityForResult(sosPage,1);
         }
     }
@@ -284,7 +285,9 @@ public class navigation extends AppCompatActivity{
     }
 
     public void sos(View view) {
-        startActivity(new Intent(this,sos_page.class));
+        Intent intent=new Intent(navigation.this,sos_page.class);
+        intent.putExtra("btn","2");
+        startActivity(intent);
     }
 
     @Override

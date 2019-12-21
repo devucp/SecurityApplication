@@ -22,9 +22,9 @@ public class SendSMSService extends Service {
     private static String[] contactList=null; //TODO: stores the number of the emergency contacts
     private String senderName;
     private String location;
-    private Integer alert;
-    private Integer safe;
-    private Integer emergency;
+    private static Integer alert;
+    private static Integer safe;
+    private static Integer emergency;
 
 
     private String SOS_MESSAGE=" You are my SOS Contact." ;
@@ -48,7 +48,16 @@ public class SendSMSService extends Service {
     }
 
 
+    public static int getAlert(){
+        return alert;
+    }
+    public static int getEmergency(){
+        return emergency;
+    }
 
+    public static int getSafe(){
+        return safe;
+    }
 
     public void setSenderName(String senderName) {
         this.senderName = senderName;
@@ -139,14 +148,17 @@ public class SendSMSService extends Service {
 
         if(alert==1)
         {
+            safe=0; //reset the safe variable
             toastmsg="send alert sos message";
         }
         else if(safe==1)
         {
+            alert=0; //reset the alert variable
             toastmsg="send safe sos message";
         }
         else
         {
+            safe=0; //emergency =1 . reset the safe variable
             toastmsg="send emergency sos message";
         }
         Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
@@ -167,6 +179,7 @@ public class SendSMSService extends Service {
         }
         else
         {
+
             messageToSend+="PLEASE HELP ME. ";
 
         }

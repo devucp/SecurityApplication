@@ -102,12 +102,12 @@ public class navigation extends AppCompatActivity{
     private void async() {
         checkFirstSosContact();
         if(db.get_user_row().getCount()==0){
-            Log.d("iamrun","me1");
+            Log.d("iamrun","me21");
             db.delete_table();
             db.deleteDatabase(this);
             // Signout Code Here
 
-            
+
 
 
             //rohan have you found me i am here!!!!!!!!!!!!!!!

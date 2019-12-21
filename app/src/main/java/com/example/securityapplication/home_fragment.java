@@ -37,7 +37,7 @@ public class home_fragment extends Fragment {
     public Button emergency;
     public Button informsafety;
     int RC;
-    Boolean is_paid = false;
+    Boolean is_paid = true;
     public static Boolean test = true;
     //NOTE: Button bt has been removed. Now using Button emergency. Event listeners also moved to emergency
 

@@ -273,8 +273,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /** DATABASE FORCEFUL CREATION**/
         //uncomment to forcefully delete database
-//        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
-//        sqLiteDBHelper.deleteDatabase(this);
+        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
+        sqLiteDBHelper.deleteDatabase(this);
 
     }
 

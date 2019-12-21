@@ -52,7 +52,7 @@
                 android:text="user"
                 android:textAllCaps="true"
                 android:textColor="#fff"
-                android:textSize="35sp"
+                android:textSize="25sp"
                 android:textStyle="bold" />
 
 
@@ -81,8 +81,7 @@
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:text="UserAccountmail.com"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -106,8 +105,7 @@
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:text="Phone Number"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -132,8 +130,7 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
                         android:text="Address"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -158,8 +155,7 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
                         android:text="Gender"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -184,8 +180,7 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
                         android:text="Date Of Birth"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -198,8 +193,8 @@
 
                     <Button
                         android:id="@+id/btn_Edit"
-                        android:layout_width="125dp"
-                        android:layout_height="wrap_content"
+                        android:layout_width="120dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
                         android:background="@drawable/buttonstylegradient"
@@ -212,8 +207,8 @@
                     <Button
                         android:id="@+id/btn_Logout"
                         android:layout_marginLeft="25dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="120dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
                         android:background="@drawable/buttonstylegradient"

@@ -35,7 +35,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DOB = "dob";
     public static final String COLUMN_TESTM = "testmode";
     public static final String COLUMN_PAID = "paid";
-    public static final String COLUMN_COUNT="count";
     private static String DB_PATH = "/data/data/com.example.securityapplication/databases/";
 
     private static final String CREATE_TABLE_QUERY =
@@ -51,8 +50,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_DOB + " TEXT, " +
                     COLUMN_IMEI + " TEXT, " +
                     COLUMN_TESTM + " BOOLEAN DEFAULT FALSE, "+
-                    COLUMN_PAID  + " BOOLEAN DEFAULT FALSE, "+
-                    COLUMN_COUNT  + " BOOLEAN DEFAULT TRUE "+")";
+                    COLUMN_PAID  + " BOOLEAN DEFAULT FALSE "+")";
 
     private static final String SOS_TABLE = "sostable";
     public static final String COLUMN_C1 = "c1";
@@ -281,36 +279,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         return newuser;
     }
 
-    public Boolean get_count(){
-        SQLiteDatabase db = null;
-        Boolean bool=true;
-        try {
-            db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
-            Cursor cursor = db.rawQuery("select "+COLUMN_COUNT+" FROM user", null);
-            Log.d("get_coutn", "noofrow" + cursor.getCount());
-            if (cursor.getCount() > 0) {
-                while (cursor.moveToNext()) {
-                    bool=Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(COLUMN_COUNT)));
-                    db.close();
-                }
-            }
-        }catch (Exception se ) {
-            Log.d("Paid1234hello", "hello3"+se.getMessage());
-        }
-        Log.d("get_coutn", "boolean : " + bool);
-        return bool;
-    }
-    public void set_count(boolean bool){
-        SQLiteDatabase db = null;
-        try {
-            db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
-            ContentValues cv = new ContentValues();
-            cv.put("count",bool);
-            db.update(TABLE_NAME, cv, COLUMN_ID+" = 1", null);
-        }catch (Exception se ) {
-            Log.d("set_count", se.getMessage());
-        }
-    }
+
 
     public void delete_table(){
 

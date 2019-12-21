@@ -791,15 +791,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     db.setUser(user);
                     if (user.getSosContacts() != null)
                         db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
-
-//                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
-//                    if(dataSnapshot.getValue(User.class).isPaid()){
-//                        Log.d("Paid12345","i am here");
-//                        home_fragment.setpaid(true);
-//                    }
-//                    else{
-//                        home_fragment.setpaid(false);
-//                    }
                     updateUI(firebaseUser);
                 }
 

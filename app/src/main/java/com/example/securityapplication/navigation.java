@@ -1,14 +1,10 @@
 package com.example.securityapplication;
 
 import android.Manifest;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -22,26 +18,15 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+
 
 import java.util.HashMap;
 
@@ -53,48 +38,23 @@ public class navigation extends AppCompatActivity{
 
     SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
     public static Boolean test=false;
-    public static TextView tmode;
     public static TextView tmode1;
 
     private int flag=0;
-    Menu optionsMenu;
-
-    //private FirebaseAuth mAuth;
-    private FirebaseUser firebaseUser;
-    /*private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mUsersDatabaseReference;
-    private DatabaseReference mDevicesDatabaseReference;*/
-    //private User user;
     private Device device;
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
 
-    public static ValueEventListener mUsersDatabaseReferenceListener;
-    private FirebaseHelper firebaseHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getImei();
-
         setContentView(R.layout.activity_navigation);
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListner);
-
-
-        firebaseHelper = FirebaseHelper.getInstance();
-        firebaseHelper.initFirebase();
-        firebaseHelper.initContext(navigation.this);
-        firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
-
-        firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
-
-        AsycTaskRunner runner=new AsycTaskRunner();
-        runner.execute();
+        async();
         //sqlite db code here
         Log.d("checking11","oncreate option menu 3 is running");
         Log.d("checking11", "oncreate "+db.getTestmode());
@@ -135,6 +95,18 @@ public class navigation extends AppCompatActivity{
         });
     }
 
+    private void async() {
+        checkFirstSosContact();
+        if(db.getSosContacts().getCount()!=0) {
+            UserObject.user=db.getdb_user();
+            SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
+        }
+
+        Log.d("Paid1234hello11","userobj"+UserObject.user.isPaid()+db.getdb_user().getName());
+        Log.d("Paid1234hello111","userobj2"+UserObject.print());
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
+    }
+
 
     private void checkFirstSosContact(){
         // check if first sos contact is added
@@ -150,20 +122,6 @@ public class navigation extends AppCompatActivity{
     }
 
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.top_menu,menu);
-        optionsMenu=menu;
-        MenuItem titem=optionsMenu.findItem(R.id.testmode);
-        test=db.getTestmode();
-        Log.d("checking","oncreate option menu is running"+db.getTestmode());
-        if(test)
-            titem.setChecked(true);
-        else
-            titem.setChecked(false);
-        return true;
-    }*/
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
@@ -173,22 +131,12 @@ public class navigation extends AppCompatActivity{
                         item.setChecked(false);
                         test = false;
                         db.updatetestmode(test);
-                        //Log.d("checking1", String.valueOf(db.getTestmode()) + "home" + is_home);
                         Toast.makeText(this, "Test mode Off", Toast.LENGTH_SHORT).show();
-//                        if (is_home) {
-//                            TextView tv = (TextView) findViewById(R.id.textView3);
-//                            tv.setVisibility(View.INVISIBLE);
-//                        }
                     } else {
                         item.setChecked(true);
                         test = true;
                         db.updatetestmode(test);
-                        //Log.d("checking2", String.valueOf(db.getTestmode()));
                         Toast.makeText(this, "Test mode On", Toast.LENGTH_SHORT).show();
-//                        if (is_home) {
-//                            TextView tv = (TextView) findViewById(R.id.textView3);
-//                            tv.setVisibility(View.VISIBLE);
-//                        }
                     }
 
 
@@ -288,7 +236,6 @@ public class navigation extends AppCompatActivity{
         switch (requestCode) {
             case 101:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getImei();
                 } else {
                     closeNow();
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
@@ -308,126 +255,8 @@ public class navigation extends AppCompatActivity{
         }
     }
 
-    private void getImei(){
-        telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
-            return;
-        }
-        else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mImeiNumber = telephonyManager.getImei(0);
-                Log.d("IMEI", "IMEI Number of slot 1 is:" + mImeiNumber);
-            } else {
-                mImeiNumber = telephonyManager.getDeviceId();
-            }
-        }
-    }
-
-    private void recheckUserAuthentication(){
-        if (FirebaseAuth.getInstance().getCurrentUser() == null)
-            return;
-        Log.d(TAG,FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        Log.d(TAG,firebaseUser.getEmail());
-        Log.d(TAG,"Inside recheckUserAuthentication");
-        if (mImeiNumber==null) {
-            getImei();
-            return;
-        }
-        Log.d(TAG,"Imei of device:"+mImeiNumber);
-        Log.d(TAG,"Imei from firebase:"+newUser.getImei());
-        if (!newUser.getImei().equals(mImeiNumber)){
-            // same user trying to login from multiple devices -> logout the user
-            Log.d(TAG, "User is LoggedIn in other device");
-            Toast.makeText(navigation.this,"You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-            LogOutAndStartMainActivity();
-        }
-    }
-
-    public void LogOutAndStartMainActivity(){
-        if(mUsersDatabaseReferenceListener!=null){
-            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeEventListener(mUsersDatabaseReferenceListener);}
-        firebaseHelper.makeDeviceImeiNull(mImeiNumber);
-        firebaseHelper.firebaseSignOut();
-        firebaseHelper.googleSignOut(navigation.this);
-        //delete user records from SQLite
-        db.deleteDatabase(navigation.this);
-
-        Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);
-        mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mLogOutAndRedirect);
-        //finishing the navigation activity
-        try {
-            closeNow();
-            Log.d(TAG,"closed activity successfully");
-        }catch (Exception e){
-            Log.d(TAG,"Closing app exception:"+e.getMessage());
-            finish();
-        }
-    }
-    public class AsycTaskRunner extends AsyncTask<String,String,String>{
-        ProgressDialog progressDialog;
-        String resp;
-        @Override
-        protected String doInBackground(String... strings) {
-            //
-            try {
-                if(db.get_count()) {
-                    Log.d("navigation","count"+db.get_count());
-                    if (firebaseUser != null) {
-                        String uid = firebaseUser.getUid();
-
-                        mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                newUser = dataSnapshot.getValue(User.class);
-//                            Log.d("Paid12345", "schin2" + newUser.getName() + newUser
-//                                    .isPaid());
-                                //UserObject.paid=newUser.isPaid();
-                                // check if user signed in from two devices
-
-                                //recheckUserAuthentication();
-                                Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.isPaid());
-                                db.updateUser(newUser);
-                                db.setUser(newUser);
-                                if (newUser.getSosContacts() != null)
-                                    db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
-                                SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                Log.d(TAG, databaseError.getDetails());
-                                Toast.makeText(navigation.this, databaseError.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                    }
-                }
-            }catch (Exception e){
-
-            }
-            //
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog=ProgressDialog.show(navigation.this,"","Fetching data....");
-
-        }
-        @Override
-        protected void onPostExecute(String s) {
-            UserObject.user=db.getdb_user();
-            Log.d("Paid1234hello11","userobj"+UserObject.user.isPaid()+db.getdb_user().getName());
-            Log.d("Paid1234hello111","userobj2"+UserObject.print());
-            db.set_count(false);
-            progressDialog.dismiss();
-            checkFirstSosContact();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_continer,new home_fragment()).commit();
 
 
-        }
-    }
+
 }
 

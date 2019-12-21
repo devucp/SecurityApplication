@@ -179,6 +179,7 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("female");
                                                         else
                                                             user.setGender("others");
+                                                        user.setMobile(textPhone.getText().toString());
                                                         mydb.updateUser(user);
 
                                                         // check mobile number in firebase
@@ -395,10 +396,6 @@ public class profile_fragment extends Fragment {
             deviceId();
             return;
         }
-if(navigation.mUsersDatabaseReferenceListener != null) {
-    firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-            .removeEventListener(navigation.mUsersDatabaseReferenceListener);
-}
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite

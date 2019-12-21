@@ -179,8 +179,7 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("female");
                                                         else
                                                             user.setGender("others");
-                                                        user.setMobile(textPhone.getText().toString());
-                                                        mydb.updateUser(user);
+
 
                                                         // check mobile number in firebase
                                                         checkMobileInFirebase(textPhone.getText().toString());
@@ -464,8 +463,7 @@ public class profile_fragment extends Fragment {
         Log.d(TAG,"Updating user...");
 
         user.setMobile(textPhone.getText().toString());
-
-        //mydb.updateUser(user);
+        mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
         btn_edit.setText("edit");

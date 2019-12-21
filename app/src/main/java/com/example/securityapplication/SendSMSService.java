@@ -157,7 +157,7 @@ public class SendSMSService extends Service {
             toastmsg="send safe sos message";
         }
         else
-        {
+        {   emergency=1;
             safe=0; //emergency =1 . reset the safe variable
             toastmsg="send emergency sos message";
         }

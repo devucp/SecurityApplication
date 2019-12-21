@@ -227,6 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
 
         FirebaseUser currentUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+
         updateUI(currentUser);
     }
 

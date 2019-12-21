@@ -23,12 +23,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseUser;
 
 
 import java.util.HashMap;
+
+import static java.security.AccessController.getContext;
 
 public class navigation extends AppCompatActivity{
 
@@ -97,6 +101,17 @@ public class navigation extends AppCompatActivity{
 
     private void async() {
         checkFirstSosContact();
+        if(db.get_user_row().getCount()==0){
+            Log.d("iamrun","me1");
+            db.delete_table();
+            db.deleteDatabase(this);
+            // Signout Code Here
+
+            
+
+
+            //rohan have you found me i am here!!!!!!!!!!!!!!!
+        }
         if(db.getSosContacts().getCount()!=0) {
             UserObject.user=db.getdb_user();
             SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
@@ -254,7 +269,6 @@ public class navigation extends AppCompatActivity{
             finish();
         }
     }
-
 
 
 

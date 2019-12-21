@@ -239,6 +239,21 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         Log.d("checking44",str);
         return false;
     }
+    public Cursor get_user_row(){
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        User newuser = new User();
+        HashMap<String,String> contact=new HashMap<>();
+        try {
+            db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
+            cursor = db.rawQuery("select * FROM user", null);
+        }
+        catch (Exception e){
+
+        }
+        return cursor;
+
+        }
     public User getdb_user(){
         SQLiteDatabase db = null;
         User newuser = new User();

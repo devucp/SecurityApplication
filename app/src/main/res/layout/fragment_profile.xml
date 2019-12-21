@@ -48,14 +48,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:alpha="0.6"
-                android:textColor="#000000"
+                android:textColor="@color/white"
                 android:gravity="center"
                 android:hint="Name"
                 android:paddingStart="20dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="0dp"
                 android:textCursorDrawable="@drawable/cursor_color"
-                android:textSize="22sp"
+                android:textSize="25sp"
+
                 android:textStyle="bold" />
 
 
@@ -89,7 +90,7 @@
                         android:paddingRight="0dp"
                         android:textColor="#000000"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -120,7 +121,7 @@
                         android:paddingRight="0dp"
                         android:textColor="#000000"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -150,7 +151,7 @@
                         android:paddingRight="0dp"
                         android:textColor="#000000"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -176,7 +177,7 @@
                         android:paddingStart="15dp"
                         android:spinnerMode="dropdown"
                         android:textColor="#000000"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
 <!--                    <EditText-->
@@ -220,7 +221,7 @@
                         android:paddingRight="0dp"
                         android:textColor="#000000"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -234,8 +235,8 @@
 
                     <Button
                         android:id="@+id/btn_Edit"
-                        android:layout_width="125dp"
-                        android:layout_height="wrap_content"
+                        android:layout_width="120dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
                         android:background="@drawable/buttonstylegradient"
@@ -248,8 +249,8 @@
                     <Button
                         android:id="@+id/btn_Logout"
                         android:layout_marginLeft="25dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="120dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="30dp"
                         android:layout_marginBottom="30dp"
                         android:background="@drawable/buttonstylegradient"

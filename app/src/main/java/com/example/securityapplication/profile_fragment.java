@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 
 import android.os.Bundle;
+import android.os.PatternMatcher;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -46,6 +47,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.support.v4.content.ContextCompat.getSystemService;
@@ -84,9 +86,7 @@ public class profile_fragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                Toast.makeText(parent.getContext(),
-                        "OnItemSelectedListener : " + parent.getItemAtPosition(position).toString(),
-                        Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -169,7 +169,8 @@ public class profile_fragment extends Fragment {
 
 
                                                         //save code will come here
-                                                        user.setName(textName.getText().toString());
+                                                        user.setName(textName.getText().toString().trim());
+                                                        textName.setText(textName.getText().toString().trim());
                                                         user.setDob(textDob.getText().toString());
                                                         user.setLocation(textAddress.getText().toString());
                                                         if (spinner.getSelectedItemPosition() == 0)
@@ -178,6 +179,7 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("female");
                                                         else
                                                             user.setGender("others");
+                                                        mydb.updateUser(user);
 
                                                         // check mobile number in firebase
                                                         checkMobileInFirebase(textPhone.getText().toString());
@@ -219,8 +221,12 @@ public class profile_fragment extends Fragment {
     }
 
     private boolean validate() {
-        if(textName.getText().toString().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10)
-            return true;
+        if(textName.getText().toString().trim().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10) {
+            if(Pattern.matches("[ a-zA-Z]+",textName.getText().toString().trim()))
+                return true;
+            else
+                return false;
+        }
         else
             return false;
     }
@@ -308,17 +314,6 @@ public class profile_fragment extends Fragment {
         text_changePassword = getActivity().findViewById(R.id.text_changePassword);
         disable();
 
-
-//        String[] gender = new String[]{
-//                "Male",
-//                "Female",
-//                "Others"
-//        };
-//        Spinner sp=getActivity().findViewById(R.id.text_Gender);
-//       spinnerArrayAdapter = new ArrayAdapter<String>(
-//                this.getActivity(), spinner_layout, gender);
-//        spinnerArrayAdapter.setDropDownViewResource(spinner_layout);
-//        sp.setAdapter(spinnerArrayAdapter);
     }
 
     @Override

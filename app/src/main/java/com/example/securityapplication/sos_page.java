@@ -131,11 +131,11 @@ public class sos_page extends AppCompatActivity {
                 FillViews();
             }
             while (res.moveToNext()) {
-                SosContacts.put("c1",res.getString(0));
-                SosContacts.put("c2",res.getString(1));
-                SosContacts.put("c3",res.getString(2));
-                SosContacts.put("c4",res.getString(3));
-                SosContacts.put("c5",res.getString(4));
+                SosContacts.put("c1",res.getString(res.getColumnIndex("c1")));
+                SosContacts.put("c2",res.getString(res.getColumnIndex("c2")));
+                SosContacts.put("c3",res.getString(res.getColumnIndex("c3")));
+                SosContacts.put("c4",res.getString(res.getColumnIndex("c4")));
+                SosContacts.put("c5",res.getString(res.getColumnIndex("c5")));
 
                 Log.d("SOS Activity", "LocalHashMap updated by SOS activity successfully " +
                         "Sosc1 = " + SosContacts.get("c1") + " Sosc2 = " + SosContacts.get("c2"));

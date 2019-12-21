@@ -60,9 +60,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_C3 = "c3";
     public static final String COLUMN_C4 = "c4";
     public static final String COLUMN_C5 = "c5";
+    public static final String COLUMN_C0 = "id";
 
     private static final String CREATE_SOSTABLE_QUERY =
             "CREATE TABLE "+ SOS_TABLE +"(" +
+                    COLUMN_C0 + " INTEGER DEFAULT 1 PRIMARY KEY ,"+
                     COLUMN_C1 + " TEXT , " +
                     COLUMN_C2 + " TEXT ,"+
                     COLUMN_C3 + " TEXT ," +
@@ -144,16 +146,22 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         }
     }
     public boolean addsosContacts(HashMap<String,String> SosC){
+        long result;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-
         contentValues.put(COLUMN_C1, SosC.get("c1"));
         contentValues.put(COLUMN_C2, SosC.get("c2"));
         contentValues.put(COLUMN_C3, SosC.get("c3"));
         contentValues.put(COLUMN_C4, SosC.get("c4"));
         contentValues.put(COLUMN_C5, SosC.get("c5"));
-
-        long result = db.insert(SOS_TABLE,null,contentValues);
+    if(getSosContacts().getCount()==0) {
+        contentValues.put(COLUMN_C0,1);
+        result = db.insert(SOS_TABLE, null, contentValues);
+    }
+    else {
+        result = db.update(SOS_TABLE,contentValues,COLUMN_ID + "=?",
+                new String[]{"1"});
+    }
         db.close();
         if (result == -1){
             Log.d("SOS_Database","SOS contacts not added");
@@ -167,14 +175,19 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     public Cursor getSosContacts(){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from "+SOS_TABLE, null);
-        if (cursor.getCount()!=0) {
-            Log.d("Database", "Sos Contact Details loaded in Cursor");
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("select * from " + SOS_TABLE, null);
+            if (cursor.getCount() != 0) {
+                Log.d("Database", "Sos Contact Details loaded in Cursor");
+            } else {
+                Log.d("Database", "No Sos contact records Found");
+            }
+           // db.close();//Added close stmt
         }
-        else {
-            Log.d("Database","No Sos contact records Found");
+        catch(Exception e){
+            
         }
-        db.close();//Added close stmt
         return cursor;
     }
 
@@ -231,6 +244,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public User getdb_user(){
         SQLiteDatabase db = null;
         User newuser = new User();
+        HashMap<String,String> contact=new HashMap<>();
         try {
             db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
             Cursor cursor = db.rawQuery("select * FROM user", null);
@@ -246,10 +260,20 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     newuser.setMobile(cursor.getString(cursor.getColumnIndex("mobile")));
                     newuser.setPaid(cursor.getString(cursor.getColumnIndex("paid")).equals("1"));
                      Log.d("Paid1234hello2",cursor.getString(cursor.getColumnIndex("paid"))+"jj"+newuser.isPaid());
-                     db.close();
+
                 }
-            } else {
-                Log.d("Paid1234hello", "hello2");
+            }
+            if(cursor2.getCount()!=0){
+                while(cursor2.moveToNext() ){
+                    contact.put("c1",cursor2.getString(cursor2.getColumnIndex("c1")));
+                    contact.put("c2",cursor2.getString(cursor2.getColumnIndex("c1")));
+                    contact.put("c3",cursor2.getString(cursor2.getColumnIndex("c1")));
+                    contact.put("c4",cursor2.getString(cursor2.getColumnIndex("c1")));
+                    contact.put("c5",cursor2.getString(cursor2.getColumnIndex("c1")));
+                    db.close();
+                    newuser.setSosContacts(contact);
+
+                }
             }
         }catch (Exception se ) {
             Log.d("Paid1234hello", "hello3"+se.getMessage());

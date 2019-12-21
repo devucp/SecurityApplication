@@ -478,7 +478,7 @@ public class SignUp2 extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
-                    Log.d(TAG,"User Data could not be saved " + databaseError.getMessage());
+                    Log.d(TAG,"User Data could not be saved " + databaseError.getDetails());
                     Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
                 }
                 else {

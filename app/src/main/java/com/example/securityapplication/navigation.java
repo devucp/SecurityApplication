@@ -376,7 +376,7 @@ public class navigation extends AppCompatActivity{
                     Log.d("navigation","count"+db.get_count());
                     if (firebaseUser != null) {
                         String uid = firebaseUser.getUid();
-                        Thread.sleep(1000);
+
                         mUsersDatabaseReferenceListener = firebaseHelper.getUsersDatabaseReference().child(uid).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -385,7 +385,8 @@ public class navigation extends AppCompatActivity{
 //                                    .isPaid());
                                 //UserObject.paid=newUser.isPaid();
                                 // check if user signed in from two devices
-                                recheckUserAuthentication();
+
+                                //recheckUserAuthentication();
                                 Log.d("FirebaseUsername", newUser.getName() + " 2 " + newUser.isPaid());
                                 db.updateUser(newUser);
                                 db.setUser(newUser);

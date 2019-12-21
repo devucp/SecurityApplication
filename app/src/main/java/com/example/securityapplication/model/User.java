@@ -9,6 +9,7 @@ import java.util.Map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 public class User implements Parcelable {
     private String name;
@@ -156,4 +157,11 @@ public class User implements Parcelable {
     public boolean isGoogleAccountLinked(){ return googleAccountLinked; }
 
     public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
+
+    @NonNull
+    @Override
+    public String toString() {
+        String s=sosContacts.toString();
+        return s;
+    }
 }

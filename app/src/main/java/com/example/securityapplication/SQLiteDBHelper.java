@@ -22,20 +22,21 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     private static final String DB_name = "userinfo.db";
     private static final int DB_version = 1;
     User newU;
+    private SQLiteDatabase db=null;
     private static final String TABLE_NAME = "user";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_EMAIL = "email";
-    public static final String COLUMN_GENDER = "gender";
+    private static final String COLUMN_ID = "id";
+    private static final String COLUMN_NAME = "name";
+    private static final String COLUMN_EMAIL = "email";
+    private static final String COLUMN_GENDER = "gender";
     public static final String COLUMN_PASSWORD = "password";
-    public static final String COLUMN_MOBILE = "mobile";
-//    public static final String COLUMN_AADHAR = "aadhar";
-    public static final String COLUMN_LOCATION = "location";
-    public static final String COLUMN_IMEI = "imei";
-    public static final String COLUMN_DOB = "dob";
-    public static final String COLUMN_TESTM = "testmode";
-    public static final String COLUMN_PAID = "paid";
-    private static String DB_PATH = "/data/data/com.example.securityapplication/databases/";
+    private static final String COLUMN_MOBILE = "mobile";
+    private static final String COLUMN_LOCATION = "location";
+    private static final String COLUMN_IMEI = "imei";
+    private static final String COLUMN_DOB = "dob";
+    private static final String COLUMN_TESTM = "testmode";
+    private static final String COLUMN_PAID = "paid";
+    private static SQLiteDBHelper mInstance = null;
+
 
     private static final String CREATE_TABLE_QUERY =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -43,9 +44,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_NAME + " TEXT, "+
                     COLUMN_EMAIL + " TEXT, " +
                     COLUMN_GENDER + " TEXT, " +
-//                    COLUMN_PASSWORD + " TEXT, " +
                     COLUMN_MOBILE + " TEXT, " +
-//                    COLUMN_AADHAR + " TEXT, " +
                     COLUMN_LOCATION + " TEXT, " +
                     COLUMN_DOB + " TEXT, " +
                     COLUMN_IMEI + " TEXT, " +
@@ -53,12 +52,12 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     COLUMN_PAID  + " BOOLEAN DEFAULT FALSE "+")";
 
     private static final String SOS_TABLE = "sostable";
-    public static final String COLUMN_C1 = "c1";
-    public static final String COLUMN_C2 = "c2";
-    public static final String COLUMN_C3 = "c3";
-    public static final String COLUMN_C4 = "c4";
-    public static final String COLUMN_C5 = "c5";
-    public static final String COLUMN_C0 = "id";
+    private static final String COLUMN_C1 = "c1";
+    private static final String COLUMN_C2 = "c2";
+    private static final String COLUMN_C3 = "c3";
+    private static final String COLUMN_C4 = "c4";
+    private static final String COLUMN_C5 = "c5";
+    private static final String COLUMN_C0 = "id";
 
     private static final String CREATE_SOSTABLE_QUERY =
             "CREATE TABLE "+ SOS_TABLE +"(" +
@@ -71,16 +70,23 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     private User user;
 
     /**Constructor*/
+    public static synchronized SQLiteDBHelper getInstance(Context ctx)
+    {
+        if (mInstance == null) {
+            mInstance = new SQLiteDBHelper(ctx.getApplicationContext());
+        }
+        return mInstance;
+    }
 
-    public SQLiteDBHelper(Context context) {
+    private SQLiteDBHelper(Context context) {
         super(context, DB_name, null, DB_version);
+        db=this.getWritableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         Log.d("SQL Query","Create user table query is:"+CREATE_TABLE_QUERY);
         sqLiteDatabase.execSQL(CREATE_TABLE_QUERY);
-
         Log.d("SQL Query","Create sostable with query :"+CREATE_SOSTABLE_QUERY);
         sqLiteDatabase.execSQL(CREATE_SOSTABLE_QUERY);
         //sqLiteDatabase.execSQL("create table "+TABLE_NAME+" (id int , name varchar(20),location varchar(20),mobile char(10),aadhar char(12),imei varchar(10), gender Varchar(6), dob Varchar(8), email varchar(30) , password varchar(16))");
@@ -90,51 +96,33 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SOS_TABLE);
-
         onCreate(sqLiteDatabase);
     }
     //it return number of rows in the table
-    public int numberOfRows(){
-        try {
-            SQLiteDatabase db  = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
-            Cursor cursor = db.rawQuery("select * FROM user", null);
-            //Cursor cursor2 = db.rawQuery("select * FROM sostable", null);
-            Log.d("SQL", "innumberofrow" + cursor.getCount());
-            db.close();//Added close stmt
-            return cursor.getCount();
-        }catch (Exception e){
-            Log.d("message",e.getMessage());
-        }
-        return 0;
-    }
 
     /**Adding user*/
     public boolean addUser(User user){
         Log.d("SQL12","Add User is started");
         newU=user;
         this.user = user;
-        try{SQLiteDatabase db = this.getWritableDatabase();
+        try{
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME, user.getName());
         contentValues.put(COLUMN_EMAIL, user.getEmail());
-//        contentValues.put(COLUMN_PASSWORD, user.getPassword());
         contentValues.put(COLUMN_GENDER, user.getGender());
         contentValues.put(COLUMN_MOBILE,user.getMobile());
-//        contentValues.put(COLUMN_AADHAR, user.getAadhar());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
         contentValues.put(COLUMN_IMEI, user.getImei());
             contentValues.put(COLUMN_PAID, user.isPaid());
         contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
         long result = db.insert(TABLE_NAME,null, contentValues);
-        db.close();
+        //db.close();
         if (result == -1){
             Log.d("Database","User object NOT ADDED");
             return false;
         }
         else{
             Log.d("Database","User object added successfully");
-            int k=numberOfRows();
-            Log.d("NUMBER OF ROWS",String.valueOf(k));
             return true;
             }
         }catch(Exception e){
@@ -144,24 +132,25 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean addsosContacts(HashMap<String,String> SosC){
+    public boolean addsosContacts(HashMap<String,String> SosC,int i){
         long result;
-        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_C1, SosC.get("c1"));
         contentValues.put(COLUMN_C2, SosC.get("c2"));
         contentValues.put(COLUMN_C3, SosC.get("c3"));
         contentValues.put(COLUMN_C4, SosC.get("c4"));
         contentValues.put(COLUMN_C5, SosC.get("c5"));
-    if(getSosContacts().getCount()==0) {
+    if(i==1) {
         contentValues.put(COLUMN_C0,1);
+        Log.d("sachin","inserting");
         result = db.insert(SOS_TABLE, null, contentValues);
     }
     else {
+        Log.d("sachin","unserting");
         result = db.update(SOS_TABLE,contentValues,COLUMN_ID + "=?",
                 new String[]{"1"});
     }
-        db.close();
+        //db.close();
         if (result == -1){
             Log.d("SOS_Database","SOS contacts not added");
             return false;
@@ -173,7 +162,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getSosContacts(){
-        SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + SOS_TABLE, null);
@@ -182,7 +170,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             } else {
                 Log.d("Database", "No Sos contact records Found");
             }
-           // db.close();//Added close stmt
+            //db.close();//Added close stmt
         }
         catch(Exception e){
             
@@ -194,22 +182,18 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     //TO UPDATE TESTMODE
     public void updatetestmode(Boolean bool){
 
-        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues=new ContentValues();
         contentValues.put(COLUMN_TESTM,bool);
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?",
                 new String[]{"1"});
         Log.d("checking3","inside updatetestmode"+this.getTestmode());
-        db.close();
+        //db.close();
     }
     /**Updating user*/
     public void updateUser(User user){
         newU=user;
-        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_NAME, user.getName());
-//        contentValues.put(COLUMN_EMAIL, user.getEmail());
-//        contentValues.put(COLUMN_PASSWORD, user.getPassword());
         contentValues.put(COLUMN_GENDER, user.getGender());
         contentValues.put(COLUMN_MOBILE,user.getMobile());
         contentValues.put(COLUMN_LOCATION, user.getLocation());
@@ -221,19 +205,18 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         db.update(TABLE_NAME,contentValues,COLUMN_ID + "=?", //Changed from Column_Email to Column_ID
                 new String[]{"1"});
         Log.d("Paid1234hellow","inupdate"+user.isPaid());
-        db.close();
+        //db.close();
     }
 
     /**Checking if user is present*/
     public boolean getTestmode(){
-        SQLiteDatabase db = this.getReadableDatabase();
         String str="false";
         Cursor cursor = db.rawQuery("select "+ COLUMN_TESTM +" FROM "+TABLE_NAME, null);
         if(cursor.getCount()!=0){
             while (cursor.moveToNext()){
                 str = cursor.getString(0);
             }
-            db.close();//Added close stmt
+            //db.close();//Added close stmt
             if(str.equals("1"))
                 return true;
         }
@@ -241,13 +224,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         return false;
     }
     public Cursor get_user_row(){
-        SQLiteDatabase db = null;
         Cursor cursor = null;
-        User newuser = new User();
-        HashMap<String,String> contact=new HashMap<>();
         try {
-            db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
             cursor = db.rawQuery("select * FROM user", null);
+            //db.close();
         }
         catch (Exception e){
 
@@ -256,11 +236,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
         }
     public User getdb_user(){
-        SQLiteDatabase db = null;
         User newuser = new User();
         HashMap<String,String> contact=new HashMap<>();
         try {
-            db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
             Cursor cursor = db.rawQuery("select * FROM user", null);
             Cursor cursor2 = db.rawQuery("select * FROM sostable", null);
             Log.d("Paid1234hello9", "noofrow" + cursor.getCount());
@@ -285,11 +263,12 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     contact.put("c3",cursor2.getString(cursor2.getColumnIndex("c1")));
                     contact.put("c4",cursor2.getString(cursor2.getColumnIndex("c1")));
                     contact.put("c5",cursor2.getString(cursor2.getColumnIndex("c1")));
-                    db.close();
+                    //db.close();
                     newuser.setSosContacts(contact);
 
                 }
             }
+
         }catch (Exception se ) {
             Log.d("Paid1234hello", "hello3"+se.getMessage());
         }
@@ -297,19 +276,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
 
-
-    public void delete_table(){
-
-        SQLiteDatabase db = SQLiteDatabase.openDatabase(DB_PATH + "userinfo.db", null, SQLiteDatabase.CREATE_IF_NECESSARY);
-        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS "+SOS_TABLE);
-    }
-
     public boolean checkUser(String mobile){
         String[] columns = {
                 COLUMN_MOBILE   //NOTE:changed to column Email
         };
-        SQLiteDatabase db = this.getReadableDatabase();
         String selection = COLUMN_MOBILE + " = ?";
         String[] selectionArgs = {mobile};
 
@@ -322,7 +292,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                 null);
         int cursorCount = cursor.getCount();
         cursor.close();
-        db.close();
+        //db.close();
         Log.d("DATABASE","Cursor count for Phone number "+cursorCount);
         if(cursorCount == 0){
             return true;
@@ -333,7 +303,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     //Fetch data for ProfileActivity
     public Cursor getAllData() {
-        SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor cursor = db.rawQuery("select * from "+TABLE_NAME, null);
         if (cursor.getCount()!=0) {
             Log.d("Database", "Details loaded in Cursor");
@@ -341,20 +311,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         else {
             Log.d("Database","No records Found");
         }
-        db.close();//Added close stmt
+        //db.close();//Added close stmt
         return cursor;
     }
-
-    /**Delete User */
-
-    /*public void deleteUser(User user) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // NOTE: delete user record by Aadhar
-        db.delete(TABLE_NAME, COLUMN_AADHAR + " = ?",
-                new String[]{String.valueOf(user.getAadhar())});
-        db.close();
-    }*/
 
 
     //Sets the user object for this class
@@ -369,9 +328,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
     //forcefully deletes database using context to ensure creation of tables
     public void deleteDatabase(Context ctx){
-
+        mInstance=null;
         ctx.deleteDatabase(DB_name);
-        Log.d("SQLite","on deleteDatabase : no. of rows = "+numberOfRows());
         Log.d("SQLiteDBHelper","on deleteDatabase: Deleted database");
     }
 }

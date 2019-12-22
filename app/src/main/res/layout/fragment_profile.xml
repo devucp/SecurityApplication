@@ -140,7 +140,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_home_black_24dp" />
+                        android:src="@drawable/ic_home_cyan_24dp" />
 
                     <AutoCompleteTextView
                         android:id="@+id/text_Address"

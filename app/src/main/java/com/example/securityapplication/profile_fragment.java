@@ -426,38 +426,18 @@ public class profile_fragment extends Fragment {
                     // update user in sqlite and firebase
                     updateUser();
                 }else {
-                    firebaseHelper.getMobileDatabaseReference().child(newMobile).addListenerForSingleValueEvent(new ValueEventListener() {
+                    firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot mobileNodeDataSnapshot) {
-                            Log.d("Mobile Data Snapshot:", mobileNodeDataSnapshot.toString());
-                            if (mobileNodeDataSnapshot.exists()) {
-                                // stop progress bar
-
-                                // prompt user to enter different mobile number
-                                Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
-
-                            } else {
-                                // delete previous mobile number and add new number
-                                firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid());
-                                        updateUser();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        // prompt user to enter different mobile number
-                                        Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
+                        public void onSuccess(Void aVoid) {
+                            // delete previous mobile number and add new number
+                            firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null);
+                            updateUser();
                         }
-
+                    }).addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Log.d(TAG,databaseError.getDetails());
-                            Toast.makeText(getActivity(),databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                        public void onFailure(@NonNull Exception e) {
+                            // prompt user to enter different mobile number
+                            Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -466,7 +446,7 @@ public class profile_fragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(getActivity(), databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),databaseError.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
     }

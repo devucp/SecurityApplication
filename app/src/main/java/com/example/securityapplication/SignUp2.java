@@ -470,7 +470,11 @@ public class SignUp2 extends AppCompatActivity {
                 if (databaseError != null){
                     Log.d(TAG,"User Data could not be saved " + databaseError.getMessage());
                     Toast.makeText(SignUp2.this, "error in writeUsertofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                    deleteDataFromFirebase(firebaseUser);
+                    if (databaseError.getCode() == -3) {
+                        // -3 : Permission denied to write in firebase
+                        Toast.makeText(SignUp2.this, "Account already registered", Toast.LENGTH_LONG).show();
+                        redirectToMainActivity();
+                    }
                 }
                 else {
                     Log.d(TAG,"User Data saved successfully.");
@@ -478,7 +482,6 @@ public class SignUp2 extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private void writeDeviceToFirebase(final FirebaseUser firebaseUser){
@@ -546,7 +549,7 @@ public class SignUp2 extends AppCompatActivity {
                         }
                     }catch (Exception e){
                         Log.d(TAG,e.getMessage());
-                        Toast.makeText(getApplicationContext(), "Data not stored in sqlite Signup2", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Sqlite error occurred Signup2"+e.getMessage(), Toast.LENGTH_LONG).show();
                         redirectToMainActivity();
                     }
                 }
@@ -562,9 +565,9 @@ public class SignUp2 extends AppCompatActivity {
         if (DBHelper.getdb_user() != null)
             DBHelper.deleteDatabase(SignUp2.this);
 
-        Intent ReturnIntent = new Intent();
-        setResult(10,ReturnIntent);//to finish sing up 1 activity
-        //finishing the Signup2 activity
+        Intent redirect = new Intent(SignUp2.this,MainActivity.class);
+        redirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(redirect);
         finish();
     }
 
@@ -577,6 +580,8 @@ public class SignUp2 extends AppCompatActivity {
             firebaseHelper.getDevicesDatabaseReference().child(imei).removeValue();
             String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
             firebaseHelper.getEmailDatabaseReference().child(emailKey).removeValue();
+            try{firebaseHelper.getMobileDatabaseReference().child(input_mobile.getText().toString());}
+            catch (Exception e){Log.d(TAG, e.getMessage());}
         }
         Spinner.setVisibility(View.GONE);
         Enable();

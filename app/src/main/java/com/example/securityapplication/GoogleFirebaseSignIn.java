@@ -15,6 +15,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -94,18 +96,12 @@ public class GoogleFirebaseSignIn implements Serializable {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "linkWithCredential:success");
-                            FirebaseUser firebaseUser = task.getResult().getUser();
-                            // change isGoogleAccountLinked status in firebase database to true
-                            changeLinkedStatus(firebaseUser);
+                            Toast.makeText(activity, "Account Linked Successfully", Toast.LENGTH_SHORT).show();
 
-                            //Toast.makeText(LinkAccountActivity.this, "Account Linked Successfully", Toast.LENGTH_SHORT).show();
-
-                            return;
                         } else {
                             String[] exceptionSplitted = task.getException().toString().split(":");
                             Log.w(TAG, "linkWithCredential:failure", task.getException());
-                            //Toast.makeText(LinkAccountActivity.this, exceptionSplitted[exceptionSplitted.length-1], Toast.LENGTH_SHORT).show();
-                            return;
+                            Toast.makeText(activity, exceptionSplitted[exceptionSplitted.length-1], Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -136,11 +132,8 @@ public class GoogleFirebaseSignIn implements Serializable {
                             // set imei and uid in firebase
                             device = new Device();
                             device.setUID(firebaseUser.getUid());
-                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device);
-                            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber);
-                            // change isGoogleAccountLinked status in firebase database to true
-                            changeLinkedStatus(firebaseUser);
-                            storeData(firebaseUser);
+                            setImeiInFirebase(firebaseUser);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -175,34 +168,13 @@ public class GoogleFirebaseSignIn implements Serializable {
             Intent mLogOutAndRedirect = new Intent(activity, MainActivity.class);
             mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             activity.startActivity(mLogOutAndRedirect);
-            Toast.makeText(activity, "Authentication failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Sign in failed", Toast.LENGTH_SHORT).show();
         }
         //finishing the navigation activity
-        try {
-            closeNow();
-            Log.d(TAG,"closed activity successfully");
-        }catch (Exception e){
-            Log.d(TAG,"Closing app exception:"+e.getMessage());
-            activity.finish();
-        }
+        activity.finish();
     }
 
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            activity.finishAffinity();
-        }
-        else{
-            activity.finish();
-        }
-    }
-
-    private void changeLinkedStatus(FirebaseUser firebaseUser){
-        firebaseHelper = FirebaseHelper.getInstance();
-        firebaseHelper.initFirebase();
-        //firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("googleAccountLinked").setValue(true);
-    }
-
-    private void storeData(final FirebaseUser firebaseUser){
+    private void storeDataInSql(final FirebaseUser firebaseUser){
         if (firebaseUser != null) {
             final String uid = firebaseUser.getUid();
             firebaseHelper.getUsersDatabaseReference().child(uid).addListenerForSingleValueEvent(new ValueEventListener(){
@@ -225,7 +197,6 @@ public class GoogleFirebaseSignIn implements Serializable {
                         }
                         else {
                             firebaseHelper.firebaseSignOut(mImeiNumber);
-                            firebaseHelper.googleSignOut(activity);
                             setUser(null);
                             Toast.makeText(activity, "Authentication failed",Toast.LENGTH_SHORT).show();
                             return;
@@ -234,7 +205,6 @@ public class GoogleFirebaseSignIn implements Serializable {
                     }catch (Exception e){
                         Log.d(TAG,e.getMessage());
                         firebaseHelper.firebaseSignOut(mImeiNumber);
-                        firebaseHelper.googleSignOut(activity);
                         setUser(null);
                         Toast.makeText(activity, "Authentication failed",Toast.LENGTH_SHORT).show();
                         return;
@@ -251,9 +221,43 @@ public class GoogleFirebaseSignIn implements Serializable {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.d(TAG,databaseError.getDetails());
+                    Toast.makeText(activity, "Inside storeDataInSql:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                    firebaseHelper.firebaseSignOut(mImeiNumber);
+                    setUser(null);
                 }
             });
         }
+    }
+
+    private void setImeiInFirebase(final FirebaseUser firebaseUser){
+
+        firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        storeDataInSql(firebaseUser);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).child("uid").setValue("null");
+                        Log.d(TAG,e.getMessage());
+                        // sigin out the user
+                        firebaseHelper.firebaseSignOut();
+                        setUser(null);
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,e.getMessage());
+                // sign out the user
+                setUser(null);
+            }
+        });
     }
 }

@@ -379,7 +379,7 @@ public class SignUp2 extends AppCompatActivity {
                             FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             // logout user and login only after successful storing of data in db
                             firebaseHelper.firebaseSignOut();
-                            storeAndStartNextActivity(firebaseUser);
+                            writeDataToFirebase(firebaseUser);
 
                         } else {
                             try{
@@ -394,7 +394,7 @@ public class SignUp2 extends AppCompatActivity {
                                                 if (task.isSuccessful()) {
                                                     FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                                                     firebaseHelper.firebaseSignOut();
-                                                    storeAndStartNextActivity(firebaseUser);
+                                                    writeDataToFirebase(firebaseUser);
                                                 } else {
                                                     try {
                                                         throw task.getException();
@@ -422,11 +422,6 @@ public class SignUp2 extends AppCompatActivity {
                     });
     }
 
-    private void storeAndStartNextActivity(final FirebaseUser firebaseUser){
-
-        writeDataToFirebase(firebaseUser);
-    }
-
     private void setUidFromFirebase(final String mobile){
         firebaseHelper.getMobileDatabaseReference().child(mobile).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -444,7 +439,7 @@ public class SignUp2 extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG, databaseError.getDetails());
-                Toast.makeText(SignUp2.this, "Network disconnected. Try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignUp2.this, "error in setUidFromFirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -467,17 +462,18 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void writeUserToFirebase(final FirebaseUser firebaseUser){
+        Log.d(TAG,"Inside writeUser");
         //push user to firebase database 'Users' node
         firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
                     Log.d(TAG,"User Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUp2.this, "error in writeUsertofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    deleteDataFromFirebase(firebaseUser);
                 }
                 else {
                     Log.d(TAG,"User Data saved successfully.");
-                    Log.d("Pushed to db",firebaseHelper.getUsersDatabaseReference().getDatabase().toString());
                     writeDeviceToFirebase(firebaseUser);
                 }
             }
@@ -486,19 +482,19 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void writeDeviceToFirebase(final FirebaseUser firebaseUser){
+        Log.d(TAG,"Inside writeDevice");
         //push device to firebase database 'Devices' node
         device.setUID(firebaseUser.getUid());
         firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if (databaseError != null){
-                    Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                if (databaseError == null){
+                    //Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
+                    //Toast.makeText(SignUp2.this, "error in writeDevicetofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     deleteDataFromFirebase(firebaseUser);
                 }
                 else {
                     Log.d(TAG,"Device Data saved successfully.");
-                    Log.d("Pushed to db",firebaseHelper.getDevicesDatabaseReference().getDatabase().toString());
                     writeEmailToFirebase(firebaseUser);
                 }
             }
@@ -506,6 +502,7 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void writeEmailToFirebase(final FirebaseUser firebaseUser){
+        Log.d(TAG,"Inside writeEmail");
         //push email and mobile no. on root node
         String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
         firebaseHelper.getEmailDatabaseReference().child(emailKey).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
@@ -513,7 +510,7 @@ public class SignUp2 extends AppCompatActivity {
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
                     Log.d(TAG,"Email Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUp2.this, "error in writeEmailtofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     deleteDataFromFirebase(firebaseUser);
                 }
                 else {
@@ -531,7 +528,7 @@ public class SignUp2 extends AppCompatActivity {
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null){
                     Log.d(TAG,"Mobile Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "Please check your internet connection", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUp2.this, "error in writeMobiletofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     deleteDataFromFirebase(firebaseUser);
                 }
                 else {
@@ -569,13 +566,17 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void deleteDataFromFirebase(FirebaseUser firebaseUser){
+        Log.d(TAG,"Inside deleteDataFromFirebase");
         if (firebaseUser != null){
-            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).setValue(null);
-            firebaseHelper.getDevicesDatabaseReference().child(imei).setValue(null);
+            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeValue();
+            firebaseHelper.getDevicesDatabaseReference().child(imei).removeValue();
             String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
-            firebaseHelper.getEmailDatabaseReference().child(emailKey).setValue(null);
-            firebaseHelper.getMobileDatabaseReference().child(user.getMobile()).setValue(null);
+            firebaseHelper.getEmailDatabaseReference().child(emailKey).removeValue();
+            //firebaseHelper.getMobileDatabaseReference().child(user.getMobile()).removeValue();
         }
+        Spinner.setVisibility(View.GONE);
+        Enable();
+        btn_submit.setText("SIGNUP");
     }
 
     private void signIn(){

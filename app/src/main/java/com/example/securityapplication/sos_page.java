@@ -38,7 +38,7 @@ public class sos_page extends AppCompatActivity {
     Intent intent;
     public  static final int RequestPermissionCode  = 1 ;
     private Button btn_SosEdit;
-
+    private int dec=0;
     private HashMap<String,String> SosContacts;
     FirebaseHelper firebaseHelper;
     private TextInputEditText c1, c2, c3, c4, c5,current;
@@ -61,13 +61,17 @@ public class sos_page extends AppCompatActivity {
         setContentView(R.layout.activity_sos_page);
         Intent intent=getIntent();
         String btn=intent.getStringExtra("btn");
+        if(btn.equals("1"))
+            dec=1;
+        else
+            dec=0;
         Log.d("Button",btn);
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(getApplicationContext());
 
         values = new ContentValues();
-        mydb = new SQLiteDBHelper(this);
+        mydb = SQLiteDBHelper.getInstance(this);
         user = new User();
         SosContacts = new HashMap<String, String>();
         val = new Validation();
@@ -638,7 +642,7 @@ catch (Exception e)
                 user.setSosContacts(SosContacts);
                 Log.d("SosActivity", "HashMap updated in User object c1=" + user.getSosContacts().get("c1"));
 
-                if (mydb.addsosContacts(SosContacts)) {
+                if (mydb.addsosContacts(SosContacts,dec)) {
                     Log.d("SosActivity", "SOS contacts was added in database");
                     updateFireBaseSOS();
                     Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();

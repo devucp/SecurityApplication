@@ -43,7 +43,7 @@ public class navigation extends AppCompatActivity{
     static User newUser=UserObject.user;
     Boolean is_home=true;
 
-    SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
+    SQLiteDBHelper db;
     public static Boolean test=false;
     public static TextView tmode1;
 
@@ -59,6 +59,7 @@ public class navigation extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        db=SQLiteDBHelper.getInstance(navigation.this);
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -112,10 +113,10 @@ public class navigation extends AppCompatActivity{
     private void async() {
         checkFirstSosContact();
         if(db.get_user_row().getCount()==0){
-            Log.d("iamrun","me1");
+            Log.d("iamrun","me21");
+            //db.deleteDatabase(this.getApplicationContext());
             // Signout Code Here
             LogOutAndStartMainActivity();
-
         }
         if(db.getSosContacts().getCount()!=0) {
             UserObject.user=db.getdb_user();
@@ -130,7 +131,7 @@ public class navigation extends AppCompatActivity{
 
     private void checkFirstSosContact(){
         // check if first sos contact is added
-        SQLiteDBHelper mydb = new SQLiteDBHelper(navigation.this);
+        SQLiteDBHelper mydb = db;
         Cursor res=mydb.getSosContacts();
         if (res.getCount() == 0){
             //Toast.makeText(getApplicationContext(), "No SOS Contact records Found", Toast.LENGTH_LONG).show();
@@ -268,7 +269,7 @@ public class navigation extends AppCompatActivity{
         firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(navigation.this);
         //delete user records from SQLite
-        db.delete_table();
+        //db.delete_table();
         db.deleteDatabase(this);
 
         Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);

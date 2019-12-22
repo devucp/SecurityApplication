@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         /** DATABASE FORCEFUL CREATION**/
-        db = new SQLiteDBHelper(this);
+        db=SQLiteDBHelper.getInstance(MainActivity.this);
     }
 
     public void onStart(){
@@ -820,11 +820,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     user = dataSnapshot.getValue(User.class);
 //                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     //db=new SQLiteDBHelper(MainActivity.this);
-
+                    SQLiteDBHelper db=SQLiteDBHelper.getInstance(MainActivity.this);
                     try {
                         if (db.addUser(user)) {
                             if (user.getSosContacts() != null)
-                                db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+                                db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
                             updateUI(firebaseUser);
                         }
                         else {

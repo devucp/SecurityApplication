@@ -65,7 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void initObjects() {
 
 //        user = getIntent().getParcelableExtra("User");
-        mydb = new SQLiteDBHelper(this);
+        mydb = SQLiteDBHelper.getInstance(this);
     }
 
     private void initListeners() {

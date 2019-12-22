@@ -11,10 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class setting_fragment extends Fragment {
     Button sos;
-    Button rate_us;
+    Button rate_us,scream;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -24,6 +25,13 @@ public class setting_fragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rate_us=getActivity().findViewById(R.id.rate_us);
+        scream=getActivity().findViewById(R.id.screem);
+        scream.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT).show();
+            }
+        });
         rate_us.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

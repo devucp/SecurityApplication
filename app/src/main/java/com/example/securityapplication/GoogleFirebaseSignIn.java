@@ -181,18 +181,19 @@ public class GoogleFirebaseSignIn implements Serializable {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
+                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+                    SQLiteDBHelper db=SQLiteDBHelper.getInstance(activity);
+
                     try {
                         Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     }catch (Exception e){
                         Log.d(TAG, e.getMessage());
                     }
 
-                    SQLiteDBHelper db=new SQLiteDBHelper(activity);
-
                     try {
                         if (db.addUser(user)) {
                             if (user.getSosContacts() != null)
-                                db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+                                db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
                             setUser(firebaseUser);
                         }
                         else {
@@ -201,7 +202,6 @@ public class GoogleFirebaseSignIn implements Serializable {
                             Toast.makeText(activity, "Authentication failed :In GoogleFirebaseSignin sqlite error occurred",Toast.LENGTH_SHORT).show();
                             return;
                         }
-
                     }catch (Exception e){
                         Log.d(TAG,e.getMessage());
                         firebaseHelper.firebaseSignOut(mImeiNumber);
@@ -256,6 +256,7 @@ public class GoogleFirebaseSignIn implements Serializable {
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG,e.getMessage());
                 // sign out the user
+                firebaseHelper.firebaseSignOut();
                 setUser(null);
             }
         });

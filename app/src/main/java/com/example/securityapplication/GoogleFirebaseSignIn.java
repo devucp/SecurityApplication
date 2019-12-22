@@ -198,7 +198,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                         else {
                             firebaseHelper.firebaseSignOut(mImeiNumber);
                             setUser(null);
-                            Toast.makeText(activity, "Authentication failed",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "Authentication failed :In GoogleFirebaseSignin sqlite error occurred",Toast.LENGTH_SHORT).show();
                             return;
                         }
 
@@ -206,7 +206,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                         Log.d(TAG,e.getMessage());
                         firebaseHelper.firebaseSignOut(mImeiNumber);
                         setUser(null);
-                        Toast.makeText(activity, "Authentication failed",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "Authentication failed :In GoogleFirebaseSignin sqlite error occurred"+e.getMessage(),Toast.LENGTH_SHORT).show();
                         return;
                     }
 //                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());

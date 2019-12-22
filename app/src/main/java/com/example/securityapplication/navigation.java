@@ -28,6 +28,9 @@ import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.HashMap;
@@ -50,6 +53,8 @@ public class navigation extends AppCompatActivity{
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
 
+    private FirebaseHelper firebaseHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +63,11 @@ public class navigation extends AppCompatActivity{
         setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListner);
+
+        firebaseHelper = FirebaseHelper.getInstance();
+        firebaseHelper.initFirebase();
+        firebaseHelper.initContext(this);
+
         async();
         //sqlite db code here
         Log.d("checking11","oncreate option menu 3 is running");
@@ -103,14 +113,9 @@ public class navigation extends AppCompatActivity{
         checkFirstSosContact();
         if(db.get_user_row().getCount()==0){
             Log.d("iamrun","me1");
-            db.delete_table();
-            db.deleteDatabase(this);
             // Signout Code Here
+            LogOutAndStartMainActivity();
 
-            
-
-
-            //rohan have you found me i am here!!!!!!!!!!!!!!!
         }
         if(db.getSosContacts().getCount()!=0) {
             UserObject.user=db.getdb_user();
@@ -247,11 +252,24 @@ public class navigation extends AppCompatActivity{
     }
 
     public void LogOutAndStartMainActivity(){
-        //firebaseHelper.makeDeviceImeiNull(mImeiNumber);
-        //firebaseHelper.firebaseSignOut();
-        //firebaseHelper.googleSignOut(navigation.this);
+        firebaseHelper.getUsersDatabaseReference().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue(User.class).getImei() != null)
+                    firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG,"Imei not made null");
+                Toast.makeText(navigation.this, "Imei not made null in navigation",Toast.LENGTH_LONG).show();
+            }
+        });
+        firebaseHelper.firebaseSignOut();
+        firebaseHelper.googleSignOut(navigation.this);
         //delete user records from SQLite
-        db.deleteDatabase(navigation.this);
+        db.delete_table();
+        db.deleteDatabase(this);
 
         Intent mLogOutAndRedirect= new Intent(navigation.this, MainActivity.class);
         mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

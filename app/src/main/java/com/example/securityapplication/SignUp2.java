@@ -488,9 +488,9 @@ public class SignUp2 extends AppCompatActivity {
         firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if (databaseError == null){
-                    //Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
-                    //Toast.makeText(SignUp2.this, "error in writeDevicetofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                if (databaseError != null){
+                    Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
+                    Toast.makeText(SignUp2.this, "error in writeDevicetofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     deleteDataFromFirebase(firebaseUser);
                 }
                 else {
@@ -536,14 +536,17 @@ public class SignUp2 extends AppCompatActivity {
                     Log.d("Pushed to db",firebaseHelper.getMobileDatabaseReference().getDatabase().toString());
                     // add user in sqlite
                     //added conditional checking and showing respective Toast message
-                    if (DBHelper.addUser(user)){
-                        DBHelper.setUser(user);
-                        Log.d(TAG,"User added successfully in sqlite");
-                        signIn();
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(), "Something went wrong. Try login again", Toast.LENGTH_LONG).show();
-                        // redirect user to MainActivity
+                    try {
+                        if (DBHelper.addUser(user)) {
+                            signIn();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Data not stored in sqlite Signup2", Toast.LENGTH_LONG).show();
+                            redirectToMainActivity();
+                        }
+                    }catch (Exception e){
+                        Log.d(TAG,e.getMessage());
+                        Toast.makeText(getApplicationContext(), "Data not stored in sqlite Signup2", Toast.LENGTH_LONG).show();
                         redirectToMainActivity();
                     }
                 }
@@ -568,11 +571,12 @@ public class SignUp2 extends AppCompatActivity {
     private void deleteDataFromFirebase(FirebaseUser firebaseUser){
         Log.d(TAG,"Inside deleteDataFromFirebase");
         if (firebaseUser != null){
+            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue("null"); //due to db security rules
+            firebaseHelper.getDevicesDatabaseReference().child(imei).setValue("null"); // due to db security rules
             firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeValue();
             firebaseHelper.getDevicesDatabaseReference().child(imei).removeValue();
             String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
             firebaseHelper.getEmailDatabaseReference().child(emailKey).removeValue();
-            //firebaseHelper.getMobileDatabaseReference().child(user.getMobile()).removeValue();
         }
         Spinner.setVisibility(View.GONE);
         Enable();

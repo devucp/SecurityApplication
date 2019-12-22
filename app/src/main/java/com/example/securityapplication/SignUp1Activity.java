@@ -360,10 +360,7 @@ public class SignUp1Activity extends AppCompatActivity {
             spinner.setVisibility(View.GONE);
             Enable();
         }
-
     }
-
-
 
    public static void setError(String s,TextView t1)
    {

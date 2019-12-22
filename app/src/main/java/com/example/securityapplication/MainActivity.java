@@ -831,7 +831,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             firebaseHelper.firebaseSignOut(mImeiNumber);
                             firebaseHelper.googleSignOut(MainActivity.this);
                             updateUI(null);
-                            Toast.makeText(MainActivity.this, "Authentication failed",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Authentication failed :sqlite error occurred",Toast.LENGTH_SHORT).show();
                             return;
                         }
 

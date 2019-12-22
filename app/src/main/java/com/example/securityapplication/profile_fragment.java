@@ -36,6 +36,8 @@ import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -400,6 +402,7 @@ public class profile_fragment extends Fragment {
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite
+        mydb.delete_table();
         mydb.deleteDatabase(getContext());
 
         try{
@@ -435,9 +438,19 @@ public class profile_fragment extends Fragment {
 
                             } else {
                                 // delete previous mobile number and add new number
-                                firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null);
-                                firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid());
-                                updateUser();
+                                firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid());
+                                        updateUser();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // prompt user to enter different mobile number
+                                        Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
+                                    }
+                                });
                             }
                         }
 

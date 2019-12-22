@@ -143,6 +143,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             return false;
         }
     }
+
     public boolean addsosContacts(HashMap<String,String> SosC){
         long result;
         SQLiteDatabase db = this.getWritableDatabase();

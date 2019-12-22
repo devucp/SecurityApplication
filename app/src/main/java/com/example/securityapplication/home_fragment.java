@@ -178,6 +178,8 @@ public class home_fragment extends Fragment {
 //            tv.setVisibility(View.INVISIBLE);
 //        }
 
+
+
     }
 
     public  boolean checkSMSPermission(){

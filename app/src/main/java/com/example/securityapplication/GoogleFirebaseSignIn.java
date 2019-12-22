@@ -210,12 +210,12 @@ public class GoogleFirebaseSignIn implements Serializable {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
                     Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
-                    SQLiteDBHelper db=new SQLiteDBHelper(activity);
+                    SQLiteDBHelper db=SQLiteDBHelper.getInstance(activity);
 
                     db.addUser(user);
                     db.setUser(user);
                     if (user.getSosContacts() != null)
-                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+                        db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
 
 //                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
 //                    if(dataSnapshot.getValue(User.class).isPaid()){

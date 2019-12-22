@@ -104,7 +104,7 @@ public class profile_fragment extends Fragment {
 
         initObjects();
         initviews();
-        //FetchAllData();
+//        FetchAllData();
         DisplayData();
         initListeners();
 
@@ -121,7 +121,7 @@ public class profile_fragment extends Fragment {
 
 //        user = getIntent().getParcelableExtra("User");
         user = UserObject.user;
-        mydb = new SQLiteDBHelper(getContext());
+        mydb = SQLiteDBHelper.getInstance(getContext());
     }
 
     private void initListeners() {
@@ -172,7 +172,8 @@ public class profile_fragment extends Fragment {
                                                         user.setName(textName.getText().toString().trim());
                                                         textName.setText(textName.getText().toString().trim());
                                                         user.setDob(textDob.getText().toString());
-                                                        user.setLocation(textAddress.getText().toString());
+                                                        user.setLocation(textAddress.getText().toString().trim());
+                                                        textAddress.setText(textAddress.getText().toString().trim());
                                                         if (spinner.getSelectedItemPosition() == 0)
                                                             user.setGender("male");
                                                         else if (spinner.getSelectedItemPosition() == 1)
@@ -199,7 +200,7 @@ public class profile_fragment extends Fragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
-                mydb.delete_table();
+               // mydb.delete_table();
                 signOut();
 
                 //finishing the navigation activity
@@ -231,30 +232,30 @@ public class profile_fragment extends Fragment {
             return false;
     }
 
-    private void FetchAllData(){
-        int i =0;
-        Cursor res;
-        res = mydb.getAllData();
-        if (res.getCount() == 0){
-            Toast toast = Toast.makeText(getContext(),
-                    "No User Data Found",
-                    Toast.LENGTH_LONG);
-            toast.show();
-            Log.d("Profile","No Data found");
-        }
-//        StringBuffer buffer = new StringBuffer();
-        while (res.moveToNext()){
-            user.setName(res.getString(1));
-            user.setEmail(res.getString(2));
-            user.setGender(res.getString(3));
-           user.setMobile(res.getString(4));
-//            ansAadhaar = res.getString(6);
-            user.setLocation(res.getString(5));
-            user.setDob(res.getString(6));
-            i++;
-            Log.d("Profile Activity","User Object set in Profile activity successfully" +i);
-        }
-    }
+//    private void FetchAllData(){
+//        int i =0;
+//        Cursor res;
+//        res = mydb.getAllData();
+//        if (res.getCount() == 0){
+//            Toast toast = Toast.makeText(getContext(),
+//                    "No User Data Found",
+//                    Toast.LENGTH_LONG);
+//            toast.show();
+//            Log.d("Profile","No Data found");
+//        }
+////        StringBuffer buffer = new StringBuffer();
+//        while (res.moveToNext()){
+//            user.setName(res.getString(1));
+//            user.setEmail(res.getString(2));
+//            user.setGender(res.getString(3));
+//           user.setMobile(res.getString(4));
+////            ansAadhaar = res.getString(6);
+//            user.setLocation(res.getString(5));
+//            user.setDob(res.getString(6));
+//            i++;
+//            Log.d("Profile Activity","User Object set in Profile activity successfully" +i);
+//        }
+//    }
 
     private void DisplayData() {
 
@@ -398,7 +399,7 @@ public class profile_fragment extends Fragment {
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite
-        mydb.deleteDatabase(getContext());
+        mydb.deleteDatabase(Objects.requireNonNull(getContext()).getApplicationContext());
 
         try{
             Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);

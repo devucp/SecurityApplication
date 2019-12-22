@@ -40,7 +40,7 @@ public class navigation extends AppCompatActivity{
     static User newUser=UserObject.user;
     Boolean is_home=true;
 
-    SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
+    SQLiteDBHelper db;
     public static Boolean test=false;
     public static TextView tmode1;
 
@@ -54,6 +54,7 @@ public class navigation extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        db=SQLiteDBHelper.getInstance(navigation.this);
         Toolbar toolbar=findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
@@ -103,8 +104,7 @@ public class navigation extends AppCompatActivity{
         checkFirstSosContact();
         if(db.get_user_row().getCount()==0){
             Log.d("iamrun","me21");
-            db.delete_table();
-            db.deleteDatabase(this);
+            //db.deleteDatabase(this.getApplicationContext());
             // Signout Code Here
 
 
@@ -125,7 +125,7 @@ public class navigation extends AppCompatActivity{
 
     private void checkFirstSosContact(){
         // check if first sos contact is added
-        SQLiteDBHelper mydb = new SQLiteDBHelper(navigation.this);
+        SQLiteDBHelper mydb = db;
         Cursor res=mydb.getSosContacts();
         if (res.getCount() == 0){
             //Toast.makeText(getApplicationContext(), "No SOS Contact records Found", Toast.LENGTH_LONG).show();

@@ -787,11 +787,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
 //                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
-                    SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
+                    SQLiteDBHelper db=SQLiteDBHelper.getInstance(MainActivity.this);
                     db.addUser(user);
                     db.setUser(user);
                     if (user.getSosContacts() != null)
-                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+                        db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
                     updateUI(firebaseUser);
                 }
 

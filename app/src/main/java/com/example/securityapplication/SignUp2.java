@@ -174,7 +174,7 @@ public class SignUp2 extends AppCompatActivity {
 
     private void initObjects(){
         inputValidation = new InputValidation(activity);
-        DBHelper = new SQLiteDBHelper(activity);
+        DBHelper = SQLiteDBHelper.getInstance(activity);
         ReturnIntent = new Intent();
         user = getIntent().getParcelableExtra("User"); //getting the User object from previous signup activity
         password = getIntent().getStringExtra("password");

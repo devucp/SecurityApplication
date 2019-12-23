@@ -315,10 +315,12 @@ public class profile_fragment extends Fragment {
         textPhone.setAlpha(k);
         textAddress.setAlpha(k);
         textDob.setAlpha(k);
+        textName.setBottom(Color.BLACK);
     }
     private void enable(){
         spinner.setEnabled(true);
         textName.setEnabled(true);
+        chooseImgBtn.setVisibility(View.VISIBLE);
         textPhone.setEnabled(true);
         textAddress.setEnabled(true);
         textDob.setEnabled(true);

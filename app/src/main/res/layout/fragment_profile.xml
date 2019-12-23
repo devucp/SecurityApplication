@@ -34,6 +34,10 @@
             android:orientation="vertical"
             >
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
             <ImageView
                 android:id="@+id/profile_pic"
                 android:layout_width="120dp"
@@ -42,6 +46,22 @@
                 android:src="@drawable/ic_account_circle_cyan_24dp"
                 android:layout_marginTop="15dp"
                 />
+            <Button
+                android:id="@+id/btn_choose_img"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="80dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/button_bg_round"
+
+                android:text="edit"
+                android:drawableTop="@drawable/ic_edit_black_24dp"
+                android:textStyle="bold"
+                android:textColor="#fff"
+                android:visibility="gone"
+                android:textSize="10sp" />
+            </RelativeLayout>
 
             <EditText
                 android:id="@+id/text_Name"
@@ -270,30 +290,6 @@
                         android:textSize="22sp" />
 
                 </LinearLayout>
-
-                <!--Changes by rohan-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_horizontal"
-                    >
-
-                    <Button
-                        android:id="@+id/btn_choose_img"
-                        android:layout_width="125dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="30dp"
-                        android:layout_marginBottom="10dp"
-                        android:background="@drawable/buttonstylegradient"
-                        android:drawablePadding="5dp"
-                        android:text="choose"
-                        android:textColor="#fff"
-                        android:textSize="22sp" />
-
-                </LinearLayout>
-                <!--End changes by rohan-->
-
 
                 <TextView
                     android:id="@+id/text_changePassword"

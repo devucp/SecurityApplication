@@ -70,10 +70,10 @@ public class SendSMSService extends Service {
 
         //---when the SMS has been sent---
         sentReceiver= new sentReceiver();
-        registerReceiver(sentReceiver,new IntentFilter(SENT));
+        getApplicationContext().registerReceiver(sentReceiver,new IntentFilter(SENT));
         //---when the SMS has been delivered---
         deliveryReceiver= new deliveryReceiver();
-        registerReceiver(deliveryReceiver,new IntentFilter(DELIVERED));
+        getApplicationContext().registerReceiver(deliveryReceiver,new IntentFilter(DELIVERED));
         Log.d("SOS SMS","onCreate");
     }
 
@@ -118,14 +118,8 @@ public class SendSMSService extends Service {
         Log.d("SOS SMS","Location is"+location);
         //call setContactList
         if(contactList==null){
-            //filling DUMMY values
-            String number="9082021653";
-            setSenderName("DG");
-            if(location==null){
-                location="Location unavailable";
-            }
-            sendMessage(number,location);
-
+            //removed dummy contact
+            Toast.makeText(getApplicationContext(),"No SOS Contacts were found",Toast.LENGTH_SHORT);
         }
         else{
 
@@ -190,21 +184,24 @@ public class SendSMSService extends Service {
 
         String messageToSend= initSMSText(location); //refactored the code into initSMSText()
 
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
-                new Intent(SENT), 0);
+        PendingIntent sentPI = PendingIntent.getBroadcast(getApplicationContext(), 0,
+                new Intent(getApplicationContext(),sentReceiver.class), 0);
 
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
-                new Intent(DELIVERED), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(getApplicationContext(), 0,
+                new Intent(getApplicationContext(),deliveryReceiver.class), 0);
 
         Log.d("SendSMSServcie", "message to be sent is: "+messageToSend );
 
         ArrayList<String> parts = SmsManager.getDefault().divideMessage(messageToSend);
-
         ArrayList<PendingIntent> sendList = new ArrayList<>();
-        sendList.add(sentPI);
 
         ArrayList<PendingIntent> deliverList = new ArrayList<>();
-        deliverList.add(deliveredPI);
+
+        for(int i=0;i<parts.size();i++){
+            Log.d("SOS SMS","Intents added for part"+(i+1));
+            sendList.add(sentPI);
+            deliverList.add(deliveredPI);
+        }
 
 
         try {
@@ -245,8 +242,8 @@ public class SendSMSService extends Service {
 
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(sentReceiver);
-        unregisterReceiver(deliveryReceiver);
+        getApplicationContext().unregisterReceiver(sentReceiver);
+        getApplicationContext().unregisterReceiver(deliveryReceiver);
 
     }
 }

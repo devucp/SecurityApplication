@@ -46,21 +46,18 @@
                 android:src="@drawable/ic_account_circle_cyan_24dp"
                 android:layout_marginTop="15dp"
                 />
-            <Button
+
+            <ImageButton
                 android:id="@+id/btn_choose_img"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="80dp"
-                android:layout_marginStart="80dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginTop="88dp"
+                android:layout_marginStart="85dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/button_bg_round"
+                android:src="@drawable/ic_camera_icon"
+                android:visibility="gone" />
 
-                android:text="edit"
-                android:drawableTop="@drawable/ic_edit_black_24dp"
-                android:textStyle="bold"
-                android:textColor="#fff"
-                android:visibility="gone"
-                android:textSize="10sp" />
             </RelativeLayout>
 
             <EditText

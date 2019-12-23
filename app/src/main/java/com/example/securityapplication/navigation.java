@@ -127,7 +127,7 @@ public class navigation extends AppCompatActivity {
 
                 }
                 //update testmode value in db
-                boolean test= (flag==1);
+                test= (flag==1); //using the global static variable instead of the local variable
                 db.updatetestmode(test);
             }
         });

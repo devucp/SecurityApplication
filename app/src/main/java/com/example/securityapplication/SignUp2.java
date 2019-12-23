@@ -103,7 +103,6 @@ public class SignUp2 extends AppCompatActivity {
     private String password;
     public static ProgressBar Spinner;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -626,7 +625,7 @@ public class SignUp2 extends AppCompatActivity {
                                 throw task.getException();
                             } catch (Exception e) {
                                 Log.d(TAG, "Exception:" + e.getMessage());
-                                Toast.makeText(SignUp2.this, "Authentication failed. Try to login",
+                                Toast.makeText(SignUp2.this, "Authentication failed. Try to login"+e.getMessage(),
                                         Toast.LENGTH_SHORT).show();
                                 // redirect user to MainActivity
                                 redirectToMainActivity();

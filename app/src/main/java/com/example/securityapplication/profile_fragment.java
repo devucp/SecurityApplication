@@ -2,15 +2,19 @@ package com.example.securityapplication;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 
 import android.os.Bundle;
 import android.os.PatternMatcher;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +32,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,15 +50,23 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageException;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static android.support.v4.content.ContextCompat.getSystemService;
 import static com.example.securityapplication.R.layout.spinner_layout;
+import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
 
 public class profile_fragment extends Fragment {
 
@@ -71,8 +84,14 @@ public class profile_fragment extends Fragment {
     Spinner spinner;
     DatePickerDialog datePickerDialog;
 
-    navigation nv=new navigation();
     private FirebaseHelper firebaseHelper;
+
+    private ImageView profile_pic;
+    private Button chooseImgBtn;
+    private Uri filePath;
+
+    private final int PICK_IMAGE_REQUEST = 71;
+    private  ProgressDialog progressDialog;
 
     @Nullable
     @Override
@@ -168,7 +187,11 @@ public class profile_fragment extends Fragment {
                                                     }
                                                     else {
                                                         // start progress bar
-
+                                                        progressDialog = new ProgressDialog(getContext());
+                                                        progressDialog.setTitle("Saving data...");
+                                                        progressDialog.show();
+                                                        progressDialog.setMessage("validating....");
+                                                        progressDialog.setCancelable(false);
 
                                                         //save code will come here
                                                         user.setName(textName.getText().toString().trim());
@@ -204,14 +227,6 @@ public class profile_fragment extends Fragment {
                 Log.d("signout","signout happen");
                // mydb.delete_table();
                 signOut();
-
-                //finishing the navigation activity
-                getActivity().finish();
-                //Clear the back stack and re-directing to the sign-up page
-                Intent mLogOutAndRedirect= new Intent(getContext(),MainActivity.class);
-                mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(mLogOutAndRedirect);
-
             }
         });
 
@@ -219,6 +234,14 @@ public class profile_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 changePassword(firebaseHelper.getFirebaseAuth().getCurrentUser().getEmail());
+            }
+        });
+
+        chooseImgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // choose img from gallery
+                chooseImg();
             }
         });
     }
@@ -315,6 +338,10 @@ public class profile_fragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,Locality);
         textAddress.setAdapter(adapter);
         text_changePassword = getActivity().findViewById(R.id.text_changePassword);
+
+        profile_pic = getActivity().findViewById(R.id.profile_pic);
+        chooseImgBtn = getActivity().findViewById(R.id.btn_choose_img);
+
         disable();
 
     }
@@ -329,6 +356,21 @@ public class profile_fragment extends Fragment {
                 Log.d("Profile","User object returned"+user.getEmail());
                 mydb.updateUser(user);
                 DisplayData();
+            }
+        }
+
+        if(requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
+                && data != null && data.getData() != null )
+        {
+            filePath = data.getData();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                profile_pic.setImageBitmap(bitmap);
+                deleteExistingProfilePic();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
             }
         }
     }
@@ -399,6 +441,9 @@ public class profile_fragment extends Fragment {
             return;
         }
 
+        if (!IsInternet.checkInternet(getContext()))
+            return;
+
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite
@@ -414,6 +459,12 @@ public class profile_fragment extends Fragment {
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");
         }
+        //finishing the navigation activity
+        getActivity().finish();
+        //Clear the back stack and re-directing to the sign-up page
+        Intent mLogOutAndRedirect= new Intent(getContext(),MainActivity.class);
+        mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mLogOutAndRedirect);
     }
 
     private void checkMobileInFirebase(final String newMobile){
@@ -435,6 +486,8 @@ public class profile_fragment extends Fragment {
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
+                            // stop progress bar
+                            progressDialog.dismiss();
                             // prompt user to enter different mobile number
                             Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
                         }
@@ -452,13 +505,14 @@ public class profile_fragment extends Fragment {
 
     private void updateUser(){
 
-        // stop progress bar
-
         Log.d(TAG,"Updating user...");
 
         user.setMobile(textPhone.getText().toString());
         mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
+
+        // stop progress bar
+        progressDialog.dismiss();
 
         btn_edit.setText("edit");
         alphaa(0.6f);
@@ -494,5 +548,84 @@ public class profile_fragment extends Fragment {
             Log.d(TAG, e.getMessage());
             Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void chooseImg(){
+
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+
+    }
+
+    private void uploadProfilePicToFirebase(){
+        if(filePath != null)
+        {
+            final ProgressDialog progressDialog = new ProgressDialog(getContext());
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+            progressDialog.setCancelable(false);
+
+            StorageReference ref = firebaseHelper.getStorageReference().child("images/profile_pic");
+            ref.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            Toast.makeText(getContext(),"Uploaded", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(getContext(), "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100f*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                    .getTotalByteCount());
+                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
+                        }
+                    });
+        }
+    }
+
+    private void deleteExistingProfilePic(){
+        if (filePath == null)
+            return;
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Processing...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        // Create a storage reference from our app
+        StorageReference storageRef = firebaseHelper.getStorageReference();
+
+        // Create a reference to the file to delete
+        StorageReference imgRef = storageRef.child("images/profile_pic");
+
+        // Delete the file
+        imgRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+                progressDialog.dismiss();
+                uploadProfilePicToFirebase();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+                if (((StorageException) exception).getErrorCode() == ERROR_OBJECT_NOT_FOUND){
+                    progressDialog.dismiss();
+                    uploadProfilePicToFirebase();
+                }
+                else
+                    Toast.makeText(getContext(), "Unable to delete img",Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

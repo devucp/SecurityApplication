@@ -36,6 +36,7 @@ public class home_fragment extends Fragment {
     public Button alert;
     public Button emergency;
     public Button informsafety;
+    static public boolean check=false;
     int RC;
     static Boolean is_paid = false;
     public static Boolean test = true;
@@ -72,6 +73,8 @@ public class home_fragment extends Fragment {
                     Toast.makeText(getContext(),"sms permisssion noy enabled",Toast.LENGTH_LONG);
                 }
 
+                check=true;
+
                 Intent mSosPlayerIntent = new Intent(getContext(), SendSMSService.class);
                 mSosPlayerIntent.putExtra("alert",1);
 
@@ -96,6 +99,7 @@ public class home_fragment extends Fragment {
                     //Code: TO play siren and send emergency message and alert
                     //emergency.setBackgroundColor(getResources().getColor(R.drawable.buttonshape_emer));
                     Context c2 = getContext();
+                    check=true;
 
                     Intent emergencyintent1=new Intent(getContext(), BackgroundSosPlayerService.class);
 
@@ -134,33 +138,59 @@ public class home_fragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Context c3 = getContext();
-                Intent stopsms = new Intent(getContext(),SendSMSService.class);
-                stopsms.putExtra("safe",1);
-                if (c3 != null) {
-                    c3.startService(stopsms);
+
+                try {
+
+
+                    if (SendSMSService.getAlert() == 0 && SendSMSService.getEmergency() == 0) {
+
+                        Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
+
+
+                    }
+
+
+
+
+                else{
+
+
+                        Context c3 = getContext();
+
+                        Intent stopsms = new Intent(getContext(), SendSMSService.class);
+                        stopsms.putExtra("safe", 1);
+                        if (c3 != null) {
+                            c3.startService(stopsms);
+                        }
+
+
+                        if (isMyServiceRunning(SendSMSService.class)) {
+
+
+                            if (c3 != null) {
+                                c3.stopService(stopsms);
+                            }
+                        }
+
+                        if (isMyServiceRunning(BackgroundSosPlayerService.class)) {
+                            //stopping the sosplay variable and resetting count in SosPlayer.java
+                            SosPlayer.stopPlaying();
+
+                            Intent stopemergency = new Intent(getContext(), BackgroundSosPlayerService.class);
+                            if (c3 != null) {
+                                c3.stopService(stopemergency);
+
+                                check = false;
+                            }
+                        }
+                    }
                 }
+                catch (Exception e)
+                {
+                    Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
 
-
-                if(isMyServiceRunning(SendSMSService.class))
-               {
-
-
-                   if (c3 != null) {
-                       c3.stopService(stopsms);
-                   }
-               }
-
-               if(isMyServiceRunning(BackgroundSosPlayerService.class))
-               {
-                   //stopping the sosplay variable and resetting count in SosPlayer.java
-                   SosPlayer.stopPlaying();
-
-                   Intent stopemergency = new Intent(getContext(),BackgroundSosPlayerService.class);
-                   if (c3 != null) {
-                       c3.stopService(stopemergency);
-                   }
-               }
+                    Log.d("home_fragment", "catch raised");
+                }
 
 
 

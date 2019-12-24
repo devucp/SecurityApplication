@@ -58,6 +58,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -156,7 +158,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else {
                     Log.d(TAG,"Invalid credentials");
-                    Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
+                    Toasty.error(MainActivity.this, "Enter valid credentials", Toast.LENGTH_SHORT, true).show();
+
+ //                   Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -290,7 +294,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.d(TAG,e.getMessage());
-                                            Toast.makeText(MainActivity.this, "On check user status db write error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                            Toasty.error(MainActivity.this, "On check user status db write error:"+e.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+  //                                          Toast.makeText(MainActivity.this, "On check user status db write error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -298,7 +304,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     Log.d(TAG,e.getMessage());
-                                    Toast.makeText(MainActivity.this, "On check user status db write error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                    Toasty.error(MainActivity.this
+                                            , "On check user status db write error:"+e.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+                                  //  Toast.makeText(MainActivity.this, "On check user status db write error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -311,7 +320,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, "On check user status db read error:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                    Toasty.error(MainActivity.this, "On check user status db read error:"+databaseError.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+                   // Toast.makeText(MainActivity.this, "On check user status db read error:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -347,7 +358,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, RC);
@@ -363,7 +376,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     deviceId();
                 } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
                     finish();
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                    Toasty.error(this, "Permission denied", Toast.LENGTH_SHORT, true).show();
+
+                   // Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
                 break;
             default:
@@ -417,7 +432,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                Toast.makeText(MainActivity.this, "Authentication failed. Try again",Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Authentication failed. Try again", Toast.LENGTH_SHORT, true).show();
+
+               // Toast.makeText(MainActivity.this, "Authentication failed. Try again",Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
         }
@@ -481,7 +498,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         public void onFailure(@NonNull Exception e) {
                                             firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).child("uid").setValue("null");
                                             Log.d(TAG,e.getMessage());
-                                            Toast.makeText(MainActivity.this, "Sign in failed."+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                            Toasty.error(MainActivity.this, "Sign in failed.", Toast.LENGTH_SHORT, true).show();
+
+                                           // Toast.makeText(MainActivity.this, "Sign in failed."+e.getMessage(),Toast.LENGTH_SHORT).show();
                                             // sigin out the user
                                             LogOutUser();
                                         }
@@ -491,7 +510,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     Log.d(TAG,e.getMessage());
-                                    Toast.makeText(MainActivity.this, "Sign in failed"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                    Toasty.error(MainActivity.this, "Sign in failed"+e.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+                                    //Toast.makeText(MainActivity.this, "Sign in failed"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                     // sign out the user
                                     LogOutUser();
                                 }
@@ -504,11 +525,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             catch (FirebaseAuthInvalidCredentialsException e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
-                                Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
+                                Toasty.error(MainActivity.this, "Invalid Password", Toast.LENGTH_SHORT, true).show();
+
+                                //Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
                             }
                             catch (Exception e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
-                                Toast.makeText(MainActivity.this, "Authentication failed. Try again"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                Toasty.error(MainActivity.this, "Authentication failed. Try again"+e.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+                               // Toast.makeText(MainActivity.this, "Authentication failed. Try again"+e.getMessage(),Toast.LENGTH_SHORT).show();
                             }finally {
                                 updateUI(null);
                             }
@@ -588,7 +613,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (acc != null)
                         googleFirebaseSignIn.firebaseAuthWithGoogle(acc);
                     else {
-                        Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
+                        Toasty.error(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT, true).show();
+
+                       // Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
                         pgbarhide();
                     }
                 }
@@ -663,7 +690,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pgbarhide();
             }
             else
-                Toast.makeText(MainActivity.this,"Account not registered. Please complete the registration process",Toast.LENGTH_LONG).show();
+                Toasty.error(MainActivity.this, "Account not registered. Please complete the registration process", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(MainActivity.this,"Account not registered. Please complete the registration process",Toast.LENGTH_LONG).show();
             pgbarhide();
         }
         else {
@@ -706,9 +735,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             prompt user to log out from old device
                                             */
                                             Log.d(TAG, "User is LoggedIn in other device");
-                                            Toast.makeText(MainActivity.this,
+                                            Toasty.error(MainActivity.this, "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_SHORT, true).show();
+
+                                           /* Toast.makeText(MainActivity.this,
                                                     "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                            LogOutUser();
+                                           */ LogOutUser();
                                         }
                                     } else {
                                         //user can login
@@ -725,7 +756,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 if (acc != null)
                                                     googleFirebaseSignIn.firebaseAuthWithGoogle(acc);
                                                 else {
-                                                    Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
+                                                    Toasty.error(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT, true).show();
+
+                                                    //Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
                                                     pgbarhide();
                                                 }
                                                 break;

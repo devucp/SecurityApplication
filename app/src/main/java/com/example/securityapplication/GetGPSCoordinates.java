@@ -17,6 +17,8 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 public class GetGPSCoordinates extends Service {
     private LocationListener listener;
     private LocationManager locationManager;
@@ -119,7 +121,9 @@ public class GetGPSCoordinates extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
+        Toasty.error(getApplicationContext(), "GPS service destroyed", Toast.LENGTH_SHORT, true).show();
+
+        //Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
         Log.d("GPSService","OnDestroy");
         if(locationManager != null){
             //noinspection MissingPermission

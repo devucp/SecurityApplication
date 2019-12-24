@@ -31,6 +31,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 
+import es.dmoral.toasty.Toasty;
+
 public class GoogleFirebaseSignIn implements Serializable {
 
     private Activity activity;
@@ -168,7 +170,9 @@ public class GoogleFirebaseSignIn implements Serializable {
             Intent mLogOutAndRedirect = new Intent(activity, MainActivity.class);
             mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             activity.startActivity(mLogOutAndRedirect);
-            Toast.makeText(activity, "Sign in failed", Toast.LENGTH_SHORT).show();
+            Toasty.error(activity, "Sign in failed", Toast.LENGTH_SHORT, true).show();
+
+           // Toast.makeText(activity, "Sign in failed", Toast.LENGTH_SHORT).show();
         }
         //finishing the navigation activity
         activity.finish();

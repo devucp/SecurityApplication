@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import java.net.InetAddress;
 
+import es.dmoral.toasty.Toasty;
+
 public class IsInternet extends AppCompatActivity {
 
 
@@ -44,7 +46,9 @@ public class IsInternet extends AppCompatActivity {
             return true;
         }
         else {
-            Toast.makeText(context, "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
+            Toasty.error(context, "Please check your Internet Connectivity", Toast.LENGTH_LONG, true).show();
+
+           // Toast.makeText(context, "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
             return false;
         }
     }

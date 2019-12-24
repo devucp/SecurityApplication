@@ -57,6 +57,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Hashtable;
 
+import es.dmoral.toasty.Toasty;
+
 import static java.security.AccessController.getContext;
 
 /*
@@ -151,7 +153,9 @@ public class SignUp1Activity extends AppCompatActivity {
             return userData;
         }
         else {
-            Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Enter Valid Credentials", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -200,9 +204,10 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // stop spinner user interaction enabled
                                 spinner.setVisibility(View.GONE);
                                 Enable();
+                                Toasty.error(SignUp1Activity.this, "Invalid Password, Use forgot password in case you forgot your password", Toast.LENGTH_LONG, true).show();
 
-                                Toast.makeText(SignUp1Activity.this,
-                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
+                               /* Toast.makeText(SignUp1Activity.this,
+                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();*/
                             }
                             catch (Exception e)
                             {
@@ -212,8 +217,10 @@ public class SignUp1Activity extends AppCompatActivity {
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignUp1Activity.this, "Authentication failed.Please check your connection and try again",
-                                        Toast.LENGTH_LONG).show();
+                                Toasty.error(SignUp1Activity.this, "Authentication failed.Please check your connection and try again", Toast.LENGTH_LONG, true).show();
+
+                                /*Toast.makeText(SignUp1Activity.this, "Authentication failed.Please check your connection and try again",
+                                        Toast.LENGTH_LONG).show();*/
                             }
                         }
                     }
@@ -245,8 +252,10 @@ public class SignUp1Activity extends AppCompatActivity {
                                 textinputCnfPass.setAlpha(1);
                                 verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG,e.getMessage());
-                                Toast.makeText(SignUp1Activity.this,
-                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
+                                Toasty.error(SignUp1Activity.this, "Invalid Password, Use forgot password in case you forgot your password", Toast.LENGTH_LONG, true).show();
+
+                              /*  Toast.makeText(SignUp1Activity.this,
+                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();*/
                             }catch (Exception e){
                                 // stop spinner
                                 spinner.setVisibility(View.GONE);
@@ -256,7 +265,9 @@ public class SignUp1Activity extends AppCompatActivity {
                                 textinputCnfPass.setAlpha(1);
                                 verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
-                                Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
+                                Toasty.error(SignUp1Activity.this, "Authentication failed. Please check connection and try again", Toast.LENGTH_LONG, true).show();
+
+                                //Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -268,7 +279,9 @@ public class SignUp1Activity extends AppCompatActivity {
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
-            Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
+            Toasty.success(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG, true).show();
+
+            //Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
             String emailId = firebaseUser.getEmail();
 
             firebaseHelper.firebaseSignOut();
@@ -304,7 +317,9 @@ public class SignUp1Activity extends AppCompatActivity {
             finish();
 
         if (requestCode==2){
-            Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
+            Toasty.error(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -356,7 +371,9 @@ public class SignUp1Activity extends AppCompatActivity {
         else{
             spinner.setVisibility(View.GONE);
             Enable();
-            Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
+            Toasty.error(SignUp1Activity.this, "Email is already registered", Toast.LENGTH_LONG, true).show();
+
+           // Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
             spinner.setVisibility(View.GONE);
             Enable();
         }

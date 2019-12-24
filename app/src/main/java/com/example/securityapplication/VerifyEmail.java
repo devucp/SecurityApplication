@@ -14,6 +14,8 @@ import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import es.dmoral.toasty.Toasty;
+
 import static com.example.securityapplication.SignUp1Activity.Btn_Submit;
 import static com.example.securityapplication.SignUp1Activity.spinner;
 import static com.example.securityapplication.SignUp1Activity.t1;
@@ -67,11 +69,15 @@ public class VerifyEmail {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(context,
+                            Toasty.success(context, "Verification email sent to "+ firebaseUser.getEmail(), Toast.LENGTH_LONG, true).show();
+
+                            /*Toast.makeText(context,
                                     "Verification email sent to " + firebaseUser.getEmail(),
-                                    Toast.LENGTH_LONG).show();
+                                    Toast.LENGTH_LONG).show();*/
                         } else {
                             Log.e(TAG, "sendEmailVerification", task.getException());
+                            Toasty.warning(context, "Email already sent", Toast.LENGTH_LONG, true).show();
+
                             Toast.makeText(context,
                                     "Email already sent",
                                     Toast.LENGTH_LONG).show();

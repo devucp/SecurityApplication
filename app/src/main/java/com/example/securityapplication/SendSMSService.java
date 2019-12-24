@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import es.dmoral.toasty.Toasty;
 
 public class SendSMSService extends Service {
     private static String[] contactList=null; //TODO: stores the number of the emergency contacts
@@ -155,7 +158,8 @@ public class SendSMSService extends Service {
         {
             toastmsg="send emergency sos message";
         }
-        Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
+        Toasty.warning(getApplicationContext(), toastmsg, Toast.LENGTH_SHORT, true).show();
+        //Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
         this.stopSelf();//FINISH the service
     }
 
@@ -214,7 +218,9 @@ public class SendSMSService extends Service {
         catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.d("SOS SMS", "sendMessage() exception");
-            Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
+            Toasty.error(getApplicationContext(), "Invalid Mobile No or SOS contacts not initiliased", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
         }
         Log.d("SOS SMS", "sendMessage() end");
     }

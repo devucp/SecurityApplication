@@ -27,6 +27,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.User;
+
 import java.util.Objects;
 
 import static android.content.Intent.getIntent;
@@ -38,13 +40,9 @@ public class home_fragment extends Fragment {
     public Button informsafety;
     static public boolean check=false;
     int RC;
-    static Boolean is_paid = false;
+    Boolean is_paid = false;
     public static Boolean test = true;
     //NOTE: Button bt has been removed. Now using Button emergency. Event listeners also moved to emergency
-
-    public static void setpaid(Boolean b){
-        is_paid=b;
-    }
     @Nullable
     @Override
 
@@ -59,7 +57,14 @@ public class home_fragment extends Fragment {
         alert = Objects.requireNonNull(getActivity()).findViewById(R.id.alert);
         emergency = getActivity().findViewById(R.id.emergency);
         informsafety = getActivity().findViewById(R.id.inform);
-
+        Log.d("Paid1234hello2","paid: "+UserObject.user.isPaid());
+        if(UserObject.user.isPaid()){
+            is_paid=true;
+        }
+        else{
+            is_paid=false;
+        }
+        Log.d("Paid1234hello2","ispaid: "+is_paid);
 
         alert.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ShowToast")
@@ -80,11 +85,7 @@ public class home_fragment extends Fragment {
 
 
                 if (!isMyServiceRunning(SendSMSService.class)){
-
                     Objects.requireNonNull(getContext()).startService(mSosPlayerIntent);
-
-
-
 
                 }
             }
@@ -198,7 +199,16 @@ public class home_fragment extends Fragment {
             }
         });
 
-        //removed earlier test mode from here
+//        if (navigation.test) {
+//
+//            TextView tv = getActivity().findViewById(R.id.textView3);
+//            tv.setVisibility(View.VISIBLE);
+//        } else {
+//            TextView tv = getActivity().findViewById(R.id.textView3);
+//            tv.setVisibility(View.INVISIBLE);
+//        }
+
+
 
     }
 

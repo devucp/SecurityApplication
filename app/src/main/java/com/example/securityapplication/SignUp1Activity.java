@@ -301,12 +301,7 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==10 && requestCode==1)
-            try {
-                closeNow();
-            }catch (Exception e){
-                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-                finish();
-            }
+            finish();
 
         if (requestCode==2){
             Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
@@ -319,12 +314,7 @@ public class SignUp1Activity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         returnIntent.putExtra("hasBackPressed",true);
         setResult(Activity.RESULT_OK,returnIntent);
-        try {
-            closeNow();
-        }catch (Exception e){
-            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-            finish();
-        }
+        finish();
     }
 
     private void setUidFromFirebase(final Hashtable<String,String> userData){
@@ -350,7 +340,8 @@ public class SignUp1Activity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(SignUp1Activity.this, "Inside setUidFromFirebase SignUp1:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -369,10 +360,7 @@ public class SignUp1Activity extends AppCompatActivity {
             spinner.setVisibility(View.GONE);
             Enable();
         }
-
     }
-
-
 
    public static void setError(String s,TextView t1)
    {
@@ -385,15 +373,6 @@ public class SignUp1Activity extends AppCompatActivity {
            t1.setVisibility(View.GONE);
        }
    }
-
-    private void closeNow() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            finishAffinity();
-        } else {
-            finish();
-        }
-
-    }
 
    //screen enable disable
 

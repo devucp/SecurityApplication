@@ -91,7 +91,7 @@ public class SendSMSService extends Service {
         Log.d("SendSMSService","initContacts:");
         //check if HashMap was initialised on call
         try {
-            HashMap<String, String> sosContacts = navigation.newUser.getSosContacts();
+            HashMap<String, String> sosContacts = UserObject.user.getSosContacts();
             Log.d("SendSMSServcie", "SosContacts size:" + sosContacts.size());
             if (sosContacts.size() != 0) {
                 contactList = new String[sosContacts.size()];

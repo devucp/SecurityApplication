@@ -73,7 +73,7 @@ public class VerifyEmail {
                         } else {
                             Log.e(TAG, "sendEmailVerification", task.getException());
                             Toast.makeText(context,
-                                    "Failed to send verification email. Try Again",
+                                    "Email already sent",
                                     Toast.LENGTH_LONG).show();
                         }
                         signOut();

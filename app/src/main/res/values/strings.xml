@@ -1,29 +1,24 @@
 <resources>
-    <string-array name="gender">
-        <item>Male</item>
-        <item>Female</item>
-        <item>Others</item>
-    </string-array>
-
     <string name="app_name">SecurityApplication</string>
 
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
+
+    <!-- Preference Titles -->
     <string name="sync_header">Sync</string>
+    <string name="signature_title">Your signature</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
     <string name="reply_title">Default reply action</string>
+    <string name="sync_title">Sync email periodically</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
     <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-
     <string name="not_logged">NOT LOGGED IN</string>
+
     <string name="logged">LOGGED IN</string>
     <string name="sign_out_text">SIGN OUT</string>
     <string name="sign_in_text">SIGN IN</string>
@@ -33,10 +28,10 @@
     <string name="no_aadhar">PLEASE ENTER AADHAR NO.</string>
     <string name="no_location">PLEASE ENTER LOCATION</string>
     <string name="facebook_app_id">795149104216520</string>
+    <string name="signup">Sign Up</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="signup">Sign Up</string>
     <string name="head">Save Me</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
@@ -48,6 +43,11 @@
     <string name="password_can_t_be_empty">password can\'t be empty</string>
     <string name="locality">Locality</string>
     <string name="change_password">change password ?</string>
+    <string-array name="gender">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Others</item>
+    </string-array>
 
     <!-- TODO: Add AutoComplete Functionality -->
     <string-array name="Locality">

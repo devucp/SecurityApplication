@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static Hashtable<String,String> userData;
     private boolean isUserStatusChecked = false;
+    SQLiteDBHelper db;
 
     public void pgbarshow()
     {
@@ -219,23 +220,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         /** DATABASE FORCEFUL CREATION**/
-        //uncomment to forcefully delete database
-//        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
-//        sqLiteDBHelper.deleteDatabase(this);
-
+        db=SQLiteDBHelper.getInstance(MainActivity.this);
     }
 
     public void onStart(){
+        Log.d(TAG,"Inside onStart");
         super.onStart();
 
+        if (mImeiNumber == null)
+            deviceId();
+
         FirebaseUser currentUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+
         updateUI(currentUser);
     }
 
     private void initializeGoogleFirebaseSignIn(){
         if (mImeiNumber == null)
             deviceId();
-        googleFirebaseSignIn.init(this, mImeiNumber);
+        else
+            googleFirebaseSignIn.init(this, mImeiNumber);
     }
 
     public void initViews(){
@@ -255,8 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkUserStatus(){
         Log.d(TAG,"Checkig user status...");
-        if (mImeiNumber == null)
-            deviceId();
+
         if (firebaseHelper.getFirebaseAuth().getCurrentUser() == null){
             Log.d(TAG,"Inside checkUserStatus:Current user is null");
             firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -288,14 +291,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-
+                                            Log.d(TAG,e.getMessage());
+                                            Toast.makeText(MainActivity.this, "On check user status db write error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
+                                    Log.d(TAG,e.getMessage());
+                                    Toast.makeText(MainActivity.this, "On check user status db write error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -308,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
+                    Toast.makeText(MainActivity.this, "On check user status db read error:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -327,6 +333,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else {
                 mImeiNumber = telephonyManager.getDeviceId();
             }
+            googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
+            initializeGoogleFirebaseSignIn();
             if (!isUserStatusChecked) {
                 //incase user formats or uninstalls or clears user data
                 checkUserStatus();
@@ -349,15 +357,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
     }
 
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            finishAffinity();
-        }
-        else{
-            finish();
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -365,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     deviceId();
                 } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
-                    closeNow();
+                    finish();
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -420,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                Toast.makeText(MainActivity.this, "Authentication failed. Try Again",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Authentication failed. Try again",Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
         }
@@ -458,8 +457,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
-                            Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+                            try {
+                                boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
+                                Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+                            }catch (Exception e){
+                                Log.d(TAG,e.getMessage());
+                            }
 
                             final FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             Log.d(TAG, firebaseHelper.getDevicesDatabaseReference().toString());
@@ -478,14 +481,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-
+                                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).child("uid").setValue("null");
+                                            Log.d(TAG,e.getMessage());
+                                            Toast.makeText(MainActivity.this, "Sign in failed."+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                            // sigin out the user
+                                            LogOutUser();
                                         }
                                     });
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-
+                                    Log.d(TAG,e.getMessage());
+                                    Toast.makeText(MainActivity.this, "Sign in failed"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                    // sign out the user
+                                    LogOutUser();
                                 }
                             });
 
@@ -500,18 +510,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             catch (Exception e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
+                                Toast.makeText(MainActivity.this, "Authentication failed. Try again"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                            }finally {
+                                updateUI(null);
                             }
-                            updateUI(null);
                         }
                     }
                 });
     }
 
     private void LogOutUser(){
-        if (mImeiNumber == null)
-            deviceId();
         firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(MainActivity.this);
+        pgbarhide();
+        updateUI(null);
     }
 
     public void updateUI(FirebaseUser firebaseUser){
@@ -524,15 +536,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
+<<<<<<< HEAD
             Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
 
+=======
+            if (db.getdb_user() == null){
+                firebaseHelper.firebaseSignOut();
+                firebaseHelper.googleSignOut(MainActivity.this);
+                updateUI(null);
+                return;
+            }
+            Log.d(TAG,"current user"+firebaseUser.getEmail());
+            //goto next activity only if user exists in firebase db
+>>>>>>> fe4914adc93adb59e7c8a071e5d5b03dd6514ede
             /** SosPlayer Service intent**/
             startService(new Intent(this, SosPlayer.class));
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
             try {
-                closeNow();
+                finish();
             }catch (Exception e){
                 Log.d(TAG,"Exception on closing activity:"+e.getMessage());
                 finish();
@@ -569,11 +592,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else if (SignInType.equals("google")){
                     // login the user through google
                     initializeGoogleFirebaseSignIn();
-                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                    GoogleSignInAccount acc = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+                    if (acc != null)
+                        googleFirebaseSignIn.firebaseAuthWithGoogle(acc);
+                    else {
+                        Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
+                        pgbarhide();
+                    }
                 }
             }
         } else {
-            Log.d(TAG, user.toString());
+            Log.d(TAG, "User:null");
             pgbarhide();
         }
     }
@@ -595,6 +624,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(MainActivity.this, "Inside setDeviceForSignIn MainAct:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                pgbarhide();
             }
         });
     }
@@ -622,7 +653,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(MainActivity.this, "Inside setUidFromFirebaseForSignIn MainAct:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                pgbarhide();
             }
         });
     }
@@ -630,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void isEmailRegistered(){
         Log.d(TAG,"Inside isEmailRegistered");
         if (uid.equals("null")){
-            Log.d(TAG,"Account not registered");
+            Log.d(TAG,"Account not registered. Please complete the registration process");
             // prompt user to signUp
             if (userData.get("SignInType").equals("google")){
                 Intent signUpIntent = new Intent(this,SignUp1Activity.class);
@@ -638,16 +671,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pgbarhide();
             }
             else
+<<<<<<< HEAD
                 //Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
             Toasty.warning(this, "Account not registered", Toast.LENGTH_LONG, true).show();
 
+=======
+                Toast.makeText(MainActivity.this,"Account not registered. Please complete the registration process",Toast.LENGTH_LONG).show();
+>>>>>>> fe4914adc93adb59e7c8a071e5d5b03dd6514ede
             pgbarhide();
         }
         else {
             /*  case1: user tries to sign in from same device
                 case2:user tries to sign in from other device and maybe registered or not
                 Solution for both is same:
-               check if user logged out from previous device
+                ck if user logged out from previous device
                find imei of previous device: Email node->email->uid->imei
                if uid under Devices node of previous device is null then logged out..else prompt user to log out
              */
@@ -686,7 +723,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             Toast.makeText(MainActivity.this,
                                                     "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
                                             LogOutUser();
-                                            pgbarhide();
                                         }
                                     } else {
                                         //user can login
@@ -699,10 +735,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 break;
                                             case "google":
                                                 initializeGoogleFirebaseSignIn();
-                                                googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
+                                                GoogleSignInAccount acc = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+                                                if (acc != null)
+                                                    googleFirebaseSignIn.firebaseAuthWithGoogle(acc);
+                                                else {
+                                                    Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
+                                                    pgbarhide();
+                                                }
                                                 break;
                                             default:
                                                 Log.d(TAG, "Invalid SignInType");
+                                                pgbarhide();
                                                 return;
                                         }
                                     }
@@ -710,7 +753,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                    Log.d(TAG,databaseError.getDetails());
+                                    Toast.makeText(MainActivity.this, "Inside isEmailRegistered deviceDberror:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                    pgbarhide();
                                 }
                             });
                         }
@@ -718,6 +763,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         user = null;
                         Log.d(TAG,"User is null");
+                        pgbarhide();
                     }
                 }
 
@@ -726,7 +772,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     // Getting User failed, log a message
                     Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-                    Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Inside isEmailRegistered userDberror:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    pgbarhide();
                 }
             });
         }
@@ -785,6 +832,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
+<<<<<<< HEAD
                     Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
 
@@ -800,13 +848,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     else{
                         home_fragment.setpaid(false);
+=======
+//                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+                    //db=new SQLiteDBHelper(MainActivity.this);
+                    SQLiteDBHelper db=SQLiteDBHelper.getInstance(MainActivity.this);
+                    try {
+                        if (db.addUser(user)) {
+                            if (user.getSosContacts() != null)
+                                db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
+                            updateUI(firebaseUser);
+                        }
+                        else {
+                            firebaseHelper.firebaseSignOut(mImeiNumber);
+                            firebaseHelper.googleSignOut(MainActivity.this);
+                            updateUI(null);
+                            Toast.makeText(MainActivity.this, "Authentication failed :sqlite error occurred",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                    }catch (Exception e){
+                        Log.d(TAG,e.getMessage());
+                        firebaseHelper.firebaseSignOut(mImeiNumber);
+                        firebaseHelper.googleSignOut(MainActivity.this);
+                        updateUI(null);
+                        Toast.makeText(MainActivity.this, "Sqlite error occurred MainAct:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                        return;
+>>>>>>> fe4914adc93adb59e7c8a071e5d5b03dd6514ede
                     }
-                    updateUI(firebaseUser);
+
+//                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
+//                    if(dataSnapshot.getValue(User.class).isPaid()){
+//                        Log.d("Paid12345","i am here");
+//                        home_fragment.setpaid(true);
+//                    }
+//                    else{
+//                        home_fragment.setpaid(false);
+//                    }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.d(TAG,databaseError.getDetails());
+                    Toast.makeText(MainActivity.this, "Inside storeData MainAct:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                    firebaseHelper.firebaseSignOut(mImeiNumber);
+                    firebaseHelper.googleSignOut(MainActivity.this);
+                    pgbarhide();
                 }
             });
         }

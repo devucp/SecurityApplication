@@ -83,6 +83,7 @@
         >
 
         <Button
+            android:id="@+id/screem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="42dp"

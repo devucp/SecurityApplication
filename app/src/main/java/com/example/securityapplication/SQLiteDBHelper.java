@@ -78,7 +78,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         return mInstance;
     }
 
-    public SQLiteDBHelper(Context context) {
+    private SQLiteDBHelper(Context context) {
         super(context, DB_name, null, DB_version);
         db=this.getWritableDatabase();
     }
@@ -106,24 +106,24 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         newU=user;
         this.user = user;
         try{
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(COLUMN_NAME, user.getName());
-            contentValues.put(COLUMN_EMAIL, user.getEmail());
-            contentValues.put(COLUMN_GENDER, user.getGender());
-            contentValues.put(COLUMN_MOBILE,user.getMobile());
-            contentValues.put(COLUMN_LOCATION, user.getLocation());
-            contentValues.put(COLUMN_IMEI, user.getImei());
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_NAME, user.getName());
+        contentValues.put(COLUMN_EMAIL, user.getEmail());
+        contentValues.put(COLUMN_GENDER, user.getGender());
+        contentValues.put(COLUMN_MOBILE,user.getMobile());
+        contentValues.put(COLUMN_LOCATION, user.getLocation());
+        contentValues.put(COLUMN_IMEI, user.getImei());
             contentValues.put(COLUMN_PAID, user.isPaid());
-            contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
-            long result = db.insert(TABLE_NAME,null, contentValues);
-            //db.close();
-            if (result == -1){
-                Log.d("Database","User object NOT ADDED");
-                return false;
-            }
-            else{
-                Log.d("Database","User object added successfully");
-                return true;
+        contentValues.put(COLUMN_DOB, user.getDob()); //ADDED DOB
+        long result = db.insert(TABLE_NAME,null, contentValues);
+        //db.close();
+        if (result == -1){
+            Log.d("Database","User object NOT ADDED");
+            return false;
+        }
+        else{
+            Log.d("Database","User object added successfully");
+            return true;
             }
         }catch(Exception e){
             Log.d("SQL","Exception occurred");
@@ -140,16 +140,16 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_C3, SosC.get("c3"));
         contentValues.put(COLUMN_C4, SosC.get("c4"));
         contentValues.put(COLUMN_C5, SosC.get("c5"));
-        if(i==1) {
-            contentValues.put(COLUMN_C0,1);
-            Log.d("sachin","inserting");
-            result = db.insert(SOS_TABLE, null, contentValues);
-        }
-        else {
-            Log.d("sachin","unserting");
-            result = db.update(SOS_TABLE,contentValues,COLUMN_ID + "=?",
-                    new String[]{"1"});
-        }
+    if(i==1) {
+        contentValues.put(COLUMN_C0,1);
+        Log.d("sachin","inserting");
+        result = db.insert(SOS_TABLE, null, contentValues);
+    }
+    else {
+        Log.d("sachin","unserting");
+        result = db.update(SOS_TABLE,contentValues,COLUMN_ID + "=?",
+                new String[]{"1"});
+    }
         //db.close();
         if (result == -1){
             Log.d("SOS_Database","SOS contacts not added");
@@ -173,7 +173,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             //db.close();//Added close stmt
         }
         catch(Exception e){
-
         }
         return cursor;
     }
@@ -233,8 +232,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
         }
         return cursor;
+     }
 
-    }
     public User getdb_user(){
         User newuser = new User();
         HashMap<String,String> contact=new HashMap<>();
@@ -252,7 +251,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                     newuser.setMobile(cursor.getString(cursor.getColumnIndex("mobile")));
                     newuser.setPaid(cursor.getString(cursor.getColumnIndex("paid")).equals("1"));
                     newuser.setImei(cursor.getString(cursor.getColumnIndex("imei")));
-                    Log.d("Paid1234hello2",cursor.getString(cursor.getColumnIndex("paid"))+"jj"+newuser.isPaid());
+                     Log.d("Paid1234hello2",cursor.getString(cursor.getColumnIndex("paid"))+"jj"+newuser.isPaid());
 
                 }
             }

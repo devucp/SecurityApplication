@@ -27,6 +27,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class FirebaseHelper {
 
@@ -42,10 +44,16 @@ public class FirebaseHelper {
     private Device device;
     private GoogleSignInClient mGoogleSignInClient;
     private static volatile FirebaseHelper firebaseHelperInstance;
+    private FirebaseStorage firebaseStorage;
+    StorageReference storageReference;
 
     public void initFirebase(){
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        /** Get FirebaseStorage instance **/
+        firebaseStorage = FirebaseStorage.getInstance();
+        /** Get FirebaseStorage reference **/
+        storageReference = firebaseStorage.getReference();
         initDataBaseReferences();
         Log.d(TAG,"Firebase Initialization complete");
     }
@@ -166,6 +174,10 @@ public class FirebaseHelper {
     public FirebaseAuth getFirebaseAuth() { return mAuth; }
 
     public  FirebaseDatabase getFirebaseDatabase() { return mFirebaseDatabase; }
+
+    public StorageReference getStorageReference() {return storageReference.child(FirebaseAuth.getInstance().getUid());}
+
+    public StorageReference getImageStorageRef() {return storageReference.child("images");}
 
     public void addsos_infirebase(String uid,String c1,String c2,String c3,String c4,String c5){
         DatabaseReference dr= mUsersDatabaseReference.child(uid).child("sosContacts");

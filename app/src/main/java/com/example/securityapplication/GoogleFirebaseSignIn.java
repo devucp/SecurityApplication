@@ -215,7 +215,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                     db.addUser(user);
                     db.setUser(user);
                     if (user.getSosContacts() != null)
-                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+                        db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
 
                     Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
                     if(dataSnapshot.getValue(User.class).isPaid()){

@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,7 +48,7 @@ public class navigation extends AppCompatActivity {
 
     int count=0,aa;
     static User newUser=new User();
-    Boolean is_home=true;
+    Boolean is_home=false;
 
     SQLiteDBHelper db=new SQLiteDBHelper(navigation.this);
     public static Boolean test=false;
@@ -158,7 +159,7 @@ public class navigation extends AppCompatActivity {
                     db.updateUser(newUser);
                     db.setUser(newUser);
                     if (newUser.getSosContacts() != null)
-                        db.addsosContacts(newUser.getSosContacts()); //to fetch SOSContacts from Firebase even if tablepresent
+                        db.addsosContacts(newUser.getSosContacts(),1); //to fetch SOSContacts from Firebase even if tablepresent
 
                     // check if user signed in from two devices
                     recheckUserAuthentication();
@@ -250,7 +251,11 @@ public class navigation extends AppCompatActivity {
                             break;
                         case R.id.save:
                             is_home=false;
+
+
                             selectedFragment = new saviour_fragment();
+
+
                             break;
                         case R.id.profile:
                             is_home=false;

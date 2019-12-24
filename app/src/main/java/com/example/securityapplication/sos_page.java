@@ -449,7 +449,7 @@ public class sos_page extends AppCompatActivity {
                         user.setSosContacts(SosContacts);
                         Log.d("SosActivity", "HashMap updated in User object c1=" + user.getSosContacts().get("c1"));
 
-                        if (mydb.addsosContacts(SosContacts)) {
+                        if (mydb.addsosContacts(SosContacts,1)) {
                             Log.d("SosActivity", "SOS contacts was added in database");
                             updateFireBaseSOS();
                             Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();

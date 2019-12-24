@@ -58,6 +58,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -522,6 +524,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
 
             /** SosPlayer Service intent**/
             startService(new Intent(this, SosPlayer.class));
@@ -634,7 +638,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pgbarhide();
             }
             else
-                Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
+                //Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Account not registered", Toast.LENGTH_LONG, true).show();
+
             pgbarhide();
         }
         else {
@@ -785,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     db.addUser(user);
                     db.setUser(user);
                     if (user.getSosContacts() != null)
-                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
+                        db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
 
                     Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
                     if(dataSnapshot.getValue(User.class).isPaid()){

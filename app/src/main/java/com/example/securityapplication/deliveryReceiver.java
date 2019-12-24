@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 public class deliveryReceiver extends BroadcastReceiver {
 
     @Override
@@ -15,12 +17,10 @@ public class deliveryReceiver extends BroadcastReceiver {
         switch (getResultCode())
         {
             case Activity.RESULT_OK:
-                Toast.makeText(context, "SMS delivered",
-                        Toast.LENGTH_LONG).show();
+                Toasty.success(context, "SMS delivered", Toast.LENGTH_SHORT, true).show();
                 break;
             case Activity.RESULT_CANCELED:
-                Toast.makeText(context, "SMS not delivered",
-                        Toast.LENGTH_LONG).show();
+                Toasty.error(context, "SMS not delivered", Toast.LENGTH_LONG, true).show();
                 break;
         }
 

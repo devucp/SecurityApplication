@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -142,7 +144,6 @@ public class navigation extends AppCompatActivity{
         }
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
@@ -192,7 +193,11 @@ public class navigation extends AppCompatActivity{
                             break;
                         case R.id.save:
                             is_home=false;
+
+
                             selectedFragment = new saviour_fragment();
+
+
                             break;
                         case R.id.profile:
                             is_home=false;

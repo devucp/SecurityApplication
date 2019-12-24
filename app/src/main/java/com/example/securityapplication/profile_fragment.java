@@ -11,13 +11,16 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PatternMatcher;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -25,6 +28,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -63,18 +67,21 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.support.v4.content.ContextCompat.getColor;
 import static android.support.v4.content.ContextCompat.getSystemService;
 import static com.example.securityapplication.R.layout.spinner_layout;
 import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
@@ -94,12 +101,14 @@ public class profile_fragment extends Fragment {
     private String TAG = "ProfileActivity";
     Spinner spinner;
     DatePickerDialog datePickerDialog;
-
+    private  Uri file;
     private FirebaseHelper firebaseHelper;
 
     private ImageView profile_pic;
     private ImageButton chooseImgBtn;
     private Uri filePath;
+    private  Bitmap bitmappic;
+
 
     private final int PICK_IMAGE_REQUEST = 71;
     private final int TAKE_PICTURE = 81;
@@ -115,7 +124,7 @@ public class profile_fragment extends Fragment {
 
         String [] values =
                 {"Male","Female","Others"};
-        spinner = (Spinner) v.findViewById(R.id.text_Gender);
+        spinner = v.findViewById(R.id.text_Gender);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), spinner_layout, values);
         adapter.setDropDownViewResource(spinner_layout);
         spinner.setAdapter(adapter);
@@ -157,6 +166,7 @@ public class profile_fragment extends Fragment {
         firebaseHelper.initContext(getActivity());
         firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
 
+        deviceId();
         internalStorage = InternalStorage.getInstance();
         internalStorage.initContext(getContext());
     }
@@ -192,10 +202,12 @@ public class profile_fragment extends Fragment {
 
                                             if (IsInternet.isNetworkAvaliable(getContext())) {
 
+                                                chooseImgBtn.setVisibility(View.VISIBLE);
+
                                                 if(btn_edit.getText().equals("edit"))
                                                 {btn_edit.setText("Save");
                                                     enable();
-                                                alphaa(1.0f);}
+                                                    alphaa(1.0f);}
                                                 else {
                                                     if(!validate())
                                                     {
@@ -241,7 +253,6 @@ public class profile_fragment extends Fragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
-               // mydb.delete_table();
                 signOut();
             }
         });
@@ -256,6 +267,7 @@ public class profile_fragment extends Fragment {
         chooseImgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 pictureChoice();
                 // choose img from gallery
                 chooseImg("storage");
@@ -265,10 +277,7 @@ public class profile_fragment extends Fragment {
 
     private boolean validate() {
         if(textName.getText().toString().trim().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10) {
-            if(Pattern.matches("[ a-zA-Z]+",textName.getText().toString().trim()))
-                return true;
-            else
-                return false;
+            return Pattern.matches("[ a-zA-Z]+", textName.getText().toString().trim());
         }
         else
             return false;
@@ -368,7 +377,6 @@ public class profile_fragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,Locality);
         textAddress.setAdapter(adapter);
         text_changePassword = getActivity().findViewById(R.id.text_changePassword);
-
         profile_pic = getActivity().findViewById(R.id.profile_pic);
         chooseImgBtn = getActivity().findViewById(R.id.btn_choose_img);
 
@@ -393,6 +401,13 @@ public class profile_fragment extends Fragment {
                 && data != null && data.getData() != null )
         {
             filePath = data.getData();
+
+            if (filePath==null)
+            {
+                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            //bitmappic = (Bitmap) data.getExtras().get("data");
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
                 try {
@@ -410,19 +425,30 @@ public class profile_fragment extends Fragment {
             }
         }
 
-        if(requestCode == TAKE_PICTURE && resultCode == getActivity().RESULT_OK
-                && data != null && data.getData() != null )
+        if(requestCode == 201 && resultCode == getActivity().RESULT_OK)
+
         {
-            filePath = data.getData();
+
+
+
+            checkCameraPermission();
+
+
+            Log.d("tag", String.valueOf(filePath));
+
+             bitmappic = (Bitmap) data.getExtras().get("data");
+
+            Log.d("tag", String.valueOf(bitmappic));
+
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
-                profile_pic.setImageBitmap(bitmap);
+                internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+                profile_pic.setImageBitmap(bitmappic);
                 deleteExistingProfilePic();
-            }
-            catch (IOException e)
-            {
+            }catch (Exception e){
                 e.printStackTrace();
+                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
             }
+
         }
     }
 
@@ -446,8 +472,8 @@ public class profile_fragment extends Fragment {
 
         //Log.d("MAinActivity","SMS intent");
         //check permissions
-
-        while(!checkSMSPermission());
+        checkCameraPermission();
+        checkSMSPermission();
     }
 
     public  boolean checkSMSPermission(){
@@ -456,9 +482,55 @@ public class profile_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);
+
+
         }
+
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
+
     }
+
+    public  boolean checkCameraPermission(){
+
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
+        }
+
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED;
+
+    }
+
+    public  boolean checkReadExterPermission(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC);
+
+
+        }
+
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
+
+    }
+
+
+    public  boolean checkWriteExterPermission(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RC);
+
+
+        }
+
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
+
+    }
+
+
+
 
     private void closeNow(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
@@ -480,6 +552,14 @@ public class profile_fragment extends Fragment {
                     Toast.makeText(getContext(), "Without permission we check", Toast.LENGTH_LONG).show();
                 }
                 break;
+
+            case 0:
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                        chooseImgBtn.setEnabled(true);
+                    }
+
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -607,10 +687,12 @@ public class profile_fragment extends Fragment {
     private void pictureChoice(){
         final AlertDialog.Builder a_builder = new AlertDialog.Builder(getContext());
         a_builder.setTitle("Profile Photo")
+                .setIcon(R.drawable.ic_camera_icon)
                 .setPositiveButton("Camera", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         chooseImg("camera");
+
                     }
                 })
                 .setNeutralButton("Gallery", new DialogInterface.OnClickListener() {
@@ -632,67 +714,60 @@ public class profile_fragment extends Fragment {
                 break;
 
             case "camera":
-                Intent captureImgIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                //captureImgIntent.setType("image/*");
-                //Uri output = Uri.fromFile(new File(filePath));
-                //captureImgIntent.putExtra(MediaStore.EXTRA_OUTPUT, output);
-                if (captureImgIntent.resolveActivity(getContext().getPackageManager()) != null) {
-                    startActivityForResult(captureImgIntent, TAKE_PICTURE);
-                    break;
-                }
+                checkCameraPermission();
+
+                Intent cameraintent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraintent,201);
+
         }
     }
+
+
+
 
     private void uploadProfilePicToFirebase(){
 
-        if(filePath != null)
-        {
-            final ProgressDialog progressDialog = new ProgressDialog(getContext());
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
-            progressDialog.setCancelable(false);
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Uploading...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
 
-            // Get the data from an ImageView as bytes
-            profile_pic.setDrawingCacheEnabled(true);
-            profile_pic.buildDrawingCache();
-            Bitmap bitmap = ((BitmapDrawable) profile_pic.getDrawable()).getBitmap();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,40, baos);
-            byte[] data = baos.toByteArray();
+        // Get the data from an ImageView as bytes
+        profile_pic.setDrawingCacheEnabled(true);
+        profile_pic.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) profile_pic.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,40, baos);
+        byte[] data = baos.toByteArray();
 
-            StorageReference ref = firebaseHelper.getStorageReference().child("images/profile_pic");
-            UploadTask uploadTask = ref.putBytes(data);
-            uploadTask
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.dismiss();
-                            Toast.makeText(getContext(),"Image uploaded successfully", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            progressDialog.dismiss();
-                            Toast.makeText(getContext(), "Failed to upload image"+e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            double progress = (100f*taskSnapshot.getBytesTransferred()/taskSnapshot
-                                    .getTotalByteCount());
-                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
-                        }
-                    });
-        }
-        else
-            Toast.makeText(getActivity(), "File not found", Toast.LENGTH_SHORT).show();
+        StorageReference ref = firebaseHelper.getStorageReference().child("images/profile_pic");
+        UploadTask uploadTask = ref.putBytes(data);
+        uploadTask
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(),"Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Failed to upload image"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100f*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                .getTotalByteCount());
+                        progressDialog.setMessage("Uploaded "+(int)progress+"%");
+                    }
+                });
     }
 
     private void deleteExistingProfilePic(){
-        if (filePath == null)
-            return;
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setTitle("Processing...");
         progressDialog.show();

@@ -24,11 +24,11 @@ public class InternalStorage {
     public static InternalStorage getInstance() {
         //Double check locking pattern
         if (internalStorageInstance == null) { //Check for the first time..if there is no instance available... create new one
-            synchronized (GoogleFirebaseSignIn.class) { //Check for the second time to make ThreadSafe
+            synchronized (InternalStorage.class) { //Check for the second time to make ThreadSafe
                 //if there is no instance available... create new one
                 if (internalStorageInstance == null) {
                     internalStorageInstance = new InternalStorage();
-                    Log.d(TAG,"Created new FirebaseHelperInstance");
+                    Log.d(TAG,"Created new InternalStorageInstance");
                 }
             }
         }
@@ -45,11 +45,10 @@ public class InternalStorage {
 
     public void initContext(Context context){this.context = context;}
 
-
     public String saveImageToInternalStorage(Bitmap bitmapImage, String email){
         ContextWrapper cw = new ContextWrapper(context);
         // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir(email+"imageDir", Context.MODE_PRIVATE);
+        File directory = cw.getDir(email, Context.MODE_PRIVATE);
         // Create imageDir
         File mypath=new File(directory,"profile.jpeg");
 
@@ -57,7 +56,7 @@ public class InternalStorage {
         try {
             fos = new FileOutputStream(mypath);
             // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 60, fos);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -73,7 +72,7 @@ public class InternalStorage {
     public File getImagePathFromStorage(String email) {
 
         try {
-            File directory = new ContextWrapper(context).getDir(email+"imageDir", Context.MODE_PRIVATE);
+            File directory = new ContextWrapper(context).getDir(email, Context.MODE_PRIVATE);
             return new File(directory.getAbsolutePath(), "profile.jpeg");
         } catch (Exception e) {
             e.printStackTrace();

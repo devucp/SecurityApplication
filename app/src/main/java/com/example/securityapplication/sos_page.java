@@ -286,10 +286,6 @@ public class sos_page extends AppCompatActivity {
             }
         });
 
-
-
-
-
     }
 
     private void updateFireBaseSOS() {

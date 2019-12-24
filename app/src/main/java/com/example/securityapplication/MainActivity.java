@@ -58,6 +58,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -500,6 +502,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateUI(FirebaseUser firebaseUser){
+        Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+
+
         if(firebaseUser==null){
             mStatus.setText(R.string.not_logged);
             mSignInButton.setText(R.string.sign_in_text);
@@ -509,26 +515,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+
             if (db.getdb_user() == null){
                 firebaseHelper.firebaseSignOut(mImeiNumber);
                 firebaseHelper.googleSignOut(MainActivity.this);
                 updateUI(null);
                 return;
             }
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             Log.d(TAG,"current user"+firebaseUser.getEmail());
             //goto next activity only if user exists in firebase db
             /** SosPlayer Service intent**/
+
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             startService(new Intent(this, SosPlayer.class));
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             try {
                 finish();
+                Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             }catch (Exception e){
                 Log.d(TAG,"Exception on closing activity:"+e.getMessage());
                 finish();
             }
         }
         Log.d(TAG,"UI updated successfully");
+        Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
     }
 
     private void crossValidateUserData(){
@@ -638,7 +658,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pgbarhide();
             }
             else
-                Toast.makeText(MainActivity.this,"Account not registered. Please complete the registration process",Toast.LENGTH_LONG).show();
+                //Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Account not registered. Please complete the registration process", Toast.LENGTH_LONG, true).show();
+
             pgbarhide();
         }
         else {

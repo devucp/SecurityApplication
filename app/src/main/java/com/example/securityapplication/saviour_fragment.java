@@ -1,17 +1,27 @@
 package com.example.securityapplication;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.AnimatedStateListDrawable;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 public class saviour_fragment extends Fragment {
 
@@ -29,6 +39,32 @@ public class saviour_fragment extends Fragment {
         CardView cardView =  getView().findViewById(R.id.card_view);
         cardView.setRadius(20F); // set corner radius value
         // Implement onClickListener event on CardView
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext(),R.style.CustomDialogTheme);
+        TextView title = new TextView(getContext());
+        // You Can Customise your Title here
+        title.setText("COMING SOON ...");
+        //title.setBackgroundColor(Color.DKGRAY);
+        title.setPadding(10, 100, 10, 100);
+        title.setTextSize(100);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(40);
+
+        builder.setCustomTitle(title);
+        builder.setCancelable(false);
+
+        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+
+
+        builder.show();
+
+
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,6 +82,7 @@ public class saviour_fragment extends Fragment {
                 //Toast.makeText(getContext(), "CardView clicked event ", Toast.LENGTH_LONG).show();
             }
         });
+
 
 
 
@@ -69,5 +106,11 @@ public class saviour_fragment extends Fragment {
             }
         });
 
+
+
     }
+
+
+
+
 }

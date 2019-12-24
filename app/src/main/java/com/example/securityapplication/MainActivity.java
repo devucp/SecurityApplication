@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static Hashtable<String,String> userData;
     private boolean isUserStatusChecked = false;
+    private boolean GpsPermission = false;
 
     public void pgbarshow()
     {
@@ -227,7 +228,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
 
         FirebaseUser currentUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+        checkGPSPermission();
         updateUI(currentUser);
+
+    }
+
+    private void checkGPSPermission() {
+        Log.d("MainActivity","Inside CheckGPSPermission");
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
+            || (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED))
+        {   //permissions not granted
+            Log.d("GPS Access in Main","Requesting GPS Location");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, 102);
+            return;
+        }else {
+            //permissions granted
+            //ContextCompat.startForegroundService(this,new Intent(this,GetGPSCoordinates.class));
+            GpsPermission = true;
+        }
     }
 
     private void initializeGoogleFirebaseSignIn(){
@@ -367,6 +385,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case 102:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("GPS In MainActivity","GPS Permissions granted");
+                    GpsPermission = true;
+                } else {
+                    //closeNow();
+                    GpsPermission = false;
+                    Toast.makeText(getApplicationContext(),"Location Permission Denied ",Toast.LENGTH_SHORT).show();
+                    //Permission Required Prompt
+                    checkGPSPermission();
+                }
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -513,6 +542,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateUI(FirebaseUser firebaseUser){
+        Log.d("MainActivty","Inside UpdateUI GPS Permission = "+GpsPermission);
         if(firebaseUser==null){
             mStatus.setText(R.string.not_logged);
             mSignInButton.setText(R.string.sign_in_text);
@@ -525,6 +555,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             /** SosPlayer Service intent**/
             startService(new Intent(this, SosPlayer.class));
+            /**Location Service intent**/
+            ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
+
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
             try {

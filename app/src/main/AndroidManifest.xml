@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.securityapplication">
 
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -111,6 +111,7 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".GetGPSCoordinates"
+
             android:enabled="true"
             android:exported="true" />
     </application>

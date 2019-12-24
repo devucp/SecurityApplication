@@ -2,25 +2,35 @@ package com.example.securityapplication;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.location.Location;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 public class GetGPSCoordinates extends Service {
+
     private LocationListener listener;
     private LocationManager locationManager;
     private static String lastKnownLocation=null;
+    public static final String CHANNEL_ID = "ForegroundServiceChannel";
+
 
     @Nullable
     @Override
@@ -35,46 +45,73 @@ public class GetGPSCoordinates extends Service {
     @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
-        Toast.makeText(getApplicationContext(),"Oncreate",Toast.LENGTH_SHORT);
-        Log.d("GPSService","Oncreate");
-        listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Intent i = new Intent("location_update");
-                GetGPSCoordinates.lastKnownLocation=ddToDms(location.getLatitude(),location.getLongitude()) ;
-                i.putExtra("coordinates", location.getLatitude()+","+location.getLongitude() );
-                Log.d("GPSService","coordinates"+location.getLatitude()+","+location.getLongitude() );
-                Toast.makeText(getApplicationContext(),"coordinates"+location.getLatitude()+","+location.getLongitude() ,Toast.LENGTH_SHORT);
-                sendBroadcast(i);
-            }
+        Toast.makeText(getApplicationContext(), "Oncreate", Toast.LENGTH_SHORT);
+        Log.d("GPSService", "Oncreate");
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
+            && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) ==PackageManager.PERMISSION_GRANTED))
+        {
+            // Permission is granted
+            listener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    Intent i = new Intent("location_update");
+                    GetGPSCoordinates.lastKnownLocation = ddToDms(location.getLatitude(), location.getLongitude());
+                    i.putExtra("coordinates", location.getLatitude() + "," + location.getLongitude());
+                    Log.d("GPSService", "coordinates" + location.getLatitude() + "," + location.getLongitude());
+                    Toast.makeText(getApplicationContext(), "coordinates " + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT);
+                    sendBroadcast(i);
+                }
 
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
+                }
 
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
+                @Override
+                public void onProviderEnabled(String s) {
+                }
 
-            }
+                @Override
+                public void onProviderDisabled(String s) {
+                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                }
+            };
+            locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
-            @Override
-            public void onProviderEnabled(String s) {
+            //noinspection MissingPermission
 
-            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, listener);
 
-            @Override
-            public void onProviderDisabled(String s) {
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-            }
-        };
-
-        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
-        //noinspection MissingPermission
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, listener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,listener);
-
+        }else {
+            //Permission not Granted
+        }
     }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        //do heavy work on a background thread
+        Log.d("GPSService", "onStartCommand");
+        String input = "You are being protected";
+        createNotificationChannel();
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                0, notificationIntent, 0);
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                .setContentIntent(pendingIntent)
+                .setContentTitle(" Location ")
+                .setContentText(input)
+                .build();
+
+        startForeground(1, notification);
+
+        return START_STICKY;
+    }
+
     /*
     public int[] degreeToDMS(double coordinate){
         coordinate=Math.abs(coordinate);
@@ -88,6 +125,7 @@ public class GetGPSCoordinates extends Service {
         int c_seconds=(int)seconds;
 
     }*/
+
     public String ddToDms(double ilat,double ilng) {
 
         double lat = ilat;
@@ -126,4 +164,17 @@ public class GetGPSCoordinates extends Service {
             locationManager.removeUpdates(listener);
         }
     }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Foreground Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
+    }
+
 }

@@ -56,12 +56,7 @@ public class saviour_fragment extends Fragment {
         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                assert getFragmentManager() != null;
-                FragmentTransaction ft1 = getFragmentManager().beginTransaction();
-                //ft1.replace(R.id.fragment_back_stack_frame_layout, fragmentTwo, "Fragment Two");
 
-                ft1.addToBackStack(null);
-                ft1.commit();
             }
         });
 

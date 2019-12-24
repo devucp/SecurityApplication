@@ -527,6 +527,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateUI(FirebaseUser firebaseUser){
+        Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+
+
         if(firebaseUser==null){
             mStatus.setText(R.string.not_logged);
             mSignInButton.setText(R.string.sign_in_text);
@@ -536,32 +540,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
-<<<<<<< HEAD
             Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
 
-=======
             if (db.getdb_user() == null){
                 firebaseHelper.firebaseSignOut();
                 firebaseHelper.googleSignOut(MainActivity.this);
                 updateUI(null);
                 return;
             }
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             Log.d(TAG,"current user"+firebaseUser.getEmail());
             //goto next activity only if user exists in firebase db
->>>>>>> fe4914adc93adb59e7c8a071e5d5b03dd6514ede
             /** SosPlayer Service intent**/
+
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             startService(new Intent(this, SosPlayer.class));
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
+            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             try {
                 finish();
+                Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             }catch (Exception e){
                 Log.d(TAG,"Exception on closing activity:"+e.getMessage());
                 finish();
             }
         }
         Log.d(TAG,"UI updated successfully");
+        Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
     }
 
     private void crossValidateUserData(){
@@ -671,13 +683,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pgbarhide();
             }
             else
-<<<<<<< HEAD
                 //Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
-            Toasty.warning(this, "Account not registered", Toast.LENGTH_LONG, true).show();
+            Toasty.warning(this, "Account not registered. Please complete the registration process", Toast.LENGTH_LONG, true).show();
 
-=======
-                Toast.makeText(MainActivity.this,"Account not registered. Please complete the registration process",Toast.LENGTH_LONG).show();
->>>>>>> fe4914adc93adb59e7c8a071e5d5b03dd6514ede
             pgbarhide();
         }
         else {
@@ -832,23 +840,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
-<<<<<<< HEAD
-                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
-                    SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
-
-                    db.addUser(user);
-                    db.setUser(user);
-                    if (user.getSosContacts() != null)
-                        db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
-
-                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
-                    if(dataSnapshot.getValue(User.class).isPaid()){
-                        Log.d("Paid12345","i am here");
-                        home_fragment.setpaid(true);
-                    }
-                    else{
-                        home_fragment.setpaid(false);
-=======
 //                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
                     //db=new SQLiteDBHelper(MainActivity.this);
                     SQLiteDBHelper db=SQLiteDBHelper.getInstance(MainActivity.this);
@@ -873,7 +864,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         updateUI(null);
                         Toast.makeText(MainActivity.this, "Sqlite error occurred MainAct:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                         return;
->>>>>>> fe4914adc93adb59e7c8a071e5d5b03dd6514ede
                     }
 
 //                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());

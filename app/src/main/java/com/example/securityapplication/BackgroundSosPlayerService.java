@@ -57,6 +57,7 @@ public class BackgroundSosPlayerService extends Service {
     @Override
     public void onDestroy() {
         getApplicationContext().getContentResolver().unregisterContentObserver(mSettingsContentObserver);
+        mAudioManager.setSpeakerphoneOn(false);
         player.stop();
         player.release();
     }

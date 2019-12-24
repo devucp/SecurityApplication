@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -27,19 +28,22 @@ import android.widget.Toast;
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static java.security.AccessController.getContext;
 
-public class navigation extends AppCompatActivity{
+public class navigation extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener{
 
     int count=0,aa;
     static User newUser=UserObject.user;
     Boolean is_home=true;
-
     SQLiteDBHelper db;
     public static Boolean test=false;
     public static TextView tmode1;
@@ -49,6 +53,7 @@ public class navigation extends AppCompatActivity{
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
+    FirebaseRemoteConfig firebaseRemoteConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +103,10 @@ public class navigation extends AppCompatActivity{
                 }
             }
         });
+
+        final FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+       // Log.d("remoteaaa","rohan"+firebaseRemoteConfig.getString("force_update_store_url"));
+        ForceUpdateChecker.with(this).onUpdateNeeded(this).check();
     }
 
     private void async() {
@@ -270,7 +279,33 @@ public class navigation extends AppCompatActivity{
         }
     }
 
+    @Override
+    public void onUpdateNeeded(final String updateUrl) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("New version available")
+                .setMessage("Please, update app to new version to continue reposting.")
+                .setPositiveButton("Update",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                redirectStore(updateUrl);
+                            }
+                        }).setNegativeButton("No, thanks",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        }).create();
+        dialog.show();
+    }
 
+
+    private void redirectStore(String updateUrl) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
 }
 

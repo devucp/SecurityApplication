@@ -90,7 +90,6 @@ public class FirebaseHelper {
         mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
         mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
-        mMobileDatabaseReference = mFirebaseDatabase.getReference().child("Mobile");
     }
 
     public void initGoogleSignInClient(String server_client_id){
@@ -109,20 +108,22 @@ public class FirebaseHelper {
     public void makeDeviceImeiNull(String imei){
         // first make uid under imei null in Devices and imei under uid null in Users
         device = new Device();
-        device.setUID("null");
-        mDevicesDatabaseReference.child(imei).setValue(device);
+        device.setUID(null);
+        if (mAuth.getCurrentUser() != null)
+            mDevicesDatabaseReference.child(imei).setValue(device);
     }
 
     public void makeUserImeiNull(){
-        mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
+        if (mAuth.getCurrentUser() != null)
+            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue(null);
     }
 
     public void firebaseSignOut(String imei){
         Log.d(TAG,"Firebase SignOut(String imei) called");
-        makeDeviceImeiNull(imei);
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
+            makeDeviceImeiNull(imei);
             makeUserImeiNull();
             mAuth.signOut();
             Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
@@ -161,10 +162,6 @@ public class FirebaseHelper {
 
     public DatabaseReference getEmailDatabaseReference(){
         return mEmailDatabaseReference;
-    }
-
-    public DatabaseReference getMobileDatabaseReference(){
-        return mMobileDatabaseReference;
     }
 
     public GoogleSignInClient getGoogleSignInClient(){

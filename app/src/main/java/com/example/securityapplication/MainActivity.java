@@ -61,9 +61,6 @@ import java.util.Hashtable;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-//import androidx.annotation.NonNull;
-
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private TelephonyManager telephonyManager;
@@ -95,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int RC;
 
     private static Hashtable<String,String> userData;
-    private boolean isUserStatusChecked = false;
     SQLiteDBHelper db;
 
     public void pgbarshow()
@@ -255,36 +251,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.signInButton).setOnClickListener(this);
     }
 
-    private void checkUserStatus(){
+   /* private void checkUserStatus(){
         Log.d(TAG,"Checkig user status...");
-
         if (firebaseHelper.getFirebaseAuth().getCurrentUser() == null){
             Log.d(TAG,"Inside checkUserStatus:Current user is null");
-            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull final DataSnapshot deviceDataSnapshot) {
-                    Log.d(TAG,"Inside onDataChange");
-                    if (deviceDataSnapshot.exists()){
-                        device = deviceDataSnapshot.getValue(Device.class);
-                        if (!device.getUID().equals("null")){
-                            // for this, either same user will be already signed in(so this will be the case if data cleared from device)
-                            // or other user may have formatted the mobile without logging out
-                            // so user gets logged out without updating firebas database, so update firebase
-                            // make Devices->imei->"null" and Users->uid->imei->"null"
-                            // check internet connection
-                            uid = device.getUID();
-                            Log.d(TAG,"Formatted or uninstalled or cleared data behavior");
-                            deviceId();
-                            device = new Device();
-                            device.setUID("null");
-                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device).addOnSuccessListener(new OnSuccessListener<Void>() {
+            // for this, either same user will be already signed in(so this will be the case if data cleared from device)
+            // or other user may have formatted the mobile without logging out
+            // so user gets logged out without updating firebas database, so update firebase
+            // make Devices->imei->"null" and Users->uid->imei->"null"
+            // check internet connection
+            Log.d(TAG,"Formatted or uninstalled or cleared data behavior");
+            deviceId();
+            device = new Device();
+            device.setUID("null");
+            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     firebaseHelper.getUsersDatabaseReference().child(uid).child("imei").setValue("null").addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d(TAG,"Updated firebase");
-                                            isUserStatusChecked = true;
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -307,15 +294,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, "On check user status db read error:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
+    }*/
 
     private void deviceId() {
         telephonyManager = (TelephonyManager) getSystemService(this.TELEPHONY_SERVICE);
@@ -333,10 +312,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
             initializeGoogleFirebaseSignIn();
-            if (!isUserStatusChecked) {
-                //incase user formats or uninstalls or clears user data
-                checkUserStatus();
-            }
         }
 
         //Log.d("MAinActivity","SMS intent");
@@ -479,7 +454,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).child("uid").setValue("null");
+                                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).child("uid").setValue(null);
                                             Log.d(TAG,e.getMessage());
                                             Toast.makeText(MainActivity.this, "Sign in failed."+e.getMessage(),Toast.LENGTH_SHORT).show();
                                             // sigin out the user
@@ -535,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         else {
             if (db.getdb_user() == null){
-                firebaseHelper.firebaseSignOut();
+                firebaseHelper.firebaseSignOut(mImeiNumber);
                 firebaseHelper.googleSignOut(MainActivity.this);
                 updateUI(null);
                 return;
@@ -638,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     uid = emailNodeDataSnapshot.getValue().toString();
                     Log.d(TAG,uid);
                 } else {
-                    uid = "null";
+                    uid = null;
                 }
                 isEmailRegistered();
             }
@@ -654,7 +629,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void isEmailRegistered(){
         Log.d(TAG,"Inside isEmailRegistered");
-        if (uid.equals("null")){
+        if (uid == null){
             Log.d(TAG,"Account not registered. Please complete the registration process");
             // prompt user to signUp
             if (userData.get("SignInType").equals("google")){
@@ -681,7 +656,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.d("User Data Snapshot:", userDataSnapshot.toString());
                     if (userDataSnapshot.exists()) {
                         user = userDataSnapshot.getValue(User.class);
-                        if (user.getImei().equals("null")){
+                        if (user.getImei() == null){
                             // user is logged out
                             Log.d(TAG,"No user not logged  in. Login the user");
                             crossValidateUserData();
@@ -693,25 +668,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
                                     if (deviceDataSnapshot.exists()) {
                                         device = deviceDataSnapshot.getValue(Device.class);
-                                        if (device.getUID().equals("null")) {
-                                            /* implies user logged out from old device
-                                               Now login the user and set uid under imei of device node
-                                            */
-                                            Log.d(TAG, "User is logged out from old device..Now user can login from new device");
-                                            device.setUID(uid);
-                                            crossValidateUserData();
-
-                                        } else {
-                                            /* User not logged out from old device
-                                            prompt user to log out from old device
-                                            */
-                                            Log.d(TAG, "User is LoggedIn in other device");
-                                            Toast.makeText(MainActivity.this,
-                                                    "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                            LogOutUser();
-                                        }
+                                        /* User not logged out from old device
+                                           prompt user to log out from old device
+                                           */
+                                        Log.d(TAG, "User is LoggedIn in other device");
+                                        Toast.makeText(MainActivity.this,
+                                                "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                                        LogOutUser();
                                     } else {
                                         //user can login
+                                        Log.d(TAG,"User is logged out from old device..Now user can login from new device");
+                                        device.setUID(uid);
+                                        crossValidateUserData();
 
                                         String SignInType = userData.get("SignInType");
                                         Log.d(TAG, "SignInType:" + SignInType);
@@ -770,19 +738,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Check if registered user sign's in using old device or new device using imei number.
         if (device != null) {
             // first get uid from imei
-            final String uid = device.getUID();
-            if (uid.equals("null")) {
-                Log.d(TAG, uid);
-                //setUserForSignIn(uid, userData);
-                //to check if email is registered
-                setUidFromFirebaseForSignIn();
-            } else {
-                // for this, either same user will be already signed in(so this will be the case if data cleared)
-                // or other user may have formatted the mobile without logging out
-                // implemented in checkUserStatus() function
-                pgbarhide();
-                Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser()+"this should not be the case");
-            }
+            //incase user formats or uninstalls or clears user data
+            //checkUserStatus();
+            pgbarhide();
+            Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser()+"this should not be the case");
+            Toast.makeText(MainActivity.this, "Previous logout was unsuccessful. Please contact the admin.", Toast.LENGTH_LONG).show();
         } else {
             Log.d(TAG, "Imei not registered");
             //to check if email is registered
@@ -843,15 +803,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Toast.makeText(MainActivity.this, "Sqlite error occurred MainAct:"+e.getMessage(),Toast.LENGTH_SHORT).show();
                         return;
                     }
-
-//                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
-//                    if(dataSnapshot.getValue(User.class).isPaid()){
-//                        Log.d("Paid12345","i am here");
-//                        home_fragment.setpaid(true);
-//                    }
-//                    else{
-//                        home_fragment.setpaid(false);
-//                    }
                 }
 
                 @Override

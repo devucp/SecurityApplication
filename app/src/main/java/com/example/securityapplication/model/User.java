@@ -22,7 +22,7 @@ public class User implements Parcelable {
     private String dob;
     private Boolean paid=false;
     private HashMap<String,String> sosContacts;
-    //private Boolean googleAccountLinked;
+    private Boolean googleAccountLinked;
 
     public String getDob() {
         return dob;
@@ -60,8 +60,23 @@ public class User implements Parcelable {
         }
     };
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", gender='" + gender + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", location='" + location + '\'' +
+                ", imei='" + imei + '\'' +
+                ", dob='" + dob + '\'' +
+                ", paid=" + paid +
+                ", sosContacts=" + sosContacts +
+                ", googleAccountLinked=" + googleAccountLinked +
+                '}';
+    }
 
-    /*public int getId() {
+/*public int getId() {
         return id;
     }
 
@@ -156,5 +171,10 @@ public class User implements Parcelable {
 
 //    public Boolean isGoogleAccountLinked(){ return googleAccountLinked; }
 
+
     //public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
+
+    public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
+
+
 }

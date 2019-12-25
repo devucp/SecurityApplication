@@ -84,6 +84,7 @@
 
         <Button
             android:id="@+id/screem"
+            android:alpha="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="42dp"
@@ -101,7 +102,6 @@
         android:layout_marginTop="20dp">
 
         <View
-
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorPrimaryDark"
@@ -164,7 +164,7 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="42dp"
@@ -175,6 +175,23 @@
             android:textColor="@color/cyan"
             android:textSize="20sp" />
     </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/invite"
+                android:layout_marginBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="42dp"
+                android:background="@color/graylight"
+                android:drawablePadding="150dp"
+                android:text="Invite the friend"
+                android:textAlignment="textStart"
+                android:textColor="@color/cyan"
+                android:textSize="20sp" />
+        </LinearLayout>
     </LinearLayout>
 
 

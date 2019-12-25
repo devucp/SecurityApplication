@@ -259,10 +259,10 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             if(cursor2.getCount()!=0){
                 while(cursor2.moveToNext() ){
                     contact.put("c1",cursor2.getString(cursor2.getColumnIndex("c1")));
-                    contact.put("c2",cursor2.getString(cursor2.getColumnIndex("c1")));
-                    contact.put("c3",cursor2.getString(cursor2.getColumnIndex("c1")));
-                    contact.put("c4",cursor2.getString(cursor2.getColumnIndex("c1")));
-                    contact.put("c5",cursor2.getString(cursor2.getColumnIndex("c1")));
+                    contact.put("c2",cursor2.getString(cursor2.getColumnIndex("c2")));
+                    contact.put("c3",cursor2.getString(cursor2.getColumnIndex("c3")));
+                    contact.put("c4",cursor2.getString(cursor2.getColumnIndex("c4")));
+                    contact.put("c5",cursor2.getString(cursor2.getColumnIndex("c5")));
                     //db.close();
                     newuser.setSosContacts(contact);
 

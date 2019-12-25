@@ -223,6 +223,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onStart(){
         Log.d(TAG,"Inside onStart");
+
+ //       final DatabaseReference ddb=FirebaseDatabase.getInstance().getReference().child("Devices").child("356477081682635");
+//        ddb.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for(DataSnapshot dp:dataSnapshot.getChildren()){
+//                    String st=dp.getKey();
+//                    DatabaseReference d=ddb.child(st);
+//                    d.removeValue();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+ //      ddb.removeValue();
+   //     Toast.makeText(this, "deletion done", Toast.LENGTH_SHORT).show();
+
         super.onStart();
 
         if (mImeiNumber == null)

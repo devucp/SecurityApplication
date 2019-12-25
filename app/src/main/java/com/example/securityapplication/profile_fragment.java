@@ -233,10 +233,8 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("female");
                                                         else
                                                             user.setGender("others");
-
-
-                                                        // check mobile number in firebase
-                                                        checkMobileInFirebase(textPhone.getText().toString());
+                                                        user.setMobile(textPhone.getText().toString());
+                                                        updateUser();
                                                     }
                                                 }
                                             }//Sending Data to EditProfileActivity
@@ -529,18 +527,6 @@ public class profile_fragment extends Fragment {
 
     }
 
-
-
-
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            //finishAffinity();
-        }
-        else{
-            //finish();
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -548,7 +534,7 @@ public class profile_fragment extends Fragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     deviceId();
                 } else {
-                    closeNow();
+                    getActivity().finish();
                     Toast.makeText(getContext(), "Without permission we check", Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -598,47 +584,9 @@ public class profile_fragment extends Fragment {
         startActivity(mLogOutAndRedirect);
     }
 
-    private void checkMobileInFirebase(final String newMobile){
-        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                final User oldUser = userDataSnapshot.getValue(User.class);
-                if (oldUser.getMobile().equals(newMobile)){
-                    // update user in sqlite and firebase
-                    updateUser();
-                }else {
-                    firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            // delete previous mobile number and add new number
-                            firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null);
-                            updateUser();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // stop progress bar
-                            progressDialog.dismiss();
-                            // prompt user to enter different mobile number
-                            Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(getActivity(),databaseError.getMessage(),Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void updateUser(){
 
         Log.d(TAG,"Updating user...");
-
-        user.setMobile(textPhone.getText().toString());
         mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 

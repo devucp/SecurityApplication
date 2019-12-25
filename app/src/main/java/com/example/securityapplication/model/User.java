@@ -60,8 +60,23 @@ public class User implements Parcelable {
         }
     };
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", gender='" + gender + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", location='" + location + '\'' +
+                ", imei='" + imei + '\'' +
+                ", dob='" + dob + '\'' +
+                ", paid=" + paid +
+                ", sosContacts=" + sosContacts +
+                ", googleAccountLinked=" + googleAccountLinked +
+                '}';
+    }
 
-    /*public int getId() {
+/*public int getId() {
         return id;
     }
 
@@ -158,10 +173,4 @@ public class User implements Parcelable {
 
     public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
 
-    @NonNull
-    @Override
-    public String toString() {
-        String s=sosContacts.toString();
-        return s;
-    }
 }

@@ -123,6 +123,9 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
         }
         if(db.getSosContacts().getCount()!=0) {
             UserObject.user=db.getdb_user();
+            HashMap<String,String> sosContacts=UserObject.user.getSosContacts();
+            Log.d("soscontactchecking1","c1"+ sosContacts.get("c1")+" c2: "+sosContacts.get("c2"));
+            Log.d("soscontactchecking2",UserObject.user.toString());
             SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
         }
 

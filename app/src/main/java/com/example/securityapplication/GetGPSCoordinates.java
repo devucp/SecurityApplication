@@ -24,11 +24,25 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 public class GetGPSCoordinates extends Service {
 
     private LocationListener listener;
     private LocationManager locationManager;
     private static String lastKnownLocation=null;
+    private FusedLocationProviderClient mFusedLocationClient;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private GoogleApiClient client;
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
 
@@ -45,9 +59,78 @@ public class GetGPSCoordinates extends Service {
     @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
-        Toast.makeText(getApplicationContext(), "Oncreate", Toast.LENGTH_SHORT);
+
         Log.d("GPSService", "Oncreate");
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(4*1000);
+        locationRequest.setFastestInterval(2*1000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        //locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        //initListener();
+        //turnGPSOn();
+
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        Log.d("GPS Service","LocationResult is "+locationResult);
+                        return;
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        if (location != null) {
+                            GetGPSCoordinates.lastKnownLocation = ddToDms(location.getLatitude(), location.getLongitude());
+                            Log.d("GPS Service Running", "Coordinates = Latitude = " + location.getLatitude() + " Longitude = " + location.getLongitude());
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Location Fetch Failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onLocationAvailability(LocationAvailability locationAvailability) {
+                    //super.onLocationAvailability(locationAvailability);
+                    Log.d("GPS Service","OnLocationAvailabilty IsLocationAvailable "+ locationAvailability.isLocationAvailable());
+                    if (locationAvailability.isLocationAvailable()){
+                        Log.d("onLocationAvailabilty","Location Available will show updates");
+                        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                    }else {
+                        Log.d("onLocationAvailabilty","Location Unavailable calling turnGPSOn()");
+                        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
+                        //locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER,0,0,listener);
+                    }
+                }
+            };
+
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
+
+            Log.d("GPSService", "Notification ON");
+            String input = "You are being protected";
+            createNotificationChannel();
+            Intent notificationIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                    0, notificationIntent, 0);
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                    .setContentIntent(pendingIntent)
+                    .setContentTitle(" Security Application ")
+                    .setContentText(input)
+                    .build();
+
+            startForeground(1, notification);
+        }
+        else {
+            Log.d("GPS Service","Inside else, Permissions denied");
+            Toast.makeText(this,"Location Permissions not granted",Toast.LENGTH_LONG).show();
+        }
+
+
+        /*if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
             && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) ==PackageManager.PERMISSION_GRANTED))
         {
             // Permission is granted
@@ -60,14 +143,6 @@ public class GetGPSCoordinates extends Service {
                     Log.d("GPSService", "coordinates" + location.getLatitude() + "," + location.getLongitude());
                     Toast.makeText(getApplicationContext(), "coordinates " + location.getLatitude() + "," + location.getLongitude(), Toast.LENGTH_SHORT);
                     sendBroadcast(i);
-                }
-
-                @Override
-                public void onStatusChanged(String s, int i, Bundle bundle) {
-                }
-
-                @Override
-                public void onProviderEnabled(String s) {
                 }
 
                 @Override
@@ -86,28 +161,13 @@ public class GetGPSCoordinates extends Service {
 
         }else {
             //Permission not Granted
-        }
+        }*/
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        Log.d("GPS Service","Inside OnStart");
         //do heavy work on a background thread
-        Log.d("GPSService", "onStartCommand");
-        String input = "You are being protected";
-        createNotificationChannel();
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, 0);
-
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
-                .setContentIntent(pendingIntent)
-                .setContentTitle(" Location ")
-                .setContentText(input)
-                .build();
-
-        startForeground(1, notification);
 
         return START_STICKY;
     }
@@ -176,5 +236,37 @@ public class GetGPSCoordinates extends Service {
             manager.createNotificationChannel(serviceChannel);
         }
     }
+
+    private void initListener(){
+        listener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Log.d("GPS Service","Fetching Location Through Network ");
+                GetGPSCoordinates.lastKnownLocation = ddToDms(location.getLatitude(), location.getLongitude());
+                Log.d("Network Location ","Latitude = "+location.getLatitude()+" Longitude = "+location.getLongitude());
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+               /* Log.d("GPS Service","Serice provider disabled");
+                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);*/
+            }
+        };
+    }
+
+    private void turnGPSOn() {
+
+    }
+
 
 }

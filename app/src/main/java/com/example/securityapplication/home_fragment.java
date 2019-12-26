@@ -139,7 +139,6 @@ public class home_fragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-
                 try {
 
 

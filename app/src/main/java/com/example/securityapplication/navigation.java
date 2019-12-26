@@ -106,6 +106,9 @@ public class navigation extends AppCompatActivity{
                     db.updatetestmode(false);
 
                 }
+                //update testmode value in db
+                test= (flag==1); //using the global static variable instead of the local variable
+                db.updatetestmode(test);
             }
         });
     }

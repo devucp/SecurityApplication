@@ -5,9 +5,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/cyan"
     app:title="TRATA"
+    app:subtitleTextColor="@color/accept"
+    app:titleMarginStart="20dp"
     app:titleTextColor="@color/white"
     android:elevation="4dp"
+    android:id="@+id/toolbar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="50dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+        android:layout_marginBottom="8dp"
+        android:maxWidth="10dp"
+        android:minWidth="10dp"
+        app:srcCompat="@mipmap/ic_launcher_foreground" />
 
         <TextView
             android:id="@+id/testmode"

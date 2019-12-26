@@ -38,14 +38,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center">
-                        <ImageView
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            xmlns:app="http://schemas.android.com/apk/res-auto"
                             android:id="@+id/profile_pic"
                             android:layout_width="120dp"
                             android:layout_height="120dp"
-                            android:layout_gravity="center_horizontal"
                             android:src="@drawable/ic_account_circle_cyan_24dp"
                             android:layout_marginTop="15dp"
-                            />
+                            app:civ_border_width="0dp"
+                            app:civ_border_color="@color/cyan"/>
 
                         <ImageButton
                             android:id="@+id/btn_choose_img"
@@ -74,9 +76,12 @@
                         android:paddingRight="0dp"
                         android:singleLine="true"
                         android:textColor="@color/white"
-                        android:textColorLink="#00EEEEEE"
+
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+
+
+                        android:textColorLink="#00EEEEEE"
+                        android:textSize="30sp"
                         android:textStyle="bold" />
 
 
@@ -108,12 +113,15 @@
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
+                        android:background="@drawable/shapeemail"
+
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:background="@android:color/transparent"/>
+                        android:textSize="20sp"
+                        android:textColorHighlight="#007399"
+
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -145,7 +153,10 @@
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
+                        android:textColorHighlight="#007399"
+                        android:background="@drawable/shapeemail"
+
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -177,7 +188,10 @@
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
+                        android:textColorHighlight="#007399"
+                        android:background="@drawable/shapeemail"
+
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -203,7 +217,10 @@
                         android:paddingStart="15dp"
                         android:spinnerMode="dropdown"
                         android:textColor="@color/cyan"
-                        android:textSize="22sp"
+                        android:textColorHighlight="#007399"
+                        android:background="@drawable/shapeemail"
+
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <!--                    <EditText-->
@@ -246,10 +263,14 @@
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
                         android:singleLine="true"
+                        android:background="@drawable/shapeemail"
+
+                        android:textColorHighlight="#007399"
+
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -293,9 +314,10 @@
                     android:id="@+id/text_changePassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="30dp"
                     android:text="@string/change_password"
                     android:textSize="16sp"
+
                     android:textColor="@color/cyan"
                     android:gravity="center"
                     android:clickable="true"

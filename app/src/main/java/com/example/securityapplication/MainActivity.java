@@ -141,13 +141,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(validateForm()){
                     if (!IsInternet.checkInternet(MainActivity.this))
                         return;
-
                     KeyboardHelper.hideSoftKeyboard(MainActivity.this, v);
-
                     userData = new Hashtable<>();
-
                     pgbarshow();
-
                     userData.put("email",mEmail.getText().toString());
                     userData.put("password",mPassword.getText().toString());
                     userData.put("SignInType", "email");
@@ -222,9 +218,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onStart(){
+
         Log.d(TAG,"Inside onStart");
 
  //       final DatabaseReference ddb=FirebaseDatabase.getInstance().getReference().child("Devices").child("356477081682635");
+
+//        final DatabaseReference ddb=FirebaseDatabase.getInstance().getReference().child("Devices").child("356477081682635");
+
 //        ddb.addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

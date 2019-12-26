@@ -35,9 +35,12 @@ public class ForceUpdateChecker {
     public void check() {
         final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
 Log.d("firebasesachin","outside of if"+remoteConfig.getString(KEY_UPDATE_URL));
+        Log.d("firebasesachin2","outside of if"+remoteConfig.getBoolean(KEY_UPDATE_REQUIRED));
         if (remoteConfig.getBoolean(KEY_UPDATE_REQUIRED)) {
             String currentVersion = remoteConfig.getString(KEY_CURRENT_VERSION);
+            Log.d("currentVersion",currentVersion);
             String appVersion = getAppVersion(context);
+            Log.d("currentVersion",appVersion);
             String updateUrl = remoteConfig.getString(KEY_UPDATE_URL);
             Log.d("firebasesachin",currentVersion+" "+appVersion);
             if (!TextUtils.equals(currentVersion, appVersion)

@@ -80,7 +80,7 @@
                     android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="@color/white"
-                    android:textCursorDrawable="@color/white"
+                    android:textCursorDrawable="@drawable/maincursor"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -112,7 +112,7 @@
                     android:textColor="#FFFFFF"
                     android:textColorHighlight="#007399"
                     android:textColorHint="#FFFFFF"
-                    android:textCursorDrawable="@color/white"
+                    android:textCursorDrawable="@drawable/maincursor"
                     android:textColorLink="@color/white"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -145,7 +145,6 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/shapeemail"
                     android:hint="@string/confirm_password"
-
                     android:inputType="textPassword"
                     android:paddingStart="20dp"
                     android:paddingTop="9dp"
@@ -153,7 +152,7 @@
                     android:paddingBottom="9dp"
                     android:textColor="#ffffff"
                     android:textColorHighlight="#007399"
-                    android:textCursorDrawable="@color/white"
+                    android:textCursorDrawable="@drawable/maincursor"
 
                     android:textColorHint="#FFFFFF"
                     android:textSize="18sp" />

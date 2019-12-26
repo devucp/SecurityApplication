@@ -71,6 +71,14 @@ public class navigation extends AppCompatActivity{
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(this);
 
+        Toolbar toolbar1 = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        //toolbar.setNavigationIcon(R.drawable.ic_toolbar);
+        toolbar.setTitle("");
+        toolbar.setSubtitle("");
+        //toolbar.setLogo(R.drawable.ic_toolbar);
+
         async();
         //sqlite db code here
         Log.d("checking11","oncreate option menu 3 is running");

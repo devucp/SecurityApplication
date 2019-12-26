@@ -35,8 +35,12 @@ public class SosPlayer extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         startWaitTimer();
-
-        stop= intent.getIntExtra("stop",0);
+        try {
+            stop = intent.getIntExtra("stop", 0);
+        }catch(Exception e){
+            stop=0; //assigning a default value
+            Toast.makeText(getApplicationContext(),"SOS player Exception"+e.getMessage(),Toast.LENGTH_LONG);
+        }
         Log.d(TAG,"Inside onStartCOmmand : Stop ="+stop);
 
 

@@ -22,7 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
+        android:soundEffectsEnabled="true"
+        android:elevation="50dp"
+        app:elevation="50dp"
+        app:itemTextColor="@color/cyan"
+        app:itemIconTint="@color/cyan"
+        app:itemHorizontalTranslationEnabled="true"
+        android:background="#fff"
+
         app:menu="@menu/bottom_navigation" />
 
 

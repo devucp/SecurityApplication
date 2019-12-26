@@ -80,8 +80,9 @@
                     android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="@color/white"
-                    android:textCursorDrawable="@color/white"
-                    android:textSize="18sp" />
+                    android:textCursorDrawable="@color/graylight"
+                    android:textSize="18sp"
+                    />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -198,6 +199,7 @@
                     android:indeterminateTintMode="src_atop"
                     android:foregroundGravity="center"
                     android:layout_marginTop="20dp"
+                    android:translationZ="8dp"
  />
             </RelativeLayout>
 

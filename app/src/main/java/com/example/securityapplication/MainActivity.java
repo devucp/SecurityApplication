@@ -7,7 +7,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,7 +18,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -30,18 +28,13 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.KeyboardHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 //import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
@@ -51,12 +44,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import es.dmoral.toasty.Toasty;
@@ -85,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ProgressBar pgsBar1;
 
     private User user;
-    private Device device;
     private String uid;
     private Boolean isDeviceFormatted;
 
@@ -258,34 +248,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
        Log.d(TAG,"Checkig user status...");
         if (firebaseHelper.getFirebaseAuth().getCurrentUser() != null) {
-            Log.d(TAG, "Inside checkUserStatus:Current user is null");
-            Log.d(TAG, "Formatted or uninstalled or cleared data behavior");
             deviceId();
-            device = new Device();
-            device.setUID(FirebaseAuth.getInstance().getUid());
-            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device, new DatabaseReference.CompletionListener() {
+            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(FirebaseAuth.getInstance().getUid(), new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                     if (databaseError != null) {
-                        if (databaseError.getCode() == -3)
+                        firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+                        if (databaseError.getCode() == -3) {
                             Toast.makeText(MainActivity.this, "Last logout was unsuccessful. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
+                        }
                         else {
                             Toast.makeText(MainActivity.this, "Please check your connection and try again", Toast.LENGTH_LONG).show();
                             Log.d(TAG,databaseError.getMessage());
                             Toast.makeText(MainActivity.this, "Sign in failed"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
-                            // sign out the user
-                            LogOutUser();
                         }
+                        LogOutUser();
                     } else {
                         firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getUid()).child("imei").setValue(mImeiNumber, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                                 if (databaseError != null) {
-                                    if (databaseError.getCode() == -3)
+                                    firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+                                    if (databaseError.getCode() == -3){
                                         Toast.makeText(MainActivity.this, "Last logout was unsuccessful. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
+                                    }
                                     else
                                         Toast.makeText(MainActivity.this, "Please check your connection and try again", Toast.LENGTH_LONG).show();
-                                    firebaseHelper.makeDeviceImeiNull(mImeiNumber);
                                     Log.d(TAG,databaseError.getMessage());
                                     Toast.makeText(MainActivity.this, "Sign in failed."+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
                                     // sigin out the user
@@ -475,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateUI(FirebaseUser firebaseUser){
-        Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+        //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
         if(firebaseUser==null){
             mStatus.setText(R.string.not_logged);
@@ -486,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
-            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
 
             if (db.getdb_user() == null){
@@ -495,22 +483,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 updateUI(null);
                 return;
             }
-            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
             Log.d(TAG,"current user"+firebaseUser.getEmail());
             //goto next activity only if user exists in firebase db
             /** SosPlayer Service intent**/
 
-            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
             startService(new Intent(this, SosPlayer.class));
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
-            Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
             try {
                 finish();
-                Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+                //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
             }catch (Exception e){
                 Log.d(TAG,"Exception on closing activity:"+e.getMessage());
@@ -518,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         Log.d(TAG,"UI updated successfully");
-        Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+        //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
     }
 
@@ -529,9 +517,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
                 Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
                 if (deviceDataSnapshot.exists()) {
-                    device = deviceDataSnapshot.getValue(Device.class);
+                    uid = deviceDataSnapshot.getValue(String.class);
                 } else {
-                    device = null;
+                    uid = null;
                 }
                 validateBeforeSignIn();
             }
@@ -548,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void validateBeforeSignIn() {
         Log.d(TAG,"Inside validateBeforeSignIn");
         // Check if registered user sign's in using old device or new device using imei number.
-        if (device != null) {
+        if (uid != null) {
             Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser()+"device formatted  or user data cleared or app uninstalled");
             isDeviceFormatted = true;
         }
@@ -569,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());
                 if (emailNodeDataSnapshot.exists()) {
                     //emailNode = emailNodeDataSnapshot.getValue(Email.class);
-                    uid = emailNodeDataSnapshot.getValue().toString();
+                    uid = emailNodeDataSnapshot.getValue(String.class);
                     Log.d(TAG,uid);
                 } else {
                     uid = null;
@@ -591,15 +579,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (uid == null){
             Log.d(TAG,"Account not registered. Please complete the registration process");
             // prompt user to signUp
-            if (userData.get("SignInType").equals("google")){
-                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-                startActivityForResult(signUpIntent,1);
-                pgbarhide();
-            }
-            else
-                //Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
             Toasty.warning(this, "Account not registered. Please complete the registration process", Toast.LENGTH_LONG, true).show();
-
+            if (userData.get("SignInType").equals("email")){
+                signUpIntent.putExtra("email", userData.get("email"));
+            }
+            startActivityForResult(signUpIntent,1);
             pgbarhide();
         }
         else {
@@ -621,42 +606,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
                                     Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
                                     if (deviceDataSnapshot.exists()) {
-                                        device = deviceDataSnapshot.getValue(Device.class);
+                                        if (user.getImei().equals(mImeiNumber)){
+                                            crossValidateUserData();
+                                        }
+                                        else {
+                                            uid = deviceDataSnapshot.getValue(String.class);
                                         /* User not logged out from old device
                                            prompt user to log out from old device
                                            */
-                                        Log.d(TAG, "User is LoggedIn in other device");
-                                        Toast.makeText(MainActivity.this,
-                                                "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                        LogOutUser();
-                                    } /*else {
-                                        //user can login
-                                        Log.d(TAG,"User is logged out from old device..Now user can login from new device");
-                                        device.setUID(uid);
-                                        crossValidateUserData();
-
-                                        String SignInType = userData.get("SignInType");
-                                        Log.d(TAG, "SignInType:" + SignInType);
-                                        switch (SignInType) {
-                                            case "email":
-                                                signIn(userData.get("email"), userData.get("password"));
-                                                break;
-                                            case "google":
-                                                initializeGoogleFirebaseSignIn();
-                                                GoogleSignInAccount acc = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
-                                                if (acc != null)
-                                                    googleFirebaseSignIn.firebaseAuthWithGoogle(acc);
-                                                else {
-                                                    Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
-                                                    pgbarhide();
-                                                }
-                                                break;
-                                            default:
-                                                Log.d(TAG, "Invalid SignInType");
-                                                pgbarhide();
-                                                return;
+                                            Log.d(TAG, "User is LoggedIn in other device");
+                                            Toast.makeText(MainActivity.this,
+                                                    "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                                            LogOutUser();
                                         }
-                                    }*/
+                                    }
+                                    else {
+                                        //log out the user
+                                        firebaseHelper.firebaseSignOut(mImeiNumber);
+                                        LogOutUser();
+                                    }
                                 }
 
                                 @Override

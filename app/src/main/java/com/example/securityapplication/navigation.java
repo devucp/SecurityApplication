@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +49,6 @@ public class navigation extends AppCompatActivity{
     public static TextView tmode1;
 
     private int flag=0;
-    private Device device;
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;

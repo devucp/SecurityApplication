@@ -36,7 +36,6 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.KeyboardHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -64,9 +63,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
-
-
-
 public class SignUp2 extends AppCompatActivity {
     private final AppCompatActivity activity = SignUp2.this;
 
@@ -80,7 +76,6 @@ public class SignUp2 extends AppCompatActivity {
     private Validation validation = new Validation();
     private SQLiteDBHelper DBHelper;
     private User user;
-    private Device device;
     private String blockcharset = "~#^|$%&*!,.";
     //adding requestCode variable for requestPermission
     private int RC;
@@ -121,8 +116,6 @@ public class SignUp2 extends AppCompatActivity {
         firebaseHelper.initFirebase();
         firebaseHelper.initContext(SignUp2.this);
         firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
-
-        device = new Device();
 
         Resources res = getResources();
         String[] Locality = res.getStringArray(R.array.Locality);
@@ -206,6 +199,7 @@ public class SignUp2 extends AppCompatActivity {
             public void onClick(View view)
             {
                 KeyboardHelper.hideSoftKeyboard(SignUp2.this, view);
+                Toast.makeText(SignUp2.this, "Please stay here", Toast.LENGTH_LONG).show();
 
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
                     Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
@@ -331,8 +325,9 @@ public class SignUp2 extends AppCompatActivity {
 
     public void onStart(){
         super.onStart();
-        if (btn_submit != null)
+        if (btn_submit != null) {
             KeyboardHelper.hideSoftKeyboard(SignUp2.this, btn_submit);
+        }
     }
 
     private void setUser(String gender){
@@ -419,53 +414,10 @@ public class SignUp2 extends AppCompatActivity {
                 firebaseHelper.firebaseSignOut();
             return;
         }
-        writeUserToFirebase(firebaseUser);
-    }
-
-    private void writeUserToFirebase(final FirebaseUser firebaseUser){
-        Log.d(TAG,"Inside writeUser");
-        //push user to firebase database 'Users' node
-        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if (databaseError != null){
-                    Log.d(TAG,"User Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "error in writeUsertofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (databaseError.getCode() == -3) {
-                        // -3 : Permission denied to write in firebase
-                        Toast.makeText(SignUp2.this, "Account already registered", Toast.LENGTH_LONG).show();
-                        firebaseHelper.makeDeviceImeiNull(imei);
-                        firebaseHelper.firebaseSignOut();
-                        firebaseHelper.googleSignOut(SignUp2.this);
-                        redirectToMainActivity();
-                    }
-                }
-                else {
-                    Log.d(TAG,"User Data saved successfully.");
-                    writeDeviceToFirebase(firebaseUser);
-                }
-            }
-        });
-    }
-
-    private void writeDeviceToFirebase(final FirebaseUser firebaseUser){
-        Log.d(TAG,"Inside writeDevice");
-        //push device to firebase database 'Devices' node
-        device.setUID(firebaseUser.getUid());
-        firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).setValue(device, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if (databaseError != null){
-                    Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
-                    Toast.makeText(SignUp2.this, "error in writeDevicetofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                    deleteDataFromFirebase(firebaseUser);
-                }
-                else {
-                    Log.d(TAG,"Device Data saved successfully.");
-                    writeEmailToFirebase(firebaseUser);
-                }
-            }
-        });
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            writeEmailToFirebase(firebaseUser);
+        else
+            Toast.makeText(SignUp2.this, "Please signup again.", Toast.LENGTH_SHORT).show();
     }
 
     private void writeEmailToFirebase(final FirebaseUser firebaseUser){
@@ -478,21 +430,72 @@ public class SignUp2 extends AppCompatActivity {
                 if (databaseError != null){
                     Log.d(TAG,"Email Data could not be saved " + databaseError.getMessage());
                     Toast.makeText(SignUp2.this, "error in writeEmailtofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                    deleteDataFromFirebase(firebaseUser);
+                    if (databaseError.getCode() == -3) {
+                        // -3 : Permission denied to write in firebase
+                        Toast.makeText(SignUp2.this, "Account already registered", Toast.LENGTH_LONG).show();
+                    }else Toast.makeText(SignUp2.this,"In email:"+databaseError.getMessage(),Toast.LENGTH_LONG).show();
+                    firebaseHelper.firebaseSignOut();
+                    firebaseHelper.googleSignOut(SignUp2.this);
+                    redirectToMainActivity();
                 }
                 else {
                     Log.d(TAG,"Email Data saved successfully.");
+                    writeDeviceToFirebase(firebaseUser);
+                }
+            }
+        });
+    }
+
+    private void writeDeviceToFirebase(final FirebaseUser firebaseUser){
+        Log.d(TAG,"Inside writeDevice");
+        firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).setValue(firebaseUser.getUid(), new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null){
+                    Log.d(TAG,"Device Data could not be saved " + databaseError.getMessage());
+                    if (databaseError.getCode() == -3)
+                        Toast.makeText(SignUp2.this, "Permission denied in device", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(SignUp2.this, "error in writeDevicetofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    deleteDataFromFirebase(firebaseUser);
+                }
+                else {
+                    Log.d(TAG,"Device Data saved successfully.");
+                    writeUserToFirebase(firebaseUser);
+                }
+            }
+        });
+    }
+
+    private void writeUserToFirebase(final FirebaseUser firebaseUser){
+        Log.d(TAG,"Inside writeUser");
+        //push user to firebase database 'Users' node
+        firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).setValue(user, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                if (databaseError != null){
+                    Log.d(TAG,"User Data could not be saved " + databaseError.getMessage());
+                    if (databaseError.getCode() == -3)
+                        Toast.makeText(SignUp2.this, "Permission denied in user", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(SignUp2.this, "error in writeUsertofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    deleteDataFromFirebase(firebaseUser);
+                }
+                else {
+                    Log.d(TAG,"User Data saved successfully.");
                     try {
                         if (DBHelper.addUser(user)) {
                             gotoNextActivity();
                         }
                         else {
                             Toast.makeText(getApplicationContext(), "Data not stored in sqlite Signup2", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SignUp2.this, "Authentication failed. Try to login", Toast.LENGTH_SHORT).show();
                             LogOutUser();
                         }
                     }catch (Exception e){
                         Log.d(TAG,e.getMessage());
                         Toast.makeText(getApplicationContext(), "Sqlite error occurred Signup2"+e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(SignUp2.this, "Authentication failed. Try to login", Toast.LENGTH_SHORT).show();
                         LogOutUser();
                     }
                 }
@@ -521,12 +524,15 @@ public class SignUp2 extends AppCompatActivity {
     private void deleteDataFromFirebase(FirebaseUser firebaseUser){
         Log.d(TAG,"Inside deleteDataFromFirebase");
         if (FirebaseAuth.getInstance().getCurrentUser() != null){
-            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue("null"); //due to db security rules
-            firebaseHelper.getDevicesDatabaseReference().child(imei).setValue("null"); // due to db security rules
-            firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeValue();
-            firebaseHelper.getDevicesDatabaseReference().child(imei).removeValue();
-            String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
-            firebaseHelper.getEmailDatabaseReference().child(emailKey).removeValue();
+            try {
+                firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).removeValue();
+                firebaseHelper.getDevicesDatabaseReference().child(imei).removeValue();
+                String emailKey = TextUtils.join(",", Arrays.asList(user.getEmail().split("\\."))); //as key in firebase db cannot contain "."
+                firebaseHelper.getEmailDatabaseReference().child(emailKey).removeValue();
+            }catch (Exception e){
+                Log.d(TAG,"Exception while deleting:"+e.getMessage());
+                Toast.makeText(SignUp2.this, "Exception while deleting:"+e.getMessage(),Toast.LENGTH_LONG).show();
+            }
         }
         Spinner.setVisibility(View.GONE);
         Enable();

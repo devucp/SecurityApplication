@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,11 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -34,7 +29,6 @@ public class ProfileActivity extends AppCompatActivity {
     private Button btn_logout;
     SQLiteDBHelper mydb ;
     User user;
-    Device device;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDevicesDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
@@ -226,10 +220,6 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(TAG,"Inside signout");
         // first make uid under imei null in Devices and imei under uid null in Users
         deviceId();
-        device = new Device();
-        device.setUID("null");
-        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
             mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");

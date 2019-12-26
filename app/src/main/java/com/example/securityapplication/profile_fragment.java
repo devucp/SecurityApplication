@@ -50,7 +50,7 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.InternalStorage;
-import com.example.securityapplication.model.Device;
+import com.example.securityapplication.Helper.KeyboardHelper;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -142,11 +142,8 @@ public class profile_fragment extends Fragment {
         return v;
     }
 
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         initObjects();
         initviews();
 //        FetchAllData();
@@ -330,7 +327,8 @@ public class profile_fragment extends Fragment {
             profile_pic = getActivity().findViewById(R.id.profile_pic);
             profile_pic.setImageBitmap(b);
         }catch (IOException e){
-            Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"Profile picture not found");
         }
 
         Log.d("Profile","DATA displayed on profile Successfully");
@@ -379,13 +377,12 @@ public class profile_fragment extends Fragment {
         chooseImgBtn = getActivity().findViewById(R.id.btn_choose_img);
 
         disable();
-
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.d(TAG,"resultcode:"+resultCode+"requestcode:"+requestCode);
         if (requestCode == 1){
             if (resultCode == 110){
                 user = data.getParcelableExtra("ResultUser");
@@ -405,7 +402,6 @@ public class profile_fragment extends Fragment {
                 Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
                 return;
             }
-            //bitmappic = (Bitmap) data.getExtras().get("data");
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
                 try {
@@ -426,8 +422,6 @@ public class profile_fragment extends Fragment {
         if(requestCode == 201 && resultCode == getActivity().RESULT_OK)
 
         {
-
-
 
             checkCameraPermission();
 
@@ -466,8 +460,6 @@ public class profile_fragment extends Fragment {
             }
         }
 
-
-
         //Log.d("MAinActivity","SMS intent");
         //check permissions
         checkCameraPermission();
@@ -480,8 +472,6 @@ public class profile_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);
-
-
         }
 
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
@@ -504,8 +494,6 @@ public class profile_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC);
-
-
         }
 
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
@@ -519,8 +507,6 @@ public class profile_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RC);
-
-
         }
 
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
@@ -612,7 +598,8 @@ public class profile_fragment extends Fragment {
                 public void onComplete(@NonNull Task<Void> task) {
                     progressDialog.dismiss();
                     if(task.isSuccessful()){
-                        Toast.makeText(getActivity(),"EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD",Toast.LENGTH_SHORT).show();
+                        try{Toast.makeText(getActivity(),"EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD",Toast.LENGTH_SHORT).show();}
+                        catch(Exception e){Log.d(TAG,"toast exception:"+e.getMessage());}
                     }
                     else
                     {
@@ -620,7 +607,8 @@ public class profile_fragment extends Fragment {
                             throw task.getException();
                         }catch (Exception e){
                             Log.d(TAG,e.getMessage());
-                            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
+                            try{Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();}
+                            catch(Exception e1){Log.d(TAG, "toast exception:"+e1.getMessage());}
                         }
                     }
                 }
@@ -666,12 +654,8 @@ public class profile_fragment extends Fragment {
 
                 Intent cameraintent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraintent,201);
-
         }
     }
-
-
-
 
     private void uploadProfilePicToFirebase(){
 

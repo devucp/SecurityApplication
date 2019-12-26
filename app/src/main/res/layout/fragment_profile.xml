@@ -79,9 +79,7 @@
                         android:textSize="22sp"
                         android:textStyle="bold" />
 
-
                 </LinearLayout>
-
 
 
                 <LinearLayout
@@ -103,6 +101,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:alpha="0.6"
+                        android:background="@android:color/transparent"
                         android:hint="Email"
                         android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
@@ -112,8 +111,7 @@
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
                         android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:background="@android:color/transparent"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -178,7 +176,9 @@
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
                         android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:background="@android:color/transparent"
+                        />
                 </LinearLayout>
 
                 <LinearLayout

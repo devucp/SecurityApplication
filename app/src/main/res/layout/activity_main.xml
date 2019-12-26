@@ -31,7 +31,7 @@
         android:drawablePadding="10dp"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:textCursorDrawable="@color/white"
+        android:textCursorDrawable="@color/graylight"
         android:padding="15dp"
         android:textColor="@color/white"
         android:textColorHighlight="#007399"

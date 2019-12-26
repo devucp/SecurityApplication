@@ -36,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
+import es.dmoral.toasty.Toasty;
+
 import static java.security.AccessController.getContext;
 
 public class navigation extends AppCompatActivity{
@@ -170,7 +172,9 @@ public class navigation extends AppCompatActivity{
         catch (Exception e)
         {
             item.setChecked(db.getTestmode());
-            Toast.makeText(this, "Loading.....please wait for a second", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Loading.....please wait for a second", Toast.LENGTH_LONG, true).show();
+
+           // Toast.makeText(this, "Loading.....please wait for a second", Toast.LENGTH_LONG).show();
         }
         finally {
             return true;

@@ -277,6 +277,9 @@
                 android:indeterminateDrawable="@drawable/cpb"
                 android:indeterminateTintMode="src_atop"
                 android:foregroundGravity="center"
+                android:translationZ="8dp"
+                android:layout_marginBottom="50dp"
+                android:layout_marginTop="30dp"
                 />
             </RelativeLayout>
 

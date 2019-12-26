@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import es.dmoral.toasty.Toasty;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView textName,textEmail,textPhone,textAddress,textGender,textDob;
@@ -80,7 +82,9 @@ public class ProfileActivity extends AppCompatActivity {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ProfileActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+                Toasty.info(ProfileActivity.this, "clicked", Toast.LENGTH_SHORT, true).show();
+
+               // Toast.makeText(ProfileActivity.this, "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                 signOut();
             }
@@ -183,7 +187,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.error(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG, true).show();
+
+            //Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, RC);
@@ -224,7 +230,9 @@ public class ProfileActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
             mAuth.signOut();
-            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            Toasty.info(this, "Logged Out from Firebase", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
         //Google signOut
         /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {

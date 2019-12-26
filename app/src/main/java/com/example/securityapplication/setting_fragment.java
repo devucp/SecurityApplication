@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 public class setting_fragment extends Fragment {
     Button sos;
     Button rate_us,scream;
@@ -29,7 +31,9 @@ public class setting_fragment extends Fragment {
         scream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT).show();
+                Toasty.info(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT, true).show();
+
+                //Toast.makeText(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT).show();
             }
         });
         rate_us.setOnClickListener(new View.OnClickListener() {

@@ -146,7 +146,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else {
                     Log.d(TAG,"Invalid credentials");
-                    Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
+                    Toasty.error(MainActivity.this, "Enter valid credentials", Toast.LENGTH_SHORT, true).show();
+
+ //                   Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -316,7 +318,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, RC);
@@ -332,7 +336,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     deviceId();
                 } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
                     finish();
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                    Toasty.error(this, "Permission denied", Toast.LENGTH_SHORT, true).show();
+
+                   // Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
                 break;
             default:
@@ -386,7 +392,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                Toast.makeText(MainActivity.this, "Authentication failed. Try again",Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Authentication failed. Try again", Toast.LENGTH_SHORT, true).show();
+
+               // Toast.makeText(MainActivity.this, "Authentication failed. Try again",Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
         }
@@ -434,7 +442,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             final FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             Log.d(TAG, firebaseHelper.getDevicesDatabaseReference().toString());
                             checkUserStatus();
-
                         } else {
 
                             try{
@@ -442,11 +449,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             catch (FirebaseAuthInvalidCredentialsException e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
-                                Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
+                                Toasty.error(MainActivity.this, "Invalid Password", Toast.LENGTH_SHORT, true).show();
+
+                                //Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
                             }
                             catch (Exception e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
-                                Toast.makeText(MainActivity.this, "Authentication failed. Try again"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                                Toasty.error(MainActivity.this, "Authentication failed. Try again"+e.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+                               // Toast.makeText(MainActivity.this, "Authentication failed. Try again"+e.getMessage(),Toast.LENGTH_SHORT).show();
                             }finally {
                                 updateUI(null);
                             }
@@ -507,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         Log.d(TAG,"UI updated successfully");
         //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
-
     }
 
     private void setDeviceForSignIn(String imei){
@@ -598,6 +608,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (user.getImei() == null){
                             // user is logged out
                             Log.d(TAG,"No user not logged  in. Login the user");
+                            Log.d(TAG,"No user not logged  in. Login the user");
                             crossValidateUserData();
                         }
                         else {
@@ -615,9 +626,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                            prompt user to log out from old device
                                            */
                                             Log.d(TAG, "User is LoggedIn in other device");
-                                            Toast.makeText(MainActivity.this,
+                                            Toasty.error(MainActivity.this, "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_SHORT, true).show();
+
+                                           /* Toast.makeText(MainActivity.this,
                                                     "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                            LogOutUser();
+                                           */ LogOutUser();
                                         }
                                     }
                                     else {

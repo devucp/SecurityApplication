@@ -80,7 +80,10 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.support.v4.content.ContextCompat.getDrawable;
 import static android.support.v4.content.ContextCompat.getColor;
 import static android.support.v4.content.ContextCompat.getSystemService;
 import static com.example.securityapplication.R.layout.spinner_layout;
@@ -204,11 +207,14 @@ public class profile_fragment extends Fragment {
                                                 if(btn_edit.getText().equals("edit"))
                                                 {btn_edit.setText("Save");
                                                     enable();
-                                                    alphaa(1.0f);}
+                                                    btn_edit.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                                                alphaa(1.0f);}
                                                 else {
                                                     if(!validate())
                                                     {
-                                                        Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
+                                                        Toasty.error(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT, true).show();
+
+                                                        //Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
                                                     }
                                                     else {
                                                         // start progress bar
@@ -236,7 +242,9 @@ public class profile_fragment extends Fragment {
                                                 }
                                             }//Sending Data to EditProfileActivity
                                             else {
-                                                Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
+                                                Toasty.error(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG, true).show();
+
+                                                //Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
                                             }
                                         }
 
@@ -246,7 +254,8 @@ public class profile_fragment extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
+                Toasty.info(getContext(), "clicked", Toast.LENGTH_SHORT, true).show();
+                //Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                 signOut();
             }
@@ -341,6 +350,12 @@ public class profile_fragment extends Fragment {
         textAddress.setEnabled(false);
         textDob.setEnabled(false);
         chooseImgBtn.setVisibility(View.GONE);
+
+        textName.setBackgroundColor(Color.TRANSPARENT);
+        textEmail.setBackgroundColor(Color.TRANSPARENT);
+        textPhone.setBackgroundColor(Color.TRANSPARENT);
+        textAddress.setBackgroundColor(Color.TRANSPARENT);
+        textDob.setBackgroundColor(Color.TRANSPARENT);
     }
     private void alphaa(float k){
         spinner.setAlpha(k);
@@ -357,6 +372,12 @@ public class profile_fragment extends Fragment {
         textPhone.setEnabled(true);
         textAddress.setEnabled(true);
         textDob.setEnabled(true);
+
+
+        textEmail.setBackgroundResource(R.drawable.blackborder);
+        textPhone.setBackgroundResource(R.drawable.blackborder);
+        textAddress.setBackgroundResource(R.drawable.blackborder);
+        textDob.setBackgroundResource(R.drawable.blackborder);
     }
 
     private void initviews() {
@@ -410,7 +431,9 @@ public class profile_fragment extends Fragment {
                     deleteExistingProfilePic();
                 }catch (Exception e){
                     e.printStackTrace();
-                    Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+                    Toasty.error(getContext(), "Unable to store image", Toast.LENGTH_SHORT, true).show();
+
+                    //Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
                 }
             }
             catch (IOException e)
@@ -468,7 +491,9 @@ public class profile_fragment extends Fragment {
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.error(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);
@@ -557,7 +582,9 @@ public class profile_fragment extends Fragment {
             mStopSosPlayer.putExtra("stop",1);
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
             Log.d("Profile Fr","Service sosplayer new startIntent...");
-            Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
+            Toasty.warning(getContext(), "Service sosplayer stopping...", Toast.LENGTH_SHORT, true).show();
+
+           // Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
         }
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");
@@ -581,6 +608,7 @@ public class profile_fragment extends Fragment {
 
         btn_edit.setText("edit");
         alphaa(0.6f);
+        btn_edit.setCompoundDrawablesWithIntrinsicBounds( R.drawable.ic_edit_black_24dp, 0, 0, 0);
         disable();
     }
 
@@ -598,7 +626,7 @@ public class profile_fragment extends Fragment {
                 public void onComplete(@NonNull Task<Void> task) {
                     progressDialog.dismiss();
                     if(task.isSuccessful()){
-                        try{Toast.makeText(getActivity(),"EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD",Toast.LENGTH_SHORT).show();}
+                        try{Toasty.success(getActivity(), "EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD", Toast.LENGTH_SHORT, true).show();}
                         catch(Exception e){Log.d(TAG,"toast exception:"+e.getMessage());}
                     }
                     else
@@ -607,7 +635,7 @@ public class profile_fragment extends Fragment {
                             throw task.getException();
                         }catch (Exception e){
                             Log.d(TAG,e.getMessage());
-                            try{Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();}
+                            try{Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();}
                             catch(Exception e1){Log.d(TAG, "toast exception:"+e1.getMessage());}
                         }
                     }
@@ -616,7 +644,9 @@ public class profile_fragment extends Fragment {
         }catch (Exception e){
             progressDialog.dismiss();
             Log.d(TAG, e.getMessage());
-            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
+            Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();
+
+//            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -727,7 +757,8 @@ public class profile_fragment extends Fragment {
                     uploadProfilePicToFirebase();
                 }
                 else
-                    Toast.makeText(getContext(), "Failed to upload image"+exception.getMessage(),Toast.LENGTH_LONG).show();
+                    Toasty.error(getContext(), "Failed to upload image"+exception.getMessage(), Toast.LENGTH_LONG, true).show();
+                //Toast.makeText(getContext(), "Failed to upload image"+exception.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }

@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import es.dmoral.toasty.Toasty;
 
 public class SignUp2 extends AppCompatActivity {
     private final AppCompatActivity activity = SignUp2.this;
@@ -202,7 +203,9 @@ public class SignUp2 extends AppCompatActivity {
                 Toast.makeText(SignUp2.this, "Please stay here", Toast.LENGTH_LONG).show();
 
                 if (!(validation.validateName(textinputName) & validation.validateGender(gender_grp,text_view) & validation.validateDob(textinputDOB))){
-                    Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+                    Toasty.error(SignUp2.this, "Enter Valid Credentials", Toast.LENGTH_SHORT, true).show();
+
+                    //Toast.makeText(SignUp2.this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -310,7 +313,9 @@ public class SignUp2 extends AppCompatActivity {
                         AddUser();
                     } else {
                         Log.d("SignUp2", "User exists ");
-                        Toast.makeText(getApplicationContext(), "MOBILE NO. ALREADY EXISTS", Toast.LENGTH_LONG).show();
+                        Toasty.error(getApplicationContext(), "MOBILE NO. ALREADY EXISTS", Toast.LENGTH_LONG, true).show();
+
+                        //Toast.makeText(getApplicationContext(), "MOBILE NO. ALREADY EXISTS", Toast.LENGTH_LONG).show();
                         Spinner.setVisibility(View.GONE);
                         Enable();
                         btn_submit.setText("SIGNUP");
@@ -385,8 +390,10 @@ public class SignUp2 extends AppCompatActivity {
                                                         throw task.getException();
                                                     } catch (Exception e) {
                                                         Log.d(TAG, "Exception:" + e.getMessage());
-                                                        Toast.makeText(SignUp2.this, "Authentication failed.",
-                                                                Toast.LENGTH_SHORT).show();
+                                                        Toasty.error(SignUp2.this, "Authentication failed.", Toast.LENGTH_LONG, true).show();
+
+                                                       /* Toast.makeText(SignUp2.this, "Authentication failed.",
+                                                                Toast.LENGTH_SHORT).show()*/;
                                                     }
                                                 }
                                             }
@@ -399,8 +406,10 @@ public class SignUp2 extends AppCompatActivity {
 
                                     // If sign in fails, display a message to the user.
                                     Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
+                                    Toasty.error(SignUp2.this, "Authentication failed.", Toast.LENGTH_LONG, true).show();
+/*
                                     Toast.makeText(SignUp2.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
+                                            Toast.LENGTH_SHORT).show();*/
                                 }
                             }
                         }
@@ -432,7 +441,7 @@ public class SignUp2 extends AppCompatActivity {
                     Toast.makeText(SignUp2.this, "error in writeEmailtofirebase Signup2:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     if (databaseError.getCode() == -3) {
                         // -3 : Permission denied to write in firebase
-                        Toast.makeText(SignUp2.this, "Account already registered", Toast.LENGTH_LONG).show();
+                        Toasty.error(SignUp2.this, "Account already registered", Toast.LENGTH_LONG, true).show();
                     }else Toast.makeText(SignUp2.this,"In email:"+databaseError.getMessage(),Toast.LENGTH_LONG).show();
                     firebaseHelper.firebaseSignOut();
                     firebaseHelper.googleSignOut(SignUp2.this);
@@ -488,13 +497,13 @@ public class SignUp2 extends AppCompatActivity {
                             gotoNextActivity();
                         }
                         else {
-                            Toast.makeText(getApplicationContext(), "Data not stored in sqlite Signup2", Toast.LENGTH_LONG).show();
+                            Toasty.error(getApplicationContext(), "Data not stored in sqlite Signup2", Toast.LENGTH_LONG, true).show();
                             Toast.makeText(SignUp2.this, "Authentication failed. Try to login", Toast.LENGTH_SHORT).show();
                             LogOutUser();
                         }
                     }catch (Exception e){
                         Log.d(TAG,e.getMessage());
-                        Toast.makeText(getApplicationContext(), "Sqlite error occurred Signup2"+e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toasty.error(getApplicationContext(), "Sqlite error occurred Signup2", Toast.LENGTH_LONG, true).show();
                         Toast.makeText(SignUp2.this, "Authentication failed. Try to login", Toast.LENGTH_SHORT).show();
                         LogOutUser();
                     }
@@ -541,7 +550,6 @@ public class SignUp2 extends AppCompatActivity {
     }
 
     private void gotoNextActivity(){
-
         if (FirebaseAuth.getInstance().getCurrentUser() != null){
             Toast.makeText(getApplicationContext(), "YOU ARE NOW A SAVIOUR", Toast.LENGTH_LONG).show();
             // start next activity

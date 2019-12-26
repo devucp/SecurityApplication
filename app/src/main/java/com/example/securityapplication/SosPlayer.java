@@ -27,33 +27,32 @@ public class SosPlayer extends Service {
     private String TAG="SOS Player";
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        try {
             super.onStartCommand(intent, flags, startId);
             startWaitTimer();
+            try {
+                stop = intent.getIntExtra("stop", 0);
+            }catch(Exception e){
+                stop=0; //assigning a default value
+                Toast.makeText(getApplicationContext(),"SOS player Exception"+e.getMessage(),Toast.LENGTH_LONG);
+            }
+            Log.d(TAG,"Inside onStartCOmmand : Stop ="+stop);
 
-            stop = intent.getIntExtra("stop", 0);
-            Log.d(TAG, "Inside onStartCOmmand : Stop =" + stop);
-
-            if (stop == 1) {
+            if(stop==1){
                 stopPlaying();
                 //stopping BackgroundSOSPlayer in case it was running
-                Intent stopSirenIntent = new Intent(this, BackgroundSosPlayerService.class);
-                boolean stoppedSiren = stopService(stopSirenIntent);
-                Log.d(TAG, "Stop=1 stopping BackgroundSOSPlayer service in case it was running :" + stoppedSiren);
+                Intent stopSirenIntent= new Intent(this,BackgroundSosPlayerService.class);
+                boolean stoppedSiren=stopService(stopSirenIntent);
+                Log.d(TAG,"Stop=1 stopping BackgroundSOSPlayer service in case it was running :"+stoppedSiren);
 
-                boolean stopped = stopService(new Intent(getApplicationContext(), SosPlayer.class)); //stops the service when calling intent has stop=1
-                Log.d(TAG, "Stop=1 so calling stopService() :" + stopped);
+                boolean stopped=stopService(new Intent(getApplicationContext(),SosPlayer.class)); //stops the service when calling intent has stop=1
+                Log.d(TAG,"Stop=1 so calling stopService() :"+stopped);
 
-            } else {
+            }
+            else{
                 //initialise the VolumeProviderCompact
                 detectSosPattern();
             }
-        }catch (Exception e){
-            Toast.makeText(this, e.getMessage()+"11", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, e.getMessage()+"11", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, e.getMessage()+"11", Toast.LENGTH_LONG).show();
-        }
-        return START_STICKY;
+            return START_STICKY;
     }
 
     @Override

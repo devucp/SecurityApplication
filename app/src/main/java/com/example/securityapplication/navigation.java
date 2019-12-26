@@ -18,6 +18,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +51,6 @@ public class navigation extends AppCompatActivity{
     public static TextView tmode1;
 
     private int flag=0;
-    private Device device;
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
@@ -108,6 +108,9 @@ public class navigation extends AppCompatActivity{
                     db.updatetestmode(false);
 
                 }
+                //update testmode value in db
+                test= (flag==1); //using the global static variable instead of the local variable
+                db.updatetestmode(test);
             }
         });
     }
@@ -143,7 +146,6 @@ public class navigation extends AppCompatActivity{
             startActivityForResult(sosPage,1);
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -196,7 +198,11 @@ public class navigation extends AppCompatActivity{
                             break;
                         case R.id.save:
                             is_home=false;
+
+
                             selectedFragment = new saviour_fragment();
+
+
                             break;
                         case R.id.profile:
                             is_home=false;

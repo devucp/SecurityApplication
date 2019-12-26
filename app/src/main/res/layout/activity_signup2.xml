@@ -251,7 +251,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="10dp">
 
             <Button
                 android:id="@+id/btn_submit"
@@ -273,6 +273,7 @@
                 style="?android:attr/progressBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="35sp"
                 android:indeterminateDrawable="@drawable/cpb"
                 android:indeterminateTintMode="src_atop"
                 android:foregroundGravity="center"

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,7 +14,6 @@ import com.example.securityapplication.MainActivity;
 import com.example.securityapplication.ProfileActivity;
 import com.example.securityapplication.R;
 import com.example.securityapplication.SignUp2;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -41,7 +41,6 @@ public class FirebaseHelper {
     private static final String TAG = "FirebaseHelper";
     private Context context;
     private User user;
-    private Device device;
     private GoogleSignInClient mGoogleSignInClient;
     private static volatile FirebaseHelper firebaseHelperInstance;
     private FirebaseStorage firebaseStorage;
@@ -90,7 +89,6 @@ public class FirebaseHelper {
         mDevicesDatabaseReference = mFirebaseDatabase.getReference().child("Devices");
         mUsersDatabaseReference = mFirebaseDatabase.getReference().child("Users");
         mEmailDatabaseReference = mFirebaseDatabase.getReference().child("Email");
-        mMobileDatabaseReference = mFirebaseDatabase.getReference().child("Mobile");
     }
 
     public void initGoogleSignInClient(String server_client_id){
@@ -107,24 +105,44 @@ public class FirebaseHelper {
     }
 
     public void makeDeviceImeiNull(String imei){
+        Log.d(TAG,"Inside makeDeviceImeiNull");
+        Log.d(TAG, imei+mAuth.getUid());
         // first make uid under imei null in Devices and imei under uid null in Users
-        device = new Device();
-        device.setUID("null");
-        mDevicesDatabaseReference.child(imei).setValue(device);
+        if (mAuth.getCurrentUser() != null)
+            mDevicesDatabaseReference.child(imei).setValue(null, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError != null){
+                        Log.d(TAG, databaseError.getMessage());
+                    }
+                }
+            });
     }
 
     public void makeUserImeiNull(){
-        mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
+        Log.d(TAG,"Inside makeUserImeiNull");
+        Log.d(TAG,"Inside makeDeviceImeiNull");
+        Log.d(TAG, mAuth.getUid());
+        if (mAuth.getCurrentUser() != null)
+            mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue(null, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError != null){
+                        Log.d(TAG, databaseError.getMessage());
+                    }
+                    else
+                        mAuth.signOut();
+                }
+            });
     }
 
     public void firebaseSignOut(String imei){
         Log.d(TAG,"Firebase SignOut(String imei) called");
-        makeDeviceImeiNull(imei);
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
+            makeDeviceImeiNull(imei);
             makeUserImeiNull();
-            mAuth.signOut();
             Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
     }
@@ -161,10 +179,6 @@ public class FirebaseHelper {
 
     public DatabaseReference getEmailDatabaseReference(){
         return mEmailDatabaseReference;
-    }
-
-    public DatabaseReference getMobileDatabaseReference(){
-        return mMobileDatabaseReference;
     }
 
     public GoogleSignInClient getGoogleSignInClient(){

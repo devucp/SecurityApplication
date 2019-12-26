@@ -2,17 +2,13 @@ package com.example.securityapplication;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -20,13 +16,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
@@ -42,7 +35,6 @@ public class GoogleFirebaseSignIn implements Serializable {
     private static volatile GoogleFirebaseSignIn googleFirebaseInstance;
 
     private String mImeiNumber;
-    private Device device;
     private FirebaseHelper firebaseHelper;
     private FirebaseUser firebaseUser;
 
@@ -132,8 +124,6 @@ public class GoogleFirebaseSignIn implements Serializable {
                             FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
 
                             // set imei and uid in firebase
-                            device = new Device();
-                            device.setUID(firebaseUser.getUid());
                             setImeiInFirebase(firebaseUser);
 
                         } else {
@@ -236,7 +226,7 @@ public class GoogleFirebaseSignIn implements Serializable {
 
     private void setImeiInFirebase(final FirebaseUser firebaseUser){
 
-        firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device).addOnSuccessListener(new OnSuccessListener<Void>() {
+        firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(firebaseUser.getUid()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber).addOnSuccessListener(new OnSuccessListener<Void>() {

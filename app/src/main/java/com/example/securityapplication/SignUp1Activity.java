@@ -36,7 +36,6 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.KeyboardHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -134,8 +133,17 @@ public class SignUp1Activity extends AppCompatActivity {
                 }
             }
         }
-        else
+        else if (getIntent().getStringExtra("email") != null){
             Log.d("isLoggedinGoogle","Not logged in");
+            textinputEmail.setText(getIntent().getStringExtra("email"));
+        }
+    }
+
+    public void onStart(){
+        super.onStart();
+        // stop spinner user interaction enabled
+        spinner.setVisibility(View.GONE);
+        Enable();
     }
 
     private void ShowMessage(String title,String Message){
@@ -167,11 +175,16 @@ public class SignUp1Activity extends AppCompatActivity {
 
         KeyboardHelper.hideSoftKeyboard(SignUp1Activity.this, view);
         Hashtable<String,String> userData = Validater();
+        Toast.makeText(SignUp1Activity.this, "Please stay here..", Toast.LENGTH_LONG).show();
         if (userData != null){
             // disable screen and show spinner
             spinner.setVisibility(View.VISIBLE);
             disable();
             setUidFromFirebase(userData);
+        }else {
+            // stop spinner user interaction enabled
+            spinner.setVisibility(View.GONE);
+            Enable();
         }
     }
 
@@ -279,11 +292,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
-            Toasty.success(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG, true).show();
-
-            //Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
-            String emailId = firebaseUser.getEmail();
-
+            Toasty.success(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG, true).show();  
             firebaseHelper.firebaseSignOut();
             spinner.setVisibility(View.GONE);
             Enable();
@@ -413,6 +422,3 @@ public class SignUp1Activity extends AppCompatActivity {
         Btn_Submit.setText("");
     }
 }
-
-
-  

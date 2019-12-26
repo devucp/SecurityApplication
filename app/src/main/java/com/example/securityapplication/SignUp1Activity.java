@@ -151,7 +151,7 @@ public class SignUp1Activity extends AppCompatActivity {
             return userData;
         }
         else {
-            Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -401,8 +401,8 @@ public class SignUp1Activity extends AppCompatActivity {
     {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         t1.setAlpha(1);
-        t2.setAlpha(1);
-        t3.setAlpha(1);
+        pass_outer.setAlpha(1);
+        cnfpass_outer.setAlpha(1);
         Btn_Submit.setAlpha(1);
         Btn_Submit.setText("PROCEED");
     }
@@ -411,8 +411,8 @@ public class SignUp1Activity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         t1.setAlpha((float) 0.6);
-        t2.setAlpha((float) 0.6);
-        t3.setAlpha((float) 0.6);
+        pass_outer.setAlpha((float) 0.6);
+        cnfpass_outer.setAlpha((float) 0.6);
         Btn_Submit.setAlpha((float) 0.6);
         Btn_Submit.setText("");
     }

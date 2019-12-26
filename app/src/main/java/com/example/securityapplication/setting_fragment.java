@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 public class setting_fragment extends Fragment {
     Button sos;
-    Button rate_us,scream,invite;
+    Button rate_us,scream,invite,privacy;
     String str="Check out TRATA, I use it to protect myself and the people I care about. Get it for free at \nhttps://play.google.com/store/apps/details?id=com.android.chrome";
     @Nullable
     @Override
@@ -28,6 +28,15 @@ public class setting_fragment extends Fragment {
         rate_us=getActivity().findViewById(R.id.rate_us);
         scream=getActivity().findViewById(R.id.screem);
         invite=getActivity().findViewById(R.id.invite);
+        privacy=getActivity().findViewById(R.id.privacy);
+        privacy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = Uri.parse("https://www.google.com");
+                Intent priva = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(priva);
+            }
+        });
         scream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

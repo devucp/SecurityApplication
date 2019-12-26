@@ -79,7 +79,7 @@
                     android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/white"
+                    android:textCursorDrawable="@drawable/maincursor"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -176,7 +176,7 @@
                     android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/white"
+                    android:textCursorDrawable="@drawable/maincursor"
                     android:textIsSelectable="false"
                     android:drawableTint="@color/white"
                     android:textSize="18sp" />
@@ -211,7 +211,7 @@
                     android:textColorHighlight="#007399"
                     android:textColorHint="#ffffff"
                     android:textColorLink="#00F30707"
-                    android:textCursorDrawable="@android:color/white"
+                    android:textCursorDrawable="@drawable/maincursor"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -231,7 +231,7 @@
                 android:textColorHighlight="#007399"
                 android:textColorHint="#ffffff"
                 android:textColorLink="#00F30707"
-                android:textCursorDrawable="@android:color/white"
+                android:textCursorDrawable="@drawable/maincursor"
                 android:textSize="18sp"
 
                 >
@@ -268,15 +268,14 @@
                 android:textSize="18sp"
                  />
 
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:indeterminateDrawable="@drawable/cpb"
-                android:indeterminateTintMode="src_atop"
-                android:foregroundGravity="center"
-                />
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:foregroundGravity="center"
+                    android:indeterminateDrawable="@drawable/cpb"
+                    android:indeterminateTintMode="src_atop" />
             </RelativeLayout>
 
         </LinearLayout>

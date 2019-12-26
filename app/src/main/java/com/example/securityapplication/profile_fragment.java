@@ -1,41 +1,33 @@
 package com.example.securityapplication;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.PatternMatcher;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -50,7 +42,6 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.InternalStorage;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -59,30 +50,22 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static android.support.v4.content.ContextCompat.getColor;
-import static android.support.v4.content.ContextCompat.getSystemService;
 import static com.example.securityapplication.R.layout.spinner_layout;
 import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
 
@@ -109,7 +92,7 @@ public class profile_fragment extends Fragment {
     private Uri filePath;
     private  Bitmap bitmappic;
 
-
+    private  Intent CropIntent;
     private final int PICK_IMAGE_REQUEST = 71;
     private final int TAKE_PICTURE = 81;
     private  ProgressDialog progressDialog;
@@ -388,9 +371,11 @@ public class profile_fragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
+
         if (requestCode == 1){
             if (resultCode == 110){
-                user = data.getParcelableExtra("ResultUser");
+                user = Objects.requireNonNull(data).getParcelableExtra("ResultUser");
                 Log.d("Profile","User object returned"+user.getEmail());
                 mydb.updateUser(user);
                 DisplayData();
@@ -398,32 +383,40 @@ public class profile_fragment extends Fragment {
         }
 
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
-                && data != null && data.getData() != null )
-        {
+                && data != null && data.getData() != null ) {
             filePath = data.getData();
 
-            if (filePath==null)
-            {
+
+            if (filePath == null) {
                 Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
                 return;
             }
-            //bitmappic = (Bitmap) data.getExtras().get("data");
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
-                try {
-                    internalStorage.saveImageToInternalStorage(bitmap, user.getEmail());
-                    profile_pic.setImageBitmap(bitmap);
-                    deleteExistingProfilePic();
-                }catch (Exception e){
-                    e.printStackTrace();
-                    Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+
+
+            cropimage();
         }
+
+
+
+
+
+
+
+
+           /* Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), result.getBitmap());
+
+
+            try {
+                //CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+                internalStorage.saveImageToInternalStorage(result.getBitmap(), user.getEmail());
+                profile_pic.setImageBitmap(result.getBitmap());
+                deleteExistingProfilePic();
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+            }*/
+
 
         if(requestCode == 201 && resultCode == getActivity().RESULT_OK)
 
@@ -449,6 +442,14 @@ public class profile_fragment extends Fragment {
                 Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
             }
 
+        }
+
+
+        if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
+        {
+            Bundle bundle = data.getExtras();
+            Bitmap bitmappic = bundle.getParcelable("data");
+            profile_pic.setImageBitmap(bitmappic);
         }
     }
 
@@ -708,8 +709,12 @@ public class profile_fragment extends Fragment {
     private void chooseImg(String choice){
         switch (choice) {
             case "gallery":
-                Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                Intent pickImageIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
                 pickImageIntent.setType("image/*");
+
+                //CropImage.startPickImageActivity(MainActivity.this);
+
                 startActivityForResult(Intent.createChooser(pickImageIntent, "Select Picture"), PICK_IMAGE_REQUEST);
                 break;
 
@@ -799,4 +804,21 @@ public class profile_fragment extends Fragment {
             }
         });
     }
+
+    public void cropimage()
+    {
+        CropIntent = new Intent("com.android.camera.action.CROP");
+        CropIntent.setDataAndType(filePath,"image/*");
+        CropIntent.putExtra("crop","true");
+        CropIntent.putExtra("outputX",180);
+        CropIntent.putExtra("outputY",180);
+        CropIntent.putExtra("aspectX",3);
+        CropIntent.putExtra("aspectY",3);
+        CropIntent.putExtra("scaleUpIfNeeded",true);
+        CropIntent.putExtra("return-data",true);
+        startActivityForResult(CropIntent,0);
+
+    }
+
+
 }

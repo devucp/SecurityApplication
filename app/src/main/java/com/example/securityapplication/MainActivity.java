@@ -492,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             storeData(firebaseUser);
+                                            Toasty.success(MainActivity.this, "Sign in sucessfull.", Toast.LENGTH_LONG, true).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -712,6 +713,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         user = userDataSnapshot.getValue(User.class);
                         if (user.getImei().equals("null")){
                             // user is logged out
+                            Log.d(TAG,"No user not logged  in. Login the user");
                             Log.d(TAG,"No user not logged  in. Login the user");
                             crossValidateUserData();
                         }

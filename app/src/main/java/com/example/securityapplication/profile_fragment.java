@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -89,7 +90,7 @@ public class profile_fragment extends Fragment {
 
     private ImageView profile_pic;
     private ImageButton chooseImgBtn;
-    private Uri filePath;
+    private Uri filePath, camerafilepath;
     private  Bitmap bitmappic;
 
     private  Intent CropIntent;
@@ -327,7 +328,7 @@ public class profile_fragment extends Fragment {
         textPhone.setEnabled(false);
         textAddress.setEnabled(false);
         textDob.setEnabled(false);
-        chooseImgBtn.setVisibility(View.GONE);
+        //chooseImgBtn.setVisibility(View.GONE);
     }
     private void alphaa(float k){
         spinner.setAlpha(k);
@@ -340,7 +341,7 @@ public class profile_fragment extends Fragment {
     private void enable(){
         spinner.setEnabled(true);
         textName.setEnabled(true);
-        chooseImgBtn.setVisibility(View.VISIBLE);
+        //chooseImgBtn.setVisibility(View.VISIBLE);
         textPhone.setEnabled(true);
         textAddress.setEnabled(true);
         textDob.setEnabled(true);
@@ -418,20 +419,37 @@ public class profile_fragment extends Fragment {
             }*/
 
 
-        if(requestCode == 201 && resultCode == getActivity().RESULT_OK)
-
-        {
-
-
-
+        if(requestCode == 201 && resultCode == getActivity().RESULT_OK) {
             checkCameraPermission();
 
 
+            filePath = null;
+            Bitmap cameraphoto = (Bitmap) data.getExtras().get("data");
+
+            filePath = getImageUri(getContext(),cameraphoto);
+
+
+/*
             Log.d("tag", String.valueOf(filePath));
 
-             bitmappic = (Bitmap) data.getExtras().get("data");
+            filePath = (Uri) data.getData();
 
-            Log.d("tag", String.valueOf(bitmappic));
+            Log.d("tag", String.valueOf(filePath));
+
+
+            //bitmappic = (Bitmap) data.getExtras().get("data");
+
+            if (filePath == null) {
+                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+                return;
+            }*/
+
+
+            cropimage();
+        }
+
+
+           /* Log.d("tag", String.valueOf(bitmappic));
 
             try {
                 internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
@@ -440,18 +458,36 @@ public class profile_fragment extends Fragment {
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
-            }
+            }*/
 
-        }
+
 
 
         if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
         {
             Bundle bundle = data.getExtras();
             Bitmap bitmappic = bundle.getParcelable("data");
-            profile_pic.setImageBitmap(bitmappic);
+
+            try {
+                //CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+                internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+
+                profile_pic.setImageBitmap(bitmappic);
+                deleteExistingProfilePic();
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+            }
         }
     }
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 
     private void deviceId() {
         telephonyManager = (TelephonyManager) getActivity().getSystemService(getContext().TELEPHONY_SERVICE);

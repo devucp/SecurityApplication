@@ -1,9 +1,12 @@
 package com.example.securityapplication;
 
 import android.app.Service;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.media.VolumeProviderCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -24,7 +27,10 @@ public class SosPlayer extends Service {
     public int counter=0;
 
     private int stop=0;
+    private int play=0;
     private String TAG="SOS Player";
+
+    PowerButtonBroadcastReceiver mPowerButtonBroadcastReceiver;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -32,6 +38,7 @@ public class SosPlayer extends Service {
 
         stop= intent.getIntExtra("stop",0);
         Log.d(TAG,"Inside onStartCOmmand : Stop ="+stop);
+
 
         if(stop==1){
             stopPlaying();
@@ -47,6 +54,19 @@ public class SosPlayer extends Service {
         else{
             //initialise the VolumeProviderCompact
             detectSosPattern();
+
+
+        }
+        try{
+        play=intent.getIntExtra("play",0);
+        }
+        catch (Exception e){
+            Toast.makeText(getApplicationContext(),"SosPlayer Exception"+e.getMessage(),Toast.LENGTH_LONG);
+        }
+        Log.d(TAG,"Inside onStartCOmmand : PLay ="+play);
+
+        if(play==1){
+            updateCount(0); //call updateCount and then from there call BackgroundSosPlayer
         }
         return START_STICKY;
     }
@@ -64,12 +84,16 @@ public class SosPlayer extends Service {
         timerStarted=false;
 
         //code moved to detectSosPattern which is now called from onStartCommand if stop==0
-
+        //Register PowerButtonBroadcastReceiver screen on-off
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        mPowerButtonBroadcastReceiver = new PowerButtonBroadcastReceiver();
+        getApplicationContext().registerReceiver(mPowerButtonBroadcastReceiver,filter);
     }
 
     public void detectSosPattern(){
         Log.d(TAG,"detectSOSPattern initialised");
-        mediaSession = new MediaSessionCompat(this, "SosPlayer");
+        /*mediaSession = new MediaSessionCompat(this, "SosPlayer");
         mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         mediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
@@ -78,14 +102,14 @@ public class SosPlayer extends Service {
 
         //this will only work on Lollipop and up, see https://code.google.com/p/android/issues/detail?id=224134
         VolumeProviderCompat myVolumeProvider =
-                new VolumeProviderCompat(VolumeProviderCompat.VOLUME_CONTROL_RELATIVE, /*max volume*/100, /*initial volume level*/50) {
+                new VolumeProviderCompat(VolumeProviderCompat.VOLUME_CONTROL_RELATIVE, *//*max volume*//*100, *//*initial volume level*//*50) {
                     @Override
                     public void onAdjustVolume(int direction) {
-                /*
+                *//*
                 -1 -- volume down
                 1 -- volume up
                 0 -- volume button released
-                 */
+                 *//*
                         Log.v("Player","Direction is:"+direction);
                         updateCount(direction);
                     }
@@ -93,7 +117,7 @@ public class SosPlayer extends Service {
 
         mediaSession.setPlaybackToRemote(myVolumeProvider);
         mediaSession.setActive(true);
-
+*/
     }
     public void startWaitTimer(){
         timerStarted=true;
@@ -118,6 +142,10 @@ public class SosPlayer extends Service {
 
     public static void resetCount(){
         soskeyscount=0;
+    }
+    //allows other class to initialise soskeycount
+    public static void setCount(int n){
+        soskeyscount=n;
     }
 
     public void updateCount(int direction){
@@ -172,8 +200,8 @@ public class SosPlayer extends Service {
 
         return d_p_direction!=d_n_direction;
     }
-    public boolean checkPlaying(){
-        Log.d(TAG,"checkPlaying : "+SosPlayer.sosplay);
+    public static boolean checkPlaying(){
+        Log.d("SosPlayer","checkPlaying : "+SosPlayer.sosplay);
         return SosPlayer.sosplay;
     }
 
@@ -267,5 +295,8 @@ public class SosPlayer extends Service {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        getApplicationContext().unregisterReceiver(mPowerButtonBroadcastReceiver);
+
     }
 }

@@ -13,6 +13,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.net.Uri;
 import android.os.Build;
 
@@ -27,8 +29,10 @@ import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -41,6 +45,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ceylonlabs.imageviewpopup.ImagePopup;
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.InternalStorage;
 import com.example.securityapplication.model.User;
@@ -67,6 +72,8 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static com.example.securityapplication.R.layout.spinner_layout;
 import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
 
@@ -88,7 +95,7 @@ public class profile_fragment extends Fragment {
     private  Uri file;
     private FirebaseHelper firebaseHelper;
 
-    private ImageView profile_pic;
+    private CircleImageView profile_pic;
     private ImageButton chooseImgBtn;
     private Uri filePath, camerafilepath;
     private  Bitmap bitmappic;
@@ -137,6 +144,7 @@ public class profile_fragment extends Fragment {
         DisplayData();
         initListeners();
         deviceId();
+
     }
 
     private void initObjects() {
@@ -156,6 +164,65 @@ public class profile_fragment extends Fragment {
     }
 
     private void initListeners() {
+
+
+        profile_pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                    /*Dialog builder = new Dialog(this);
+                    builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    builder.getWindow().setBackgroundDrawable(
+                            new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            //nothing;
+                        }
+                    });
+
+                    ImageView imageView = new ImageView(this);
+                    imageView.setImageURI(imageUri);
+                    builder.addContentView(imageView, new RelativeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    builder.show();*/
+                final ImagePopup imagePopup = new ImagePopup(getContext());
+                imagePopup.setWindowHeight(800); // Optional
+                imagePopup.setWindowWidth(800); // Optional
+                imagePopup.setBackgroundColor(Color.BLACK);  // Optional
+                imagePopup.setFullScreen(true); // Optional
+                imagePopup.setHideCloseIcon(true);  // Optional
+                imagePopup.setImageOnClickClose(true);  // Optional
+                imagePopup.setFadingEdgeLength(1000);
+                imagePopup.setClickable(true);
+                imagePopup.setKeepScreenOn(true);
+                imagePopup.setPressed(true);
+                imagePopup.setTop(100);
+                imagePopup.setBottom(100);
+                imagePopup.setEnabled(true);
+
+
+                imagePopup.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pictureChoice();                    }
+                });
+
+
+
+
+                imagePopup.initiatePopup(profile_pic.getDrawable()); // Load Image from Drawable
+                imagePopup.viewPopup();
+
+
+            }
+        });
+
+
+
+
         textDob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -199,7 +266,7 @@ public class profile_fragment extends Fragment {
                                                     }
                                                     else {
                                                         // start progress bar
-                                                        progressDialog = new ProgressDialog(getContext());
+                                                        progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
                                                         progressDialog.setTitle("Saving data...");
                                                         progressDialog.show();
                                                         progressDialog.setMessage("validating....");
@@ -314,6 +381,7 @@ public class profile_fragment extends Fragment {
         try{
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(imgPath));
             profile_pic = getActivity().findViewById(R.id.profile_pic);
+            //ImageButton imageButton = (ImageButton) profile_pic;
             profile_pic.setImageBitmap(b);
         }catch (IOException e){
             Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
@@ -737,7 +805,14 @@ public class profile_fragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         chooseImg("gallery");
                     }
-                });
+                })
+                .setNegativeButton("Crop", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        cropimage();
+                    }
+                })
+        ;
         AlertDialog alert = a_builder.create();
         alert.show();
     }
@@ -768,7 +843,7 @@ public class profile_fragment extends Fragment {
 
     private void uploadProfilePicToFirebase(){
 
-        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        final ProgressDialog progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
         progressDialog.setTitle("Uploading...");
         progressDialog.show();
         progressDialog.setCancelable(false);
@@ -809,7 +884,7 @@ public class profile_fragment extends Fragment {
     }
 
     private void deleteExistingProfilePic(){
-        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        final ProgressDialog progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
         progressDialog.setTitle("Processing...");
         progressDialog.show();
         progressDialog.setCancelable(false);

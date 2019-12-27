@@ -7,6 +7,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,6 +29,7 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
+import com.example.securityapplication.Helper.InternalStorage;
 import com.example.securityapplication.Helper.KeyboardHelper;
 import com.example.securityapplication.model.User;
 //import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
@@ -35,6 +38,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
@@ -45,8 +50,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Hashtable;
 
@@ -177,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG,"Starting MainActivity...........................");
 
         //initialize Activity
         initViews();
@@ -505,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
 
-            if (db.getdb_user() == null){
+            if (db.getdb_user().getImei() == null){
                 firebaseHelper.firebaseSignOut(mImeiNumber);
                 firebaseHelper.googleSignOut(MainActivity.this);
                 updateUI(null);
@@ -518,6 +529,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             /** SosPlayer Service intent**/
 
             //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+            Log.d(TAG,"Starting navigation activity");
 
             startService(new Intent(this, SosPlayer.class));
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
@@ -763,7 +776,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (db.addUser(user)) {
                             if (user.getSosContacts() != null)
                                 db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
-                            updateUI(firebaseUser);
+                            downloadProfilePic(uid);
                         }
                         else {
                             firebaseHelper.firebaseSignOut(mImeiNumber);
@@ -792,6 +805,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     pgbarhide();
                 }
             });
+        }
+    }
+
+    private void downloadProfilePic(String uid){
+        // display image from internal storage
+        final InternalStorage internalStorage = InternalStorage.getInstance();
+        internalStorage.initContext(MainActivity.this);
+        File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        try{
+            BitmapFactory.decodeStream(new FileInputStream(imgPath));
+            updateUI(FirebaseAuth.getInstance().getCurrentUser());
+        }catch (IOException e){
+            //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"Profile picture not found");
+            // download from firebase
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+            StorageReference imgRef = storageReference.child(uid).child("images/profile_pic");
+            Log.d(TAG,"imagePath"+imgRef.getPath()+imgRef.getParent());
+
+            final long ONE_MEGABYTE = 1024 * 1024;
+            imgRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    try {
+                        internalStorage.saveImageToInternalStorage(bitmap, user.getEmail());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Unable to store image",Toast.LENGTH_SHORT).show();
+                    }
+                    updateUI(FirebaseAuth.getInstance().getCurrentUser());
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d(TAG,"Profile pic doesn't exists");
+                    updateUI(FirebaseAuth.getInstance().getCurrentUser());
+                }
+            });
+
         }
     }
 }

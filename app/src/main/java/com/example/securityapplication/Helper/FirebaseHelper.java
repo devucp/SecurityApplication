@@ -121,7 +121,6 @@ public class FirebaseHelper {
 
     public void makeUserImeiNull(){
         Log.d(TAG,"Inside makeUserImeiNull");
-        Log.d(TAG,"Inside makeDeviceImeiNull");
         Log.d(TAG, mAuth.getUid());
         if (mAuth.getCurrentUser() != null)
             mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue(null, new DatabaseReference.CompletionListener() {

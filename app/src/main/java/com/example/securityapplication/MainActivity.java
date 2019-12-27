@@ -753,7 +753,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             firebaseHelper.firebaseSignOut(mImeiNumber);
                             firebaseHelper.googleSignOut(MainActivity.this);
                             updateUI(null);
-                            Toast.makeText(MainActivity.this, "Authentication failed :sqlite error occurred",Toast.LENGTH_SHORT).show();
+                            Toasty.error(MainActivity.this, "Authentication failed :sqlite error occurred",Toasty.LENGTH_LONG, true).show();
                             return;
                         }
 
@@ -762,7 +762,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         firebaseHelper.firebaseSignOut(mImeiNumber);
                         firebaseHelper.googleSignOut(MainActivity.this);
                         updateUI(null);
-                        Toast.makeText(MainActivity.this, "Sqlite error occurred MainAct:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toasty.error(MainActivity.this, "Sqlite error occurred MainAct:"+e.getMessage(),Toasty.LENGTH_LONG, true).show();
                         return;
                     }
                 }
@@ -770,7 +770,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.d(TAG,databaseError.getDetails());
-                    Toast.makeText(MainActivity.this, "Inside storeData MainAct:"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                    Toasty.error(MainActivity.this, "Inside storeData MainAct:"+databaseError.getMessage(), Toasty.LENGTH_LONG, true).show();
                     firebaseHelper.firebaseSignOut(mImeiNumber);
                     firebaseHelper.googleSignOut(MainActivity.this);
                     pgbarhide();

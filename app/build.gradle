@@ -40,5 +40,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:17.0.0'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.5.1'
+    implementation 'com.github.chathuralakmal:AndroidImagePopup:1.2.2'
+
 }
 apply plugin: 'com.google.gms.google-services'

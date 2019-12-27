@@ -60,6 +60,7 @@ public class GetGPSCoordinates extends Service {
     @Override
     public void onCreate() {
 
+
         Log.d("GPSService", "Oncreate");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = LocationRequest.create();
@@ -67,68 +68,7 @@ public class GetGPSCoordinates extends Service {
         locationRequest.setFastestInterval(2*1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-        //locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        //initListener();
-        //turnGPSOn();
-
-        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-                    if (locationResult == null) {
-                        Log.d("GPS Service","LocationResult is "+locationResult);
-                        return;
-                    }
-                    for (Location location : locationResult.getLocations()) {
-                        if (location != null) {
-                            GetGPSCoordinates.lastKnownLocation = ddToDms(location.getLatitude(), location.getLongitude());
-                            Log.d("GPS Service Running", "Coordinates = Latitude = " + location.getLatitude() + " Longitude = " + location.getLongitude());
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Location Fetch Failed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-
-                @Override
-                public void onLocationAvailability(LocationAvailability locationAvailability) {
-                    //super.onLocationAvailability(locationAvailability);
-                    Log.d("GPS Service","OnLocationAvailabilty IsLocationAvailable "+ locationAvailability.isLocationAvailable());
-                    if (locationAvailability.isLocationAvailable()){
-                        Log.d("onLocationAvailabilty","Location Available will show updates");
-                        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-                    }else {
-                        Log.d("onLocationAvailabilty","Location Unavailable calling turnGPSOn()");
-                        //mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
-                        //locationManager.requestLocationUpdates(locationManager.NETWORK_PROVIDER,0,0,listener);
-                    }
-                }
-            };
-
-            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
-
-            Log.d("GPSService", "Notification ON");
-            String input = "You are being protected";
-            createNotificationChannel();
-            Intent notificationIntent = new Intent(this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                    0, notificationIntent, 0);
-
-            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
-                    .setContentIntent(pendingIntent)
-                    .setContentTitle(" Security Application ")
-                    .setContentText(input)
-                    .build();
-
-            startForeground(1, notification);
-        }
-        else {
-            Log.d("GPS Service","Inside else, Permissions denied");
-            Toast.makeText(this,"Location Permissions not granted",Toast.LENGTH_LONG).show();
-        }
-
+        initListener();
 
         /*if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
             && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) ==PackageManager.PERMISSION_GRANTED))
@@ -166,8 +106,71 @@ public class GetGPSCoordinates extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         Log.d("GPS Service","Inside OnStart");
         //do heavy work on a background thread
+
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+
+            locationCallback = new LocationCallback() {
+                @Override
+                public void onLocationResult(LocationResult locationResult) {
+                    if (locationResult == null) {
+                        Log.d("GPS Service","LocationResult is "+locationResult);
+                        return;
+                    }
+                    for (Location location : locationResult.getLocations()) {
+                        if (location != null) {
+                            GetGPSCoordinates.lastKnownLocation = ddToDms(location.getLatitude(), location.getLongitude());
+                            Log.d("GPS Service Running", "Coordinates = Latitude = " + location.getLatitude() + " Longitude = " + location.getLongitude());
+                        } else {
+                            Log.d("GPS Service","Location Fetch failed");
+                            Toast.makeText(getApplicationContext(), "Location Fetch Failed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onLocationAvailability(LocationAvailability locationAvailability) {
+                    //super.onLocationAvailability(locationAvailability);
+                    Log.d("GPS Service","OnLocationAvailabilty IsLocationAvailable "+ locationAvailability.isLocationAvailable());
+                    if (locationAvailability.isLocationAvailable()){
+                        Log.d("onLocationAvailabilty","Location Available will show updates");
+                        //Location Available resume service
+                    }else {
+                        Log.d("onLocationAvailabilty","Location Unavailable deploying prompt");
+                        Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        Toast.makeText(getApplicationContext(),"Please turn on location to help us serve you better",Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
+
+            Log.d("GPSService", "Notification ON");
+            String input = "You are being protected";
+            createNotificationChannel();
+            Intent notificationIntent = new Intent(this, MainActivity.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                    0, notificationIntent, 0);
+
+            Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                    .setContentIntent(pendingIntent)
+                    .setContentTitle(" Security Application ")
+                    .setContentText(input)
+                    .build();
+
+            startForeground(1, notification);
+        }
+        else {
+            Log.d("GPS Service","Inside else, Permissions denied");
+            Toast.makeText(this,"Location Permissions not granted",Toast.LENGTH_LONG).show();
+        }
+
 
         return START_STICKY;
     }
@@ -219,10 +222,8 @@ public class GetGPSCoordinates extends Service {
         super.onDestroy();
         Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
         Log.d("GPSService","OnDestroy");
-        if(locationManager != null){
-            //noinspection MissingPermission
-            locationManager.removeUpdates(listener);
-        }
+        if (locationCallback!=null)
+            mFusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     private void createNotificationChannel() {
@@ -241,9 +242,9 @@ public class GetGPSCoordinates extends Service {
         listener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("GPS Service","Fetching Location Through Network ");
+                /*Log.d("GPS Service","Fetching Location Through Network ");
                 GetGPSCoordinates.lastKnownLocation = ddToDms(location.getLatitude(), location.getLongitude());
-                Log.d("Network Location ","Latitude = "+location.getLatitude()+" Longitude = "+location.getLongitude());
+                Log.d("Network Location ","Latitude = "+location.getLatitude()+" Longitude = "+location.getLongitude());*/
             }
 
             @Override
@@ -256,10 +257,10 @@ public class GetGPSCoordinates extends Service {
 
             @Override
             public void onProviderDisabled(String s) {
-               /* Log.d("GPS Service","Serice provider disabled");
+                Log.d("GPS Service","Service provider disabled");
                 Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);*/
+                startActivity(i);
             }
         };
     }

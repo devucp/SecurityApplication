@@ -23,6 +23,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +49,7 @@ public class navigation extends AppCompatActivity{
     Boolean is_home=true;
 
     SQLiteDBHelper db;
-    public static Boolean test=false;
+    public static Boolean test=true;
     public static TextView tmode1;
 
     private int flag=0;
@@ -78,6 +81,15 @@ public class navigation extends AppCompatActivity{
         toolbar.setTitle("");
         toolbar.setSubtitle("");
         //toolbar.setLogo(R.drawable.ic_toolbar);
+        
+        ImageView logo = findViewById(R.id.imageView2);
+
+
+        Animation animRotate = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.rotate);
+
+        logo.startAnimation(animRotate);
+
 
         async();
         //sqlite db code here

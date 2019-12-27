@@ -161,8 +161,6 @@ public class GoogleFirebaseSignIn implements Serializable {
             mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             activity.startActivity(mLogOutAndRedirect);
             Toasty.error(activity, "Sign in failed", Toast.LENGTH_SHORT, true).show();
-
-           // Toast.makeText(activity, "Sign in failed", Toast.LENGTH_SHORT).show();
         }
         //finishing the navigation activity
         activity.finish();
@@ -237,7 +235,7 @@ public class GoogleFirebaseSignIn implements Serializable {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).child("uid").setValue("null");
+                        firebaseHelper.makeDeviceImeiNull(mImeiNumber);
                         Log.d(TAG,e.getMessage());
                         // sigin out the user
                         firebaseHelper.firebaseSignOut();

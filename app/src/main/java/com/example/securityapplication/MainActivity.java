@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private User user;
     private String uid;
-    private Boolean isDeviceFormatted;
 
     //persistent service
     private Intent mSosPlayerIntent;
@@ -204,8 +203,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /** DATABASE FORCEFUL CREATION**/
         db=SQLiteDBHelper.getInstance(MainActivity.this);
-
-        isDeviceFormatted = false;
     }
 
     public void onStart(){
@@ -568,7 +565,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Check if registered user sign's in using old device or new device using imei number.
         if (uid != null) {
             Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser()+"device formatted  or user data cleared or app uninstalled");
-            isDeviceFormatted = true;
         }
         //to check if email is registered
         setUidFromFirebaseForSignIn();

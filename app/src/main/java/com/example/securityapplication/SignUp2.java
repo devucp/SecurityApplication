@@ -344,7 +344,6 @@ public class SignUp2 extends AppCompatActivity {
         user.setImei(imei);//setting IMEI
         user.setPaid(false);
         //user.setSosContacts(setSosContacts());
-        //user.setGoogleAccountLinked(false);
         Log.d(TAG,user.getName());
         Log.d(TAG,user.getEmail());
         Log.d(TAG,user.getGender());
@@ -352,7 +351,6 @@ public class SignUp2 extends AppCompatActivity {
         Log.d(TAG,user.getImei());
         Log.d(TAG,user.getLocation());
         Log.d(TAG,user.getMobile());
-        //Log.d(TAG,"isGoogleAccLinked?:"+user.isGoogleAccountLinked());
         Log.d(TAG,"isPaid?:"+user.isPaid());
     }
 
@@ -391,9 +389,6 @@ public class SignUp2 extends AppCompatActivity {
                                                     } catch (Exception e) {
                                                         Log.d(TAG, "Exception:" + e.getMessage());
                                                         Toasty.error(SignUp2.this, "Authentication failed.", Toast.LENGTH_LONG, true).show();
-
-                                                       /* Toast.makeText(SignUp2.this, "Authentication failed.",
-                                                                Toast.LENGTH_SHORT).show()*/;
                                                     }
                                                 }
                                             }
@@ -407,9 +402,6 @@ public class SignUp2 extends AppCompatActivity {
                                     // If sign in fails, display a message to the user.
                                     Log.w(TAG, "createUserWithEmail:failure"+e.getMessage());
                                     Toasty.error(SignUp2.this, "Authentication failed.", Toast.LENGTH_LONG, true).show();
-/*
-                                    Toast.makeText(SignUp2.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();*/
                                 }
                             }
                         }

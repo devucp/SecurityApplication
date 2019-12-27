@@ -92,7 +92,7 @@ public class SendSMSService extends Service {
 
     /**Check if testmode was active when called**/
     public boolean checkTestMode(){
-        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
+        SQLiteDBHelper sqLiteDBHelper=SQLiteDBHelper.getInstance(SendSMSService.this);
         Log.d("SOS SMS","checktestmode():"+sqLiteDBHelper.getTestmode());
         return sqLiteDBHelper.getTestmode();
     }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,14 +17,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import es.dmoral.toasty.Toasty;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -34,7 +31,6 @@ public class ProfileActivity extends AppCompatActivity {
     private Button btn_logout;
     SQLiteDBHelper mydb ;
     User user;
-    Device device;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDevicesDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
@@ -86,7 +82,9 @@ public class ProfileActivity extends AppCompatActivity {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ProfileActivity.this, "clicked", Toast.LENGTH_SHORT).show();
+                Toasty.info(ProfileActivity.this, "clicked", Toast.LENGTH_SHORT, true).show();
+
+               // Toast.makeText(ProfileActivity.this, "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                 signOut();
             }
@@ -189,7 +187,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.error(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG, true).show();
+
+            //Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS}, RC);
@@ -226,15 +226,13 @@ public class ProfileActivity extends AppCompatActivity {
         Log.d(TAG,"Inside signout");
         // first make uid under imei null in Devices and imei under uid null in Users
         deviceId();
-        device = new Device();
-        device.setUID("null");
-        mDevicesDatabaseReference.child(mImeiNumber).setValue(device);
-
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
             mUsersDatabaseReference.child(mAuth.getUid()).child("imei").setValue("null");
             mAuth.signOut();
-            Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            Toasty.info(this, "Logged Out from Firebase", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
         //Google signOut
         /*if(GoogleSignIn.getLastSignedInAccount(this) != null) {

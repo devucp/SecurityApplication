@@ -173,7 +173,6 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
             //db.close();//Added close stmt
         }
         catch(Exception e){
-            
         }
         return cursor;
     }
@@ -233,8 +232,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
         }
         return cursor;
+     }
 
-        }
     public User getdb_user(){
         User newuser = new User();
         HashMap<String,String> contact=new HashMap<>();

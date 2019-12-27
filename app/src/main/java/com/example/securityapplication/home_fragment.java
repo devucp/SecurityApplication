@@ -31,6 +31,8 @@ import com.example.securityapplication.model.User;
 
 import java.util.Objects;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.content.Intent.getIntent;
 
 public class home_fragment extends Fragment {
@@ -38,6 +40,7 @@ public class home_fragment extends Fragment {
     public Button alert;
     public Button emergency;
     public Button informsafety;
+    static public boolean check=false;
     int RC;
     Boolean is_paid = false;
     public static Boolean test = true;
@@ -74,8 +77,12 @@ public class home_fragment extends Fragment {
                 }
                 else
                 {
-                    Toast.makeText(getContext(),"sms permisssion noy enabled",Toast.LENGTH_LONG);
+                    Toasty.error(getContext(), "sms permisssion not enabled", Toast.LENGTH_SHORT);
+
+                    //Toast.makeText(getContext(),"sms permisssion not enabled",Toast.LENGTH_LONG);
                 }
+
+                check=true;
 
                 Intent mSosPlayerIntent = new Intent(getContext(), SendSMSService.class);
                 mSosPlayerIntent.putExtra("alert",1);
@@ -92,11 +99,13 @@ public class home_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (is_paid) {
-                    Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
+                    Toasty.info(getContext(), "You are premier member", Toast.LENGTH_SHORT, true).show();
+                    //Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
 
                     //Code: TO play siren and send emergency message and alert
                     //emergency.setBackgroundColor(getResources().getColor(R.drawable.buttonshape_emer));
                     Context c2 = getContext();
+                    check=true;
 
                     Intent emergencyintent1=new Intent(getContext(), BackgroundSosPlayerService.class);
 
@@ -123,7 +132,9 @@ public class home_fragment extends Fragment {
                                         intent.setData(Uri.parse("http://www.w3schools.com"));
                                         startActivity(intent);
                                     } catch (Exception e) {
-                                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                        Toasty.error(getContext(), "Something went wrong", Toast.LENGTH_SHORT, true).show();
+
+                                      //  Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             }).setNegativeButton("Cancel", null).setCancelable(false).create().show();
@@ -135,33 +146,58 @@ public class home_fragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Context c3 = getContext();
-                Intent stopsms = new Intent(getContext(),SendSMSService.class);
-                stopsms.putExtra("safe",1);
-                if (c3 != null) {
-                    c3.startService(stopsms);
+                try {
+
+
+                    if (SendSMSService.getAlert() == 0 && SendSMSService.getEmergency() == 0) {
+
+                        Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
+
+
+                    }
+
+
+
+
+                else{
+
+
+                        Context c3 = getContext();
+
+                        Intent stopsms = new Intent(getContext(), SendSMSService.class);
+                        stopsms.putExtra("safe", 1);
+                        if (c3 != null) {
+                            c3.startService(stopsms);
+                        }
+
+
+                        if (isMyServiceRunning(SendSMSService.class)) {
+
+
+                            if (c3 != null) {
+                                c3.stopService(stopsms);
+                            }
+                        }
+
+                        if (isMyServiceRunning(BackgroundSosPlayerService.class)) {
+                            //stopping the sosplay variable and resetting count in SosPlayer.java
+                            SosPlayer.stopPlaying();
+
+                            Intent stopemergency = new Intent(getContext(), BackgroundSosPlayerService.class);
+                            if (c3 != null) {
+                                c3.stopService(stopemergency);
+
+                                check = false;
+                            }
+                        }
+                    }
                 }
+                catch (Exception e)
+                {
+                    Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
 
-
-                if(isMyServiceRunning(SendSMSService.class))
-               {
-
-
-                   if (c3 != null) {
-                       c3.stopService(stopsms);
-                   }
-               }
-
-               if(isMyServiceRunning(BackgroundSosPlayerService.class))
-               {
-                   //stopping the sosplay variable and resetting count in SosPlayer.java
-                   SosPlayer.stopPlaying();
-
-                   Intent stopemergency = new Intent(getContext(),BackgroundSosPlayerService.class);
-                   if (c3 != null) {
-                       c3.stopService(stopemergency);
-                   }
-               }
+                    Log.d("home_fragment", "catch raised");
+                }
 
 
 
@@ -184,7 +220,9 @@ public class home_fragment extends Fragment {
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.info(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+           // Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);

@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -42,6 +43,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import java.util.HashMap;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
+
 import static java.security.AccessController.getContext;
 
 public class navigation extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener{
@@ -54,7 +57,6 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
     public static TextView tmode1;
 
     private int flag=0;
-    private Device device;
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
@@ -113,6 +115,9 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
                     db.updatetestmode(false);
 
                 }
+                //update testmode value in db
+                test= (flag==1); //using the global static variable instead of the local variable
+                db.updatetestmode(test);
             }
         });
 
@@ -156,7 +161,6 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
         }
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
@@ -182,7 +186,9 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
         catch (Exception e)
         {
             item.setChecked(db.getTestmode());
-            Toast.makeText(this, "Loading.....please wait for a second", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Loading.....please wait for a second", Toast.LENGTH_LONG, true).show();
+
+           // Toast.makeText(this, "Loading.....please wait for a second", Toast.LENGTH_LONG).show();
         }
         finally {
             return true;
@@ -206,7 +212,11 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
                             break;
                         case R.id.save:
                             is_home=false;
+
+
                             selectedFragment = new saviour_fragment();
+
+
                             break;
                         case R.id.profile:
                             is_home=false;

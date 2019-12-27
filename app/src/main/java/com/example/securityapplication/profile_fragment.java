@@ -413,6 +413,10 @@ public class profile_fragment extends Fragment {
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
             Log.d("Profile Fr","Service sosplayer new startIntent...");
             Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
+
+            //to stop GetGPS Service upon logout
+            Intent MStopGPSService = new Intent(getContext(),GetGPSCoordinates.class);
+            getActivity().stopService(MStopGPSService);
         }
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");

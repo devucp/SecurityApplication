@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SyncStateContract;
@@ -18,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -40,7 +42,7 @@ public class home_fragment extends Fragment {
     public Button informsafety;
     static public boolean check=false;
     int RC;
-    Boolean is_paid = false;
+    Boolean is_paid = true;
     public static Boolean test = true;
     //NOTE: Button bt has been removed. Now using Button emergency. Event listeners also moved to emergency
     @Nullable
@@ -57,6 +59,12 @@ public class home_fragment extends Fragment {
         alert = Objects.requireNonNull(getActivity()).findViewById(R.id.alert);
         emergency = getActivity().findViewById(R.id.emergency);
         informsafety = getActivity().findViewById(R.id.inform);
+        final android.support.v7.widget.Toolbar toolbar1 = (Toolbar) getActivity().findViewById(R.id.toolbar);
+
+
+
+
+
         Log.d("Paid1234hello2","paid: "+UserObject.user.isPaid());
         if(UserObject.user.isPaid()){
             is_paid=true;
@@ -94,6 +102,8 @@ public class home_fragment extends Fragment {
         emergency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
                 if (is_paid) {
                     Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
 

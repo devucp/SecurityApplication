@@ -21,6 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -154,6 +156,8 @@ public class profile_fragment extends Fragment {
 
         btn_edit.setOnClickListener(new View.OnClickListener() {
                                         @Override public void onClick(View view) {
+                                            Animation edit_anim= AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
+                                            btn_edit.startAnimation(edit_anim);
 
                                             if (IsInternet.isNetworkAvaliable(getContext())) {
 
@@ -200,6 +204,8 @@ public class profile_fragment extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Animation log_anim=AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
+                btn_logout.startAnimation(log_anim);
                 Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                // mydb.delete_table();

@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -185,6 +187,8 @@ public class sos_page extends AppCompatActivity {
         btn_SosEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Animation btn_anim= AnimationUtils.loadAnimation(sos_page.this,R.anim.btn_anim);
+                btn_SosEdit.startAnimation(btn_anim);
                 if(btn_SosEdit.getText().equals("save")){
                     save();
                 }

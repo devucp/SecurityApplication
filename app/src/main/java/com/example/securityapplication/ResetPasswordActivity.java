@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -93,7 +95,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
         btn_reset.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(final View v) {
-
+                Animation reset_anim= AnimationUtils.loadAnimation(ResetPasswordActivity.this,R.anim.btn_anim);
+                btn_reset.startAnimation(reset_anim);
                 if (!IsInternet.checkInternet(ResetPasswordActivity.this))
                     return;
 
@@ -130,4 +133,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
         });
 
     }
+
+
 }

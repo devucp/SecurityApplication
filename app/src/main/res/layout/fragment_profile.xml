@@ -44,6 +44,8 @@
                             android:id="@+id/profile_pic"
                             android:layout_width="120dp"
                             android:layout_height="120dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:src="@drawable/ic_account_circle_cyan_24dp"
                             android:layout_marginTop="15dp"
                             app:civ_border_width="0dp"
@@ -118,7 +120,7 @@
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textColorHighlight="#007399"
 
                         android:textStyle="bold" />
@@ -153,7 +155,7 @@
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textColorHighlight="#007399"
                         android:background="@drawable/shapeemail"
 
@@ -188,7 +190,7 @@
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textColorHighlight="#007399"
                         android:background="@drawable/shapeemail"
 
@@ -220,7 +222,7 @@
                         android:textColorHighlight="#007399"
                         android:background="@drawable/shapeemail"
 
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <!--                    <EditText-->
@@ -270,7 +272,7 @@
                         android:textColor="@color/cyan"
                         android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -293,7 +295,7 @@
                         android:drawablePadding="5dp"
                         android:text="edit"
                         android:textColor="#fff"
-                        android:textSize="22sp" />
+                        android:textSize="20sp" />
 
                     <Button
                         android:id="@+id/btn_Logout"
@@ -306,7 +308,7 @@
                         android:drawablePadding="5dp"
                         android:text="logout"
                         android:textColor="#fff"
-                        android:textSize="22sp" />
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -316,7 +318,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
                     android:text="@string/change_password"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
 
                     android:textColor="@color/cyan"
                     android:gravity="center"

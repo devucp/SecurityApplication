@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/graylight"
-    android:layout_margin="1dp"
+    android:layout_margin="5dp"
     android:orientation="vertical"
     tools:context=".MainActivity">
     <ScrollView
@@ -45,12 +45,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="sos"
+                android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
                 android:background="@color/graylight"
                 android:paddingLeft="42dp"
                 android:text="EMERGENCY CONTACT"
                 android:textAlignment="textStart"
                 android:textColor="@color/cyan"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
         </LinearLayout>
 
@@ -63,7 +64,7 @@
         <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         >
 
         <View
@@ -71,8 +72,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorPrimaryDark"
-            android:paddingRight="24dp"
-            android:layout_marginLeft="30dp"/>
+            android:paddingRight="4dp"
+            android:layout_marginLeft="10dp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -91,8 +92,10 @@
             android:background="@color/graylight"
             android:drawableRight="@drawable/ic_volume_up_black_24dp"
             android:text="scream test"
+
+
             android:textColor="@color/cyan"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
 
         <LinearLayout
@@ -106,7 +109,7 @@
             android:layout_height="1dp"
             android:background="@color/colorPrimaryDark"
             android:paddingRight="24dp"
-            android:layout_marginLeft="30dp"/>
+            android:layout_marginLeft="10dp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -124,7 +127,7 @@
 
 
             android:textColor="@color/cyan"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -141,7 +144,7 @@
             android:textAlignment="textStart"
 
             android:textColor="@color/cyan"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -157,7 +160,7 @@
             android:textAlignment="textStart"
 
             android:textColor="@color/cyan"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -173,7 +176,7 @@
             android:text="privacy policy"
             android:textAlignment="textStart"
             android:textColor="@color/cyan"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </LinearLayout>
     </LinearLayout>
 

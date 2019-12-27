@@ -162,8 +162,6 @@ public class SignUp1Activity extends AppCompatActivity {
         }
         else {
             Toasty.error(this, "Enter Valid Credentials", Toast.LENGTH_SHORT, true).show();
-
-            //Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
             return null;
         }
     }
@@ -202,7 +200,6 @@ public class SignUp1Activity extends AppCompatActivity {
                             FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
                             checkIsEmailVerified(firebaseUser,userData);
-
                         } else
                             {
                             try
@@ -231,9 +228,6 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
                                 Toasty.error(SignUp1Activity.this, "Authentication failed.Please check your connection and try again", Toast.LENGTH_LONG, true).show();
-
-                                /*Toast.makeText(SignUp1Activity.this, "Authentication failed.Please check your connection and try again",
-                                        Toast.LENGTH_LONG).show();*/
                             }
                         }
                     }
@@ -327,8 +321,6 @@ public class SignUp1Activity extends AppCompatActivity {
 
         if (requestCode==2){
             Toasty.error(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT, true).show();
-
-            //Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
         }
     }
 

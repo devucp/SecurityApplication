@@ -33,11 +33,10 @@
             android:textColor="@color/cyan"
             android:textSize="18sp" />
 
-    </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             >
 
             <Button
@@ -55,24 +54,17 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            />
-
-        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         >
 
-        <View
-
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimaryDark"
-            android:paddingRight="24dp"
-            android:layout_marginLeft="30dp"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimaryDark"
+                android:paddingRight="24dp"
+                android:layout_marginLeft="30dp"/>
     </LinearLayout>
 
     <LinearLayout
@@ -84,6 +76,7 @@
 
         <Button
             android:id="@+id/screem"
+            android:alpha="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="42dp"
@@ -101,7 +94,6 @@
         android:layout_marginTop="20dp">
 
         <View
-
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorPrimaryDark"
@@ -159,12 +151,29 @@
             android:textColor="@color/cyan"
             android:textSize="20sp" />
     </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            >
+
+            <View
+
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimaryDark"
+                android:paddingRight="24dp"
+                android:layout_marginLeft="30dp"/>
+        </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        >
 
         <Button
-            android:layout_marginBottom="20dp"
+            android:id="@+id/privacy"
+            android:layout_marginBottom="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="42dp"
@@ -175,6 +184,23 @@
             android:textColor="@color/cyan"
             android:textSize="20sp" />
     </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/invite"
+                android:layout_marginBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="42dp"
+                android:background="@color/graylight"
+                android:drawablePadding="150dp"
+                android:text="Protect A Firend"
+                android:textAlignment="textStart"
+                android:textColor="@color/cyan"
+                android:textSize="20sp" />
+        </LinearLayout>
     </LinearLayout>
 
 

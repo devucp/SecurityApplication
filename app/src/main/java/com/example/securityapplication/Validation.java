@@ -2,12 +2,15 @@ package com.example.securityapplication;
 
 //import android.support.design.widget.TextInputLayout;
 import android.graphics.Color;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -163,6 +166,8 @@ public class Validation {
             return false;
         } else if (!PASSWORD_PATTERN.matcher(passwordinput).matches()) {
             SignUp1Activity.setError("Password does not fit the specified criteria",t1);
+            snack(textInputPassword);
+
             return false;
         } else {
             SignUp1Activity.setError(null,t1);
@@ -258,5 +263,20 @@ public class Validation {
             edit_address.setError(null);
             return true;
         }
+    }
+    public void snack(View view) {
+        Snackbar snackBar = Snackbar.make(view, "Password must contain atleast 1 uppercase, 1 lowercase, 1 special and 1 numeric character and length must be between 6 to 16 characters.", Snackbar.LENGTH_INDEFINITE) .setAction("OK", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        snackBar.setActionTextColor(Color.RED);
+        View snackBarView = snackBar.getView();
+        TextView textView = snackBarView.findViewById(R.id.snackbar_text);
+        textView.setMaxLines(5);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+        textView.setTextColor(Color.WHITE);
+        snackBar.show();
     }
 }

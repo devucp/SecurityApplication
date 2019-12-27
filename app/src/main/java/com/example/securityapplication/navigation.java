@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -28,24 +29,29 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.model.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
 
 
 import java.util.HashMap;
+import java.util.Map;
 
 import es.dmoral.toasty.Toasty;
 
 import static java.security.AccessController.getContext;
 
-public class navigation extends AppCompatActivity{
+public class navigation extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener{
 
     int count=0,aa;
     static User newUser=UserObject.user;
     Boolean is_home=true;
-
     SQLiteDBHelper db;
     public static Boolean test=false;
     public static TextView tmode1;
@@ -54,6 +60,7 @@ public class navigation extends AppCompatActivity{
     private String TAG = "NavigatonFragment";
     private String mImeiNumber;
     private TelephonyManager telephonyManager;
+    FirebaseRemoteConfig firebaseRemoteConfig;
 
     private FirebaseHelper firebaseHelper;
 
@@ -113,6 +120,10 @@ public class navigation extends AppCompatActivity{
                 db.updatetestmode(test);
             }
         });
+
+        final FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+       // Log.d("remoteaaa","rohan"+firebaseRemoteConfig.getString("force_update_store_url"));
+        ForceUpdateChecker.with(this).onUpdateNeeded(this).check();
     }
 
     private void async() {
@@ -125,6 +136,9 @@ public class navigation extends AppCompatActivity{
         }
         if(db.getSosContacts().getCount()!=0) {
             UserObject.user=db.getdb_user();
+            HashMap<String,String> sosContacts=UserObject.user.getSosContacts();
+            Log.d("soscontactchecking1","c1"+ sosContacts.get("c1")+" c2: "+sosContacts.get("c2"));
+            Log.d("soscontactchecking2",UserObject.user.toString());
             SendSMSService.initContacts(); //to initialise SOS Contacts as soon as the database is ready
         }
 
@@ -288,5 +302,35 @@ public class navigation extends AppCompatActivity{
         //finishing the navigation activity
         finish();
     }
+
+
+    @Override
+    public void onUpdateNeeded(final String updateUrl) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("New version available")
+                .setMessage("Please, update app to new version to continue reposting.")
+                .setPositiveButton("Update",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                redirectStore(updateUrl);
+                            }
+                        }).setNegativeButton("No, thanks",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        }).create();
+        dialog.show();
+    }
+
+
+    private void redirectStore(String updateUrl) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
 }
 

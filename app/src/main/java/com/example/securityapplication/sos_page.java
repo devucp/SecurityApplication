@@ -74,7 +74,7 @@ public class sos_page extends AppCompatActivity {
 
         values = new ContentValues();
         mydb = SQLiteDBHelper.getInstance(this);
-        user = new User();
+        user = UserObject.user;
         SosContacts = new HashMap<String, String>();
         val = new Validation();
 

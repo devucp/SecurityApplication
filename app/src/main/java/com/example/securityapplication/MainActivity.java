@@ -205,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Grant Device read Permissions
         deviceId();
-        checkGPSPermission();
 
         if (mImeiNumber == null)
             deviceId();
@@ -228,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onStart(){
         super.onStart();
-
         FirebaseUser currentUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
         updateUI(currentUser);
     }
@@ -244,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //ContextCompat.startForegroundService(this,new Intent(this,GetGPSCoordinates.class));
             GpsPermission = true;
         }
-         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED;
+         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
      }
 
@@ -352,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Log.d("MAinActivity","SMS intent");
         //check permissions
 
-        while(!checkSMSPermission());
+        checkSMSPermission();
     }
 
     public  boolean checkSMSPermission(){
@@ -360,8 +358,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SEND_SMS}, RC);
+                    new String[]{Manifest.permission.SEND_SMS}, 103);
+            return false;
         }
+        checkGPSPermission();
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
     }
 
@@ -389,6 +389,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d("GPS In MainActivity","GPS Permissions granted");
                     GpsPermission = true;
+                    if (user!=null)
+                        ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
 
                 } else {
                     GpsPermission = false;
@@ -398,6 +400,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    checkGPSPermission();
                 }
                 break;
+            case 103:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkGPSPermission();
+                } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    closeNow();
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                }
+                break;
+
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -558,8 +569,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             /** SosPlayer Service intent**/
             startService(new Intent(this, SosPlayer.class));
             /**Location Service intent**/
-            ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
-
+            if (checkGPSPermission()) {
+                ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
+            } else {
+                Toast.makeText(this, "Location Permissions required", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
             try {

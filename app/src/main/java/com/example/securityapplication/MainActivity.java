@@ -20,6 +20,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
+
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -134,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         int i = v.getId();
         if(i== R.id.signInButton){
-
+            Animation sign_anim= AnimationUtils.loadAnimation(this,R.anim.btn_anim);
+            mSignInButton.startAnimation(sign_anim);
             if(firebaseHelper.getFirebaseAuth().getCurrentUser()==null) {
                 Log.d(TAG,"Current user is null");
                 if(validateForm()){
@@ -165,7 +171,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }
         else if (i==R.id.signUpButton){
-
+            Animation signup_anim=AnimationUtils.loadAnimation(this,R.anim.btn_anim);
+            signupbttn.startAnimation(signup_anim);
             signupbttn.setText("");
             findViewById(R.id.pBar1).setVisibility(VISIBLE);
             mSignInButton.setClickable(false);

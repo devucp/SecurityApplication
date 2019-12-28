@@ -23,6 +23,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -199,6 +201,8 @@ public class SignUp2 extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
+                Animation sub_anim= AnimationUtils.loadAnimation(SignUp2.this,R.anim.btn_anim);
+                btn_submit.startAnimation(sub_anim);
                 KeyboardHelper.hideSoftKeyboard(SignUp2.this, view);
                 Toast.makeText(SignUp2.this, "Please stay here", Toast.LENGTH_LONG).show();
 

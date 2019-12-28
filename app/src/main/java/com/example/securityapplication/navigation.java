@@ -340,5 +340,6 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
         startActivity(intent);
     }
 
+
 }
 

@@ -1,55 +1,75 @@
 package com.example.securityapplication;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
-import com.example.securityapplication.model.Device;
+import com.example.securityapplication.Helper.InternalStorage;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageException;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
-
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static android.support.v4.content.ContextCompat.getSystemService;
+import java.util.regex.Pattern;
+import es.dmoral.toasty.Toasty;
 import static com.example.securityapplication.R.layout.spinner_layout;
+import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
 
 public class profile_fragment extends Fragment {
 
@@ -66,9 +86,21 @@ public class profile_fragment extends Fragment {
     private String TAG = "ProfileActivity";
     Spinner spinner;
     DatePickerDialog datePickerDialog;
-
-    navigation nv=new navigation();
+    private  Uri file;
     private FirebaseHelper firebaseHelper;
+
+    private ImageView profile_pic;
+    private ImageButton chooseImgBtn;
+    private Uri filePath, camerafilepath;
+    private  Bitmap bitmappic;
+
+    private  Intent CropIntent;
+    private final int PICK_IMAGE_REQUEST = 71;
+    private final int TAKE_PICTURE = 81;
+    private  ProgressDialog progressDialog;
+
+    // InternalStorage
+    private InternalStorage internalStorage;
 
     @Nullable
     @Override
@@ -77,16 +109,14 @@ public class profile_fragment extends Fragment {
 
         String [] values =
                 {"Male","Female","Others"};
-        spinner = (Spinner) v.findViewById(R.id.text_Gender);
+        spinner = v.findViewById(R.id.text_Gender);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), spinner_layout, values);
         adapter.setDropDownViewResource(spinner_layout);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                Toast.makeText(parent.getContext(),
-                        "OnItemSelectedListener : " + parent.getItemAtPosition(position).toString(),
-                        Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -97,17 +127,21 @@ public class profile_fragment extends Fragment {
         return v;
     }
 
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         initObjects();
         initviews();
-        FetchAllData();
+//        FetchAllData();
         DisplayData();
         initListeners();
+        deviceId();
+    }
 
+    private void initObjects() {
+
+//        user = getIntent().getParcelableExtra("User");
+        user = UserObject.user;
+        mydb = SQLiteDBHelper.getInstance(getContext());
         /**  Get FirebaseHelper Instance **/
         firebaseHelper = FirebaseHelper.getInstance();
         firebaseHelper.initFirebase();
@@ -115,13 +149,8 @@ public class profile_fragment extends Fragment {
         firebaseHelper.initGoogleSignInClient(getString(R.string.server_client_id));
 
         deviceId();
-    }
-
-    private void initObjects() {
-
-//        user = getIntent().getParcelableExtra("User");
-        user = new User();
-        mydb = new SQLiteDBHelper(getContext());
+        internalStorage = InternalStorage.getInstance();
+        internalStorage.initContext(getContext());
     }
 
     private void initListeners() {
@@ -155,37 +184,49 @@ public class profile_fragment extends Fragment {
 
                                             if (IsInternet.isNetworkAvaliable(getContext())) {
 
+                                                chooseImgBtn.setVisibility(View.VISIBLE);
+
                                                 if(btn_edit.getText().equals("edit"))
                                                 {btn_edit.setText("Save");
                                                     enable();
+                                                    btn_edit.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                                                 alphaa(1.0f);}
                                                 else {
                                                     if(!validate())
                                                     {
-                                                        Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
+                                                        Toasty.error(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT, true).show();
+
+                                                        //Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
                                                     }
                                                     else {
                                                         // start progress bar
-
+                                                        progressDialog = new ProgressDialog(getContext());
+                                                        progressDialog.setTitle("Saving data...");
+                                                        progressDialog.show();
+                                                        progressDialog.setMessage("validating....");
+                                                        progressDialog.setCancelable(false);
 
                                                         //save code will come here
-                                                        user.setName(textName.getText().toString());
+                                                        user.setName(textName.getText().toString().trim());
+                                                        textName.setText(textName.getText().toString().trim());
                                                         user.setDob(textDob.getText().toString());
-                                                        user.setLocation(textAddress.getText().toString());
+                                                        user.setLocation(textAddress.getText().toString().trim());
+                                                        textAddress.setText(textAddress.getText().toString().trim());
                                                         if (spinner.getSelectedItemPosition() == 0)
                                                             user.setGender("male");
                                                         else if (spinner.getSelectedItemPosition() == 1)
                                                             user.setGender("female");
                                                         else
                                                             user.setGender("others");
-
-                                                        // check mobile number in firebase
-                                                        checkMobileInFirebase(textPhone.getText().toString());
+                                                        user.setMobile(textPhone.getText().toString());
+                                                        updateUser();
                                                     }
                                                 }
                                             }//Sending Data to EditProfileActivity
                                             else {
-                                                Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
+                                                Toasty.error(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG, true).show();
+
+                                                //Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
                                             }
                                         }
 
@@ -195,17 +236,10 @@ public class profile_fragment extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
+                Toasty.info(getContext(), "clicked", Toast.LENGTH_SHORT, true).show();
+                //Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
                 Log.d("signout","signout happen");
                 signOut();
-
-                //finishing the navigation activity
-                getActivity().finish();
-                //Clear the back stack and re-directing to the sign-up page
-                Intent mLogOutAndRedirect= new Intent(getContext(),MainActivity.class);
-                mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(mLogOutAndRedirect);
-
             }
         });
 
@@ -215,39 +249,50 @@ public class profile_fragment extends Fragment {
                 changePassword(firebaseHelper.getFirebaseAuth().getCurrentUser().getEmail());
             }
         });
+
+        chooseImgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                pictureChoice();
+                // choose img from gallery
+                chooseImg("storage");
+            }
+        });
     }
 
     private boolean validate() {
-        if(textName.getText().toString().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10)
-            return true;
+        if(textName.getText().toString().trim().length()>1 && textAddress.getText().toString().length()>1 && textPhone.getText().toString().length()==10) {
+            return Pattern.matches("[ a-zA-Z]+", textName.getText().toString().trim());
+        }
         else
             return false;
     }
 
-    private void FetchAllData(){
-        int i =0;
-        Cursor res;
-        res = mydb.getAllData();
-        if (res.getCount() == 0){
-            Toast toast = Toast.makeText(getContext(),
-                    "No User Data Found",
-                    Toast.LENGTH_LONG);
-            toast.show();
-            Log.d("Profile","No Data found");
-        }
-//        StringBuffer buffer = new StringBuffer();
-        while (res.moveToNext()){
-            user.setName(res.getString(1));
-            user.setEmail(res.getString(2));
-            user.setGender(res.getString(3));
-           user.setMobile(res.getString(4));
-//            ansAadhaar = res.getString(6);
-            user.setLocation(res.getString(5));
-            user.setDob(res.getString(6));
-            i++;
-            Log.d("Profile Activity","User Object set in Profile activity successfully" +i);
-        }
-    }
+//    private void FetchAllData(){
+//        int i =0;
+//        Cursor res;
+//        res = mydb.getAllData();
+//        if (res.getCount() == 0){
+//            Toast toast = Toast.makeText(getContext(),
+//                    "No User Data Found",
+//                    Toast.LENGTH_LONG);
+//            toast.show();
+//            Log.d("Profile","No Data found");
+//        }
+////        StringBuffer buffer = new StringBuffer();
+//        while (res.moveToNext()){
+//            user.setName(res.getString(1));
+//            user.setEmail(res.getString(2));
+//            user.setGender(res.getString(3));
+//           user.setMobile(res.getString(4));
+////            ansAadhaar = res.getString(6);
+//            user.setLocation(res.getString(5));
+//            user.setDob(res.getString(6));
+//            i++;
+//            Log.d("Profile Activity","User Object set in Profile activity successfully" +i);
+//        }
+//    }
 
     private void DisplayData() {
 
@@ -266,6 +311,17 @@ public class profile_fragment extends Fragment {
         textEmail.setText(user.getEmail());
         textPhone.setText(user.getMobile());
 
+        // display image from internal storage
+        File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        try{
+            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(imgPath));
+            profile_pic = getActivity().findViewById(R.id.profile_pic);
+            profile_pic.setImageBitmap(b);
+        }catch (IOException e){
+            //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"Profile picture not found");
+        }
+
         Log.d("Profile","DATA displayed on profile Successfully");
     }
     private void disable(){
@@ -275,6 +331,12 @@ public class profile_fragment extends Fragment {
         textPhone.setEnabled(false);
         textAddress.setEnabled(false);
         textDob.setEnabled(false);
+        chooseImgBtn.setVisibility(View.GONE);
+        textName.setBackgroundColor(Color.TRANSPARENT);
+        textEmail.setBackgroundColor(Color.TRANSPARENT);
+        textPhone.setBackgroundColor(Color.TRANSPARENT);
+        textAddress.setBackgroundColor(Color.TRANSPARENT);
+        textDob.setBackgroundColor(Color.TRANSPARENT);
     }
     private void alphaa(float k){
         spinner.setAlpha(k);
@@ -282,13 +344,21 @@ public class profile_fragment extends Fragment {
         textPhone.setAlpha(k);
         textAddress.setAlpha(k);
         textDob.setAlpha(k);
+        textName.setBottom(Color.BLACK);
     }
     private void enable(){
         spinner.setEnabled(true);
         textName.setEnabled(true);
+        //chooseImgBtn.setVisibility(View.VISIBLE);
         textPhone.setEnabled(true);
         textAddress.setEnabled(true);
         textDob.setEnabled(true);
+
+
+        textEmail.setBackgroundResource(R.drawable.blackborder);
+        textPhone.setBackgroundResource(R.drawable.blackborder);
+        textAddress.setBackgroundResource(R.drawable.blackborder);
+        textDob.setBackgroundResource(R.drawable.blackborder);
     }
 
     private void initviews() {
@@ -305,34 +375,126 @@ public class profile_fragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,Locality);
         textAddress.setAdapter(adapter);
         text_changePassword = getActivity().findViewById(R.id.text_changePassword);
+        profile_pic = getActivity().findViewById(R.id.profile_pic);
+        chooseImgBtn = getActivity().findViewById(R.id.btn_choose_img);
+
         disable();
-
-
-//        String[] gender = new String[]{
-//                "Male",
-//                "Female",
-//                "Others"
-//        };
-//        Spinner sp=getActivity().findViewById(R.id.text_Gender);
-//       spinnerArrayAdapter = new ArrayAdapter<String>(
-//                this.getActivity(), spinner_layout, gender);
-//        spinnerArrayAdapter.setDropDownViewResource(spinner_layout);
-//        sp.setAdapter(spinnerArrayAdapter);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Log.d(TAG,"resultcode:"+resultCode+"requestcode:"+requestCode);
         if (requestCode == 1){
             if (resultCode == 110){
-                user = data.getParcelableExtra("ResultUser");
+                user = Objects.requireNonNull(data).getParcelableExtra("ResultUser");
                 Log.d("Profile","User object returned"+user.getEmail());
                 mydb.updateUser(user);
                 DisplayData();
             }
         }
+
+        if(requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
+                && data != null && data.getData() != null ) {
+            filePath = data.getData();
+
+            if (filePath == null) {
+                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            cropimage();
+        }
+
+
+
+
+
+           /* Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), result.getBitmap());
+
+
+            try {
+                //CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+                internalStorage.saveImageToInternalStorage(result.getBitmap(), user.getEmail());
+                profile_pic.setImageBitmap(result.getBitmap());
+                deleteExistingProfilePic();
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+            }*/
+
+
+        if(requestCode == 201 && resultCode == getActivity().RESULT_OK) {
+            checkCameraPermission();
+
+
+            filePath = null;
+            Bitmap cameraphoto = (Bitmap) data.getExtras().get("data");
+
+            filePath = getImageUri(getContext(),cameraphoto);
+
+
+/*
+            Log.d("tag", String.valueOf(filePath));
+
+            filePath = (Uri) data.getData();
+
+            Log.d("tag", String.valueOf(filePath));
+
+
+            //bitmappic = (Bitmap) data.getExtras().get("data");
+
+            if (filePath == null) {
+                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
+                return;
+            }*/
+
+
+            cropimage();
+        }
+
+
+           /* Log.d("tag", String.valueOf(bitmappic));
+
+            try {
+                internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+                profile_pic.setImageBitmap(bitmappic);
+                deleteExistingProfilePic();
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+            }*/
+
+           
+        if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
+        {
+            try {
+                if (data != null) {
+                    // get the returned data
+                    Bundle extras = data.getExtras();
+                    // get the cropped bitmap
+                    Bitmap bitmappic = extras.getParcelable("data");
+                    //CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+                    internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+
+                    profile_pic.setImageBitmap(bitmappic);
+                    deleteExistingProfilePic();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 
     private void deviceId() {
         telephonyManager = (TelephonyManager) getActivity().getSystemService(getContext().TELEPHONY_SERVICE);
@@ -350,31 +512,59 @@ public class profile_fragment extends Fragment {
             }
         }
 
-
-
         //Log.d("MAinActivity","SMS intent");
         //check permissions
-
-        while(!checkSMSPermission());
+        checkCameraPermission();
+        checkSMSPermission();
     }
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.error(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);
         }
+
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
+
     }
 
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            //finishAffinity();
+    public  boolean checkCameraPermission(){
+
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
         }
-        else{
-            //finish();
+
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED;
+
+    }
+
+    public  boolean checkReadExterPermission(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC);
         }
+
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
+
+    }
+
+
+    public  boolean checkWriteExterPermission(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RC);
+        }
+
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
+
     }
 
     @Override
@@ -384,10 +574,18 @@ public class profile_fragment extends Fragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     deviceId();
                 } else {
-                    closeNow();
+                    getActivity().finish();
                     Toast.makeText(getContext(), "Without permission we check", Toast.LENGTH_LONG).show();
                 }
                 break;
+
+            case 0:
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                        chooseImgBtn.setEnabled(true);
+                    }
+
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -400,80 +598,50 @@ public class profile_fragment extends Fragment {
             return;
         }
 
-        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .removeEventListener(navigation.mUsersDatabaseReferenceListener);
+        if (!IsInternet.checkInternet(getContext()))
+            return;
+
         firebaseHelper.firebaseSignOut(mImeiNumber);
         firebaseHelper.googleSignOut(getActivity());
         //delete user records from SQLite
-        mydb.deleteDatabase(getContext());
+        mydb.deleteDatabase(Objects.requireNonNull(getContext()).getApplicationContext());
 
         try{
             Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);
             mStopSosPlayer.putExtra("stop",1);
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
             Log.d("Profile Fr","Service sosplayer new startIntent...");
-            Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
+
+            //to stop GetGPS Service upon logout
+            Intent MStopGPSService = new Intent(getContext(),GetGPSCoordinates.class);
+            getActivity().stopService(MStopGPSService);
+            Toasty.warning(getContext(), "Service sosplayer stopping...", Toast.LENGTH_SHORT, true).show();
+
+           // Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
         }
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");
         }
-    }
-
-    private void checkMobileInFirebase(final String newMobile){
-        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                final User oldUser = userDataSnapshot.getValue(User.class);
-                if (oldUser.getMobile().equals(newMobile)){
-                    // update user in sqlite and firebase
-                    updateUser();
-                }else {
-                    firebaseHelper.getMobileDatabaseReference().child(newMobile).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot mobileNodeDataSnapshot) {
-                            Log.d("Mobile Data Snapshot:", mobileNodeDataSnapshot.toString());
-                            if (mobileNodeDataSnapshot.exists()) {
-                                // stop progress bar
-
-                                // prompt user to enter different mobile number
-                                Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
-
-                            } else {
-                                // delete previous mobile number and add new number
-                                firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null);
-                                firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid());
-                                updateUser();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        //finishing the navigation activity
+        getActivity().finish();
+        //Clear the back stack and re-directing to the sign-up page
+        Intent mLogOutAndRedirect= new Intent(getContext(),MainActivity.class);
+        mLogOutAndRedirect.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mLogOutAndRedirect);
     }
 
     private void updateUser(){
 
-        // stop progress bar
-
         Log.d(TAG,"Updating user...");
-
-        user.setMobile(textPhone.getText().toString());
-
-        //mydb.updateUser(user);
+        mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
+
+        // stop progress bar
+        progressDialog.dismiss();
 
         btn_edit.setText("edit");
         alphaa(0.6f);
+        btn_edit.setCompoundDrawablesWithIntrinsicBounds( R.drawable.ic_edit_black_24dp, 0, 0, 0);
         disable();
     }
 
@@ -481,26 +649,177 @@ public class profile_fragment extends Fragment {
         if (!IsInternet.checkInternet(getContext()))
             return;
 
-        //pgbarshow();
-        firebaseHelper.getFirebaseAuth().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Sending Email...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        try {
+            firebaseHelper.getFirebaseAuth().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-
+                    progressDialog.dismiss();
                     if(task.isSuccessful()){
-                        Toast.makeText(getActivity(),"EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD",Toast.LENGTH_SHORT).show();
+                        try{Toasty.success(getActivity(), "EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD", Toast.LENGTH_SHORT, true).show();}
+                        catch(Exception e){Log.d(TAG,"toast exception:"+e.getMessage());}
                     }
                     else
                     {
                         try {
                             throw task.getException();
                         }catch (Exception e){
-                            String error = e.getMessage().split("\\.")[0];
                             Log.d(TAG,e.getMessage());
-                            Toast.makeText(getActivity(),error,Toast.LENGTH_LONG).show();
+                            try{Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();}
+                            catch(Exception e1){Log.d(TAG, "toast exception:"+e1.getMessage());}
                         }
                     }
-                    //pgbarhide();
                 }
+            });
+        }catch (Exception e){
+            progressDialog.dismiss();
+            Log.d(TAG, e.getMessage());
+            Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();
+
+//            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void pictureChoice(){
+        final AlertDialog.Builder a_builder = new AlertDialog.Builder(getContext());
+        a_builder.setTitle("Profile Photo")
+                .setIcon(R.drawable.ic_camera_icon)
+                .setPositiveButton("Camera", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        chooseImg("camera");
+
+                    }
+                })
+                .setNeutralButton("Gallery", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        chooseImg("gallery");
+                    }
+                });
+        AlertDialog alert = a_builder.create();
+        alert.show();
+    }
+
+    private void chooseImg(String choice){
+        switch (choice) {
+            case "gallery":
+                Intent pickImageIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                pickImageIntent.setType("image/*");
+
+                //CropImage.startPickImageActivity(MainActivity.this);
+
+                startActivityForResult(Intent.createChooser(pickImageIntent, "Select Picture"), PICK_IMAGE_REQUEST);
+                break;
+
+            case "camera":
+                checkCameraPermission();
+
+                Intent cameraintent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraintent,201);
+        }
+    }
+
+    private void uploadProfilePicToFirebase(){
+
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Uploading...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+
+        // Get the data from an ImageView as bytes
+        profile_pic.setDrawingCacheEnabled(true);
+        profile_pic.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) profile_pic.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,40, baos);
+        byte[] data = baos.toByteArray();
+
+        StorageReference ref = firebaseHelper.getStorageReference().child("images/profile_pic");
+        UploadTask uploadTask = ref.putBytes(data);
+        uploadTask
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(),"Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "Failed to upload image"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100f*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                .getTotalByteCount());
+                        progressDialog.setMessage("Uploaded "+(int)progress+"%");
+                    }
+                });
+    }
+
+    private void deleteExistingProfilePic(){
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setTitle("Processing...");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        // Create a storage reference from our app
+        StorageReference storageRef = firebaseHelper.getStorageReference();
+
+        // Create a reference to the file to delete
+        StorageReference imgRef = storageRef.child("images/profile_pic");
+
+        // Delete the file
+        imgRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+                progressDialog.dismiss();
+                uploadProfilePicToFirebase();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+                if (((StorageException) exception).getErrorCode() == ERROR_OBJECT_NOT_FOUND){
+                    progressDialog.dismiss();
+                    uploadProfilePicToFirebase();
+                }
+                else
+                    Toasty.error(getContext(), "Failed to upload image"+exception.getMessage(), Toast.LENGTH_LONG, true).show();
+                //Toast.makeText(getContext(), "Failed to upload image"+exception.getMessage(),Toast.LENGTH_LONG).show();
+            }
         });
+    }
+
+    public void cropimage()
+    {
+        try {
+            CropIntent = new Intent("com.android.camera.action.CROP");
+            CropIntent.setDataAndType(filePath, "image/*");
+            CropIntent.putExtra("crop", "true");
+            CropIntent.putExtra("outputX", 180);
+            CropIntent.putExtra("outputY", 180);
+            CropIntent.putExtra("aspectX", 3);
+            CropIntent.putExtra("aspectY", 3);
+            CropIntent.putExtra("scaleUpIfNeeded", true);
+            CropIntent.putExtra("return-data", true);
+            CropIntent.putExtra(MediaStore.EXTRA_OUTPUT, filePath);
+            startActivityForResult(CropIntent, 0);
+        }catch (ActivityNotFoundException anfe) {
+            // display an error message
+            String errorMessage = "Whoops - your device doesn't support the crop action!";
+            try {
+                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+            }catch (Exception e){Log.d(TAG,e.getMessage());}
+        }
     }
 }

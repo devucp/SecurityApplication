@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import es.dmoral.toasty.Toasty;
 
 public class SendSMSService extends Service {
     private static String[] contactList=null; //TODO: stores the number of the emergency contacts
@@ -61,7 +64,8 @@ public class SendSMSService extends Service {
 
     public void initSenderName() {
         try{
-        this.senderName= navigation.newUser.getName();}
+            Log.d("SMS Service","Calling Userobject.print():"+UserObject.print());
+        this.senderName= UserObject.user.getName();} //Was previously navigation.newUser. Changed to Userobject.user
         catch(Exception e){
             Toast.makeText(this,"initialising sender name error"+e.getMessage(),Toast.LENGTH_LONG);
             //initSenderName(); //re-try
@@ -89,7 +93,7 @@ public class SendSMSService extends Service {
 
     /**Check if testmode was active when called**/
     public boolean checkTestMode(){
-        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
+        SQLiteDBHelper sqLiteDBHelper=SQLiteDBHelper.getInstance(SendSMSService.this);
         Log.d("SOS SMS","checktestmode():"+sqLiteDBHelper.getTestmode());
         return sqLiteDBHelper.getTestmode();
     }
@@ -99,7 +103,7 @@ public class SendSMSService extends Service {
         Log.d("SendSMSService","initContacts:");
         //check if HashMap was initialised on call
         try {
-            HashMap<String, String> sosContacts = navigation.newUser.getSosContacts();
+            HashMap<String, String> sosContacts = UserObject.user.getSosContacts();
             Log.d("SendSMSServcie", "SosContacts size:" + sosContacts.size());
             if (sosContacts.size() != 0) {
                 contactList = new String[sosContacts.size()];
@@ -109,7 +113,7 @@ public class SendSMSService extends Service {
                     Map.Entry contactEntry = (Map.Entry) sosContactsIterator.next();
                     String contact = (String) contactEntry.getValue();
                     Log.d("SendSMSService", "contact.get(" + i + "):" + contact);
-                    if (!contact.equals("null") && contact.length() == 10) {
+                    if (contact!=null && !contact.equals("null") && contact.length() == 10) { //added a condition to check if contact is not null
                         contactList[i] = contact;
                         Log.d("SendSMSService", "contactList[" + i + "]:" + contactList[i]);
 
@@ -169,7 +173,8 @@ public class SendSMSService extends Service {
             safe=0; //emergency =1 . reset the safe variable
             toastmsg="send emergency sos message";
         }
-        Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
+        Toasty.warning(getApplicationContext(), toastmsg, Toast.LENGTH_SHORT, true).show();
+        //Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
         this.stopSelf();//FINISH the service
     }
 
@@ -196,8 +201,9 @@ public class SendSMSService extends Service {
         }
         else{
             initSenderName();
-            messageToSend= getSenderName()+ "uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
-                                            " This is a TEST message."+getSenderName()+" may contact you in emergency.";
+            messageToSend= getSenderName()+ " uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
+                                            " This is a TEST message. "+getSenderName()+" may contact you in emergency.";
+//            Log.d("SMS Service","Tstmode msg: "+messageToSend);
         }
         return messageToSend;
 
@@ -233,7 +239,9 @@ public class SendSMSService extends Service {
         catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.d("SOS SMS", "sendMessage() exception");
-            Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
+            Toasty.error(getApplicationContext(), "Invalid Mobile No or SOS contacts not initiliased", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
         }
         Log.d("SOS SMS", "sendMessage() end");
     }

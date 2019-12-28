@@ -11,19 +11,13 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <LinearLayout
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_margin="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        >
-
-        <Button
+            <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/graylight"
@@ -31,16 +25,14 @@
             android:text="general"
             android:textAlignment="textStart"
             android:textColor="@color/cyan"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
-    </LinearLayout>
-        <LinearLayout
+            <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            >
+            android:layout_marginTop="20dp">
 
-            <Button
+                <Button
                 android:id="@+id/settingsos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,62 +43,53 @@
                 android:textAlignment="textStart"
                 android:textColor="@color/cyan"
                 android:textSize="20sp" />
+            </LinearLayout>
 
-        </LinearLayout>
+            <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
 
-        <LinearLayout
+                <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimaryDark"
+                android:paddingRight="24dp"
+                android:layout_marginLeft="30dp"/>
+            </LinearLayout>
+
+            <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            />
+            android:paddingLeft="0dp">
 
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        >
+                <Button
+                android:id="@+id/screem"
+                android:alpha="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="42dp"
+                android:textAlignment="textStart"
+                android:background="@color/graylight"
+                android:drawableRight="@drawable/ic_volume_up_black_24dp"
+                android:text="scream test"
+                android:textColor="@color/cyan"
+                android:textSize="20sp" />
+            </LinearLayout>
 
-        <View
-
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimaryDark"
-            android:paddingRight="24dp"
-            android:layout_marginLeft="30dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:paddingLeft="0dp"
-        >
-
-        <Button
+            <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="42dp"
-            android:textAlignment="textStart"
-            android:background="@color/graylight"
-            android:drawableRight="@drawable/ic_volume_up_black_24dp"
-            android:text="scream test"
-            android:textColor="@color/cyan"
-            android:textSize="20sp" />
-    </LinearLayout>
+            android:layout_marginTop="20dp">
 
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
-
-        <View
-
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimaryDark"
-            android:paddingRight="24dp"
-            android:layout_marginLeft="30dp"/>
-    </LinearLayout>
+                <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimaryDark"
+                android:paddingRight="24dp"
+                android:layout_marginLeft="30dp"/>
+            </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -158,12 +141,28 @@
             android:textColor="@color/cyan"
             android:textSize="20sp" />
     </LinearLayout>
-    <LinearLayout
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            >
+
+            <View
+
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorPrimaryDark"
+                android:paddingRight="24dp"
+                android:layout_marginLeft="30dp"/>
+        </LinearLayout>
+        <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
 
         <Button
-            android:layout_marginBottom="20dp"
+            android:id="@+id/privacy"
+            android:layout_marginBottom="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="42dp"
@@ -173,7 +172,24 @@
             android:textAlignment="textStart"
             android:textColor="@color/cyan"
             android:textSize="20sp" />
-    </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/invite"
+                android:layout_marginBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="42dp"
+                android:background="@color/graylight"
+                android:drawablePadding="150dp"
+                android:text="Protect A Firend"
+                android:textAlignment="textStart"
+                android:textColor="@color/cyan"
+                android:textSize="20sp" />
+        </LinearLayout>
     </LinearLayout>
 
 

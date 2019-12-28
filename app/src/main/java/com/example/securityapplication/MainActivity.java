@@ -7,9 +7,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +20,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -28,14 +29,12 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
+import com.example.securityapplication.Helper.InternalStorage;
 import com.example.securityapplication.Helper.KeyboardHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 //import com.agrawalsuneet.dotsloader.loaders.TashieLoader;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -50,19 +49,21 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Hashtable;
+
+import es.dmoral.toasty.Toasty;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-
-//import androidx.annotation.NonNull;
-
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -85,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ProgressBar pgsBar1;
 
     private User user;
-    private Device device;
     private String uid;
 
     //persistent service
@@ -95,7 +95,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int RC;
 
     private static Hashtable<String,String> userData;
-    private boolean isUserStatusChecked = false;
+    private boolean GpsPermission = false;
+
+    SQLiteDBHelper db;
 
     public void pgbarshow()
     {
@@ -140,13 +142,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(validateForm()){
                     if (!IsInternet.checkInternet(MainActivity.this))
                         return;
-
                     KeyboardHelper.hideSoftKeyboard(MainActivity.this, v);
-
                     userData = new Hashtable<>();
-
                     pgbarshow();
-
                     userData.put("email",mEmail.getText().toString());
                     userData.put("password",mPassword.getText().toString());
                     userData.put("SignInType", "email");
@@ -155,7 +153,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else {
                     Log.d(TAG,"Invalid credentials");
-                    Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
+                    Toasty.error(MainActivity.this, "Enter valid credentials", Toast.LENGTH_SHORT, true).show();
+
+ //                   Toast.makeText(MainActivity.this, "Enter valid credentials",Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -189,8 +189,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG,"Starting MainActivity...........................");
 
         //initialize Activity
+        Log.d("MainActivity","Inside onCreate");
         initViews();
         initOnClickListeners();
 
@@ -202,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         firebaseHelper.initContext(MainActivity.this);
 
         //Grant Device read Permissions
-        deviceId();
-
         if (mImeiNumber == null)
             deviceId();
 
@@ -215,25 +215,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //initialize user defined class GoogleFirebaseSignIn with Firebase user instance andTAGusing user defined init method
         initializeGoogleFirebaseSignIn();
 
-
         /** DATABASE FORCEFUL CREATION**/
-        //uncomment to forcefully delete database
-//        SQLiteDBHelper sqLiteDBHelper= new SQLiteDBHelper(this);
-//        sqLiteDBHelper.deleteDatabase(this);
-
+        db=SQLiteDBHelper.getInstance(MainActivity.this);
     }
 
     public void onStart(){
+
+        Log.d(TAG,"Inside onStart");
+
+ //       final DatabaseReference ddb=FirebaseDatabase.getInstance().getReference().child("Devices").child("356477081682635");
+
+//        final DatabaseReference ddb=FirebaseDatabase.getInstance().getReference().child("Devices").child("356477081682635");
+
+//        ddb.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                for(DataSnapshot dp:dataSnapshot.getChildren()){
+//                    String st=dp.getKey();
+//                    DatabaseReference d=ddb.child(st);
+//                    d.removeValue();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+ //      ddb.removeValue();
+   //     Toast.makeText(this, "deletion done", Toast.LENGTH_SHORT).show();
+
         super.onStart();
+        if (mImeiNumber == null)
+            deviceId();
 
         FirebaseUser currentUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
+
         updateUI(currentUser);
     }
+
+     boolean checkGPSPermission() {
+        Log.d("MainActivity","Inside CheckGPSPermission");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {   //permissions not granted
+            Log.d("GPS Access in Main","Requesting GPS Location");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 102);
+        }else {
+            //permissions granted
+            //ContextCompat.startForegroundService(this,new Intent(this,GetGPSCoordinates.class));
+            GpsPermission = true;
+        }
+         return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+     }
 
     private void initializeGoogleFirebaseSignIn(){
         if (mImeiNumber == null)
             deviceId();
-        googleFirebaseSignIn.init(this, mImeiNumber);
+        else
+            googleFirebaseSignIn.init(this, mImeiNumber);
     }
 
     public void initViews(){
@@ -251,61 +291,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.signInButton).setOnClickListener(this);
     }
 
-    private void checkUserStatus(){
-        Log.d(TAG,"Checkig user status...");
-        if (mImeiNumber == null)
+   private void checkUserStatus(){
+
+       Log.d(TAG,"Checkig user status...");
+        if (firebaseHelper.getFirebaseAuth().getCurrentUser() != null) {
             deviceId();
-        if (firebaseHelper.getFirebaseAuth().getCurrentUser() == null){
-            Log.d(TAG,"Inside checkUserStatus:Current user is null");
-            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(FirebaseAuth.getInstance().getUid(), new DatabaseReference.CompletionListener() {
                 @Override
-                public void onDataChange(@NonNull final DataSnapshot deviceDataSnapshot) {
-                    Log.d(TAG,"Inside onDataChange");
-                    if (deviceDataSnapshot.exists()){
-                        device = deviceDataSnapshot.getValue(Device.class);
-                        if (!device.getUID().equals("null")){
-                            // for this, either same user will be already signed in(so this will be the case if data cleared from device)
-                            // or other user may have formatted the mobile without logging out
-                            // so user gets logged out without updating firebas database, so update firebase
-                            // make Devices->imei->"null" and Users->uid->imei->"null"
-                            // check internet connection
-                            uid = device.getUID();
-                            Log.d(TAG,"Formatted or uninstalled or cleared data behavior");
-                            deviceId();
-                            device = new Device();
-                            device.setUID("null");
-                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    firebaseHelper.getUsersDatabaseReference().child(uid).child("imei").setValue("null").addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG,"Updated firebase");
-                                            isUserStatusChecked = true;
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-
-                                }
-                            });
-
-                            Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser());
-                            updateUI(firebaseHelper.getFirebaseAuth().getCurrentUser());
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError != null) {
+                        firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+                        if (databaseError.getCode() == -3) {
+                            Toast.makeText(MainActivity.this, "Last logout was unsuccessful. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
                         }
+                        else {
+                            Toast.makeText(MainActivity.this, "Please check your connection and try again", Toast.LENGTH_LONG).show();
+                            Log.d(TAG,databaseError.getMessage());
+                            Toast.makeText(MainActivity.this, "Sign in failed"+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                        }
+                        LogOutUser();
+                    } else {
+                        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getUid()).child("imei").setValue(mImeiNumber, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                if (databaseError != null) {
+                                    firebaseHelper.makeDeviceImeiNull(mImeiNumber);
+                                    if (databaseError.getCode() == -3){
+                                        Toast.makeText(MainActivity.this, "Last logout was unsuccessful. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
+                                    }
+                                    else
+                                        Toast.makeText(MainActivity.this, "Please check your connection and try again", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG,databaseError.getMessage());
+                                    Toast.makeText(MainActivity.this, "Sign in failed."+databaseError.getMessage(),Toast.LENGTH_SHORT).show();
+                                    // sigin out the user
+                                    LogOutUser();
+                                } else {
+                                    Log.d(TAG, "Updated firebase");
+                                    storeData(FirebaseAuth.getInstance().getCurrentUser());
+                                }
+                            }
+                        });
                     }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.d(TAG,databaseError.getDetails());
                 }
             });
         }
@@ -325,35 +351,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else {
                 mImeiNumber = telephonyManager.getDeviceId();
             }
-            if (!isUserStatusChecked) {
-                //incase user formats or uninstalls or clears user data
-                checkUserStatus();
-            }
+            googleFirebaseSignIn = GoogleFirebaseSignIn.getInstance();
+            initializeGoogleFirebaseSignIn();
         }
 
         //Log.d("MAinActivity","SMS intent");
         //check permissions
 
-        while(!checkSMSPermission());
+        checkSMSPermission();
     }
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(this, "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SEND_SMS}, RC);
+                    new String[]{Manifest.permission.SEND_SMS}, 103);
+            return false;
         }
+        checkGPSPermission();
         return ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            finishAffinity();
-        }
-        else{
-            finish();
-        }
     }
 
     @Override
@@ -363,16 +382,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     deviceId();
                 } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
-                    closeNow();
+                    finish();
+                    Toasty.error(this, "Permission denied", Toast.LENGTH_SHORT, true).show();
+
+                   // Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case 102:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("GPS In MainActivity","GPS Permissions granted");
+                    GpsPermission = true;
+                    if (user!=null)
+                        ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
+
+                } else {
+                    GpsPermission = false;
+                    Toast.makeText(getApplicationContext(),"Location Permission Denied ",Toast.LENGTH_LONG).show();
+                    //Permission Required Prompt
+//                    checkGPSPermission();
+                }
+                break;
+            case 103:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkGPSPermission();
+                } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED){
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
                 break;
+
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
-    private boolean validateForm() {
+    private boolean validateForm(){
         boolean valid = true;
 
         String email = mEmail.getText().toString();
@@ -418,7 +461,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-                Toast.makeText(MainActivity.this, "Authentication failed. Try Again",Toast.LENGTH_SHORT).show();
+                Toasty.error(this, "Authentication failed. Try again", Toast.LENGTH_SHORT, true).show();
+
+               // Toast.makeText(MainActivity.this, "Authentication failed. Try again",Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
         }
@@ -456,37 +501,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
-                            Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+                            try {
+                                boolean isNew = task.getResult().getAdditionalUserInfo().isNewUser();
+                                Log.d(TAG, "onComplete: " + (isNew ? "new user" : "old user"));
+                            }catch (Exception e){
+                                Log.d(TAG,e.getMessage());
+                            }
 
                             final FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             Log.d(TAG, firebaseHelper.getDevicesDatabaseReference().toString());
-
-                            deviceId();
-                            device = new Device();
-                            device.setUID(firebaseUser.getUid());
-                            firebaseHelper.getDevicesDatabaseReference().child(mImeiNumber).setValue(device).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    firebaseHelper.getUsersDatabaseReference().child(firebaseUser.getUid()).child("imei").setValue(mImeiNumber).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            storeData(firebaseUser);
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-
-                                }
-                            });
-
+                            checkUserStatus();
                         } else {
 
                             try{
@@ -494,25 +518,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             catch (FirebaseAuthInvalidCredentialsException e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
-                                Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
+                                Toasty.error(MainActivity.this, "Invalid Password", Toast.LENGTH_SHORT, true).show();
+
+                                //Toast.makeText(MainActivity.this, "Invalid Password",Toast.LENGTH_SHORT).show();
                             }
                             catch (Exception e){
                                 Log.d(TAG,"Exception:"+e.getMessage());
+                                Toasty.error(MainActivity.this, "Authentication failed. Try again"+e.getMessage(), Toast.LENGTH_SHORT, true).show();
+
+                               // Toast.makeText(MainActivity.this, "Authentication failed. Try again"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                            }finally {
+                                updateUI(null);
                             }
-                            updateUI(null);
                         }
                     }
                 });
     }
 
     private void LogOutUser(){
-        if (mImeiNumber == null)
-            deviceId();
         firebaseHelper.firebaseSignOut();
         firebaseHelper.googleSignOut(MainActivity.this);
+        pgbarhide();
+        updateUI(null);
     }
 
     public void updateUI(FirebaseUser firebaseUser){
+        Log.d("MainActivty","Inside UpdateUI GPS Permission = "+GpsPermission);
+        //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
         if(firebaseUser==null){
             mStatus.setText(R.string.not_logged);
             mSignInButton.setText(R.string.sign_in_text);
@@ -522,19 +555,195 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pgbarhide();
         }
         else {
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
+
+            if (db.getdb_user().getImei() == null){
+                firebaseHelper.firebaseSignOut(mImeiNumber);
+                firebaseHelper.googleSignOut(MainActivity.this);
+                updateUI(null);
+                return;
+            }
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+            Log.d(TAG,"current user"+firebaseUser.getEmail());
+            //goto next activity only if user exists in firebase db
             /** SosPlayer Service intent**/
+
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+            Log.d(TAG,"Starting navigation activity");
+
             startService(new Intent(this, SosPlayer.class));
+            /**Location Service intent**/
+            if (checkGPSPermission()) {
+                ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
+            } else {
+                Toast.makeText(this, "Location Permissions required", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
             startActivity(mHomeIntent);
+            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             try {
-                closeNow();
+                finish();
+                //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
             }catch (Exception e){
                 Log.d(TAG,"Exception on closing activity:"+e.getMessage());
                 finish();
             }
         }
         Log.d(TAG,"UI updated successfully");
+        //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+    }
+
+    private void setDeviceForSignIn(String imei){
+        Log.d(TAG,"Inside setDeviceForSignIn method-Imei no.:"+imei);
+        firebaseHelper.getDevicesDatabaseReference().child(imei).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
+                Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
+                if (deviceDataSnapshot.exists()) {
+                    uid = deviceDataSnapshot.getValue(String.class);
+                } else {
+                    uid = null;
+                }
+                validateBeforeSignIn();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(MainActivity.this, "Inside setDeviceForSignIn MainAct:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                pgbarhide();
+            }
+        });
+    }
+
+    private void validateBeforeSignIn() {
+        Log.d(TAG,"Inside validateBeforeSignIn");
+        // Check if registered user sign's in using old device or new device using imei number.
+        if (uid != null) {
+            Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser()+"device formatted  or user data cleared or app uninstalled");
+        }
+        //to check if email is registered
+        setUidFromFirebaseForSignIn();
+    }
+
+    private void setUidFromFirebaseForSignIn(){
+        Log.d(TAG,"Inside setUidFromFirebaseForSignIn");
+        String email = userData.get("email");
+        // replace "." with "," in email id to store in firebase db as key
+        String commaSeperatedEmail = TextUtils.join(",", Arrays.asList(email.split("\\.")));
+        Log.d(TAG,commaSeperatedEmail);
+        Log.d(TAG,firebaseHelper.getEmailDatabaseReference().toString());
+        firebaseHelper.getEmailDatabaseReference().child(commaSeperatedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
+                Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());
+                if (emailNodeDataSnapshot.exists()) {
+                    //emailNode = emailNodeDataSnapshot.getValue(Email.class);
+                    uid = emailNodeDataSnapshot.getValue(String.class);
+                    Log.d(TAG,uid);
+                } else {
+                    uid = null;
+                }
+                isEmailRegistered();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(MainActivity.this, "Inside setUidFromFirebaseForSignIn MainAct:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                pgbarhide();
+            }
+        });
+    }
+
+    private void isEmailRegistered(){
+        Log.d(TAG,"Inside isEmailRegistered");
+        if (uid == null){
+            Log.d(TAG,"Account not registered. Please complete the registration process");
+            // prompt user to signUp
+            Intent signUpIntent = new Intent(this,SignUp1Activity.class);
+            Toasty.warning(this, "Account not registered. Please complete the registration process", Toast.LENGTH_LONG, true).show();
+            if (userData.get("SignInType").equals("email")){
+                signUpIntent.putExtra("email", userData.get("email"));
+            }
+            startActivityForResult(signUpIntent,1);
+            pgbarhide();
+        }
+        else {
+            Log.d(TAG, uid);
+            firebaseHelper.getUsersDatabaseReference().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
+                    Log.d("User Data Snapshot:", userDataSnapshot.toString());
+                    if (userDataSnapshot.exists()) {
+                        user = userDataSnapshot.getValue(User.class);
+                        if (user.getImei() == null){
+                            // user is logged out
+                            Log.d(TAG,"No user not logged  in. Login the user");
+                            Log.d(TAG,"No user not logged  in. Login the user");
+                            crossValidateUserData();
+                        }
+                        else {
+                            firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
+                                    Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
+                                    if (deviceDataSnapshot.exists()) {
+                                        if (user.getImei().equals(mImeiNumber)){
+                                            crossValidateUserData();
+                                        }
+                                        else {
+                                            uid = deviceDataSnapshot.getValue(String.class);
+                                        /* User not logged out from old device
+                                           prompt user to log out from old device
+                                           */
+                                            Log.d(TAG, "User is LoggedIn in other device");
+                                            Toasty.error(MainActivity.this, "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_SHORT, true).show();
+
+                                           /* Toast.makeText(MainActivity.this,
+                                                    "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
+                                           */ LogOutUser();
+                                        }
+                                    }
+                                    else {
+                                        //log out the user
+                                        firebaseHelper.firebaseSignOut(mImeiNumber);
+                                        LogOutUser();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.d(TAG,databaseError.getDetails());
+                                    Toast.makeText(MainActivity.this, "Inside isEmailRegistered deviceDberror:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                                    pgbarhide();
+                                }
+                            });
+                        }
+
+                    } else {
+                        user = null;
+                        Log.d(TAG,"User is null");
+                        pgbarhide();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    // Getting User failed, log a message
+                    Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
+                    Toast.makeText(MainActivity.this, "Inside isEmailRegistered userDberror:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    pgbarhide();
+                }
+            });
+        }
     }
 
     private void crossValidateUserData(){
@@ -565,191 +774,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else if (SignInType.equals("google")){
                     // login the user through google
                     initializeGoogleFirebaseSignIn();
-                    googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                }
-            }
-        } else {
-            Log.d(TAG, user.toString());
-            pgbarhide();
-        }
-    }
-
-    private void setDeviceForSignIn(String imei){
-        Log.d(TAG,"Inside setDeviceForSignIn method-Imei no.:"+imei);
-        firebaseHelper.getDevicesDatabaseReference().child(imei).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
-                Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
-                if (deviceDataSnapshot.exists()) {
-                    device = deviceDataSnapshot.getValue(Device.class);
-                } else {
-                    device = null;
-                }
-                validateBeforeSignIn();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG,databaseError.getDetails());
-            }
-        });
-    }
-
-    private void setUidFromFirebaseForSignIn(){
-        Log.d(TAG,"Inside setUidFromFirebaseForSignIn");
-        String email = userData.get("email");
-        // replace "." with "," in email id to store in firebase db as key
-        String commaSeperatedEmail = TextUtils.join(",", Arrays.asList(email.split("\\.")));
-        Log.d(TAG,commaSeperatedEmail);
-        Log.d(TAG,firebaseHelper.getEmailDatabaseReference().toString());
-        firebaseHelper.getEmailDatabaseReference().child(commaSeperatedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot emailNodeDataSnapshot) {
-                Log.d("Email Data Snapshot:", emailNodeDataSnapshot.toString());
-                if (emailNodeDataSnapshot.exists()) {
-                    //emailNode = emailNodeDataSnapshot.getValue(Email.class);
-                    uid = emailNodeDataSnapshot.getValue().toString();
-                    Log.d(TAG,uid);
-                } else {
-                    uid = "null";
-                }
-                isEmailRegistered();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void isEmailRegistered(){
-        Log.d(TAG,"Inside isEmailRegistered");
-        if (uid.equals("null")){
-            Log.d(TAG,"Account not registered");
-            // prompt user to signUp
-            if (userData.get("SignInType").equals("google")){
-                Intent signUpIntent = new Intent(this,SignUp1Activity.class);
-                startActivityForResult(signUpIntent,1);
-                pgbarhide();
-            }
-            else
-                Toast.makeText(MainActivity.this,"Account not registered",Toast.LENGTH_LONG).show();
-            pgbarhide();
-        }
-        else {
-            /*  case1: user tries to sign in from same device
-                case2:user tries to sign in from other device and maybe registered or not
-                Solution for both is same:
-               check if user logged out from previous device
-               find imei of previous device: Email node->email->uid->imei
-               if uid under Devices node of previous device is null then logged out..else prompt user to log out
-             */
-            Log.d(TAG, uid);
-            firebaseHelper.getUsersDatabaseReference().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                    Log.d("User Data Snapshot:", userDataSnapshot.toString());
-                    if (userDataSnapshot.exists()) {
-                        user = userDataSnapshot.getValue(User.class);
-                        if (user.getImei().equals("null")){
-                            // user is logged out
-                            Log.d(TAG,"No user not logged  in. Login the user");
-                            crossValidateUserData();
-                        }
-                        else {
-                            firebaseHelper.getDevicesDatabaseReference().child(user.getImei()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot deviceDataSnapshot) {
-                                    Log.d("Device Data Snapshot:", deviceDataSnapshot.toString());
-                                    if (deviceDataSnapshot.exists()) {
-                                        device = deviceDataSnapshot.getValue(Device.class);
-                                        if (device.getUID().equals("null")) {
-                                            /* implies user logged out from old device
-                                               Now login the user and set uid under imei of device node
-                                            */
-                                            Log.d(TAG, "User is logged out from old device..Now user can login from new device");
-                                            device.setUID(uid);
-                                            crossValidateUserData();
-
-                                        } else {
-                                            /* User not logged out from old device
-                                            prompt user to log out from old device
-                                            */
-                                            Log.d(TAG, "User is LoggedIn in other device");
-                                            Toast.makeText(MainActivity.this,
-                                                    "You are logged in another device .Please logout from old device to continue", Toast.LENGTH_LONG).show();
-                                            LogOutUser();
-                                            pgbarhide();
-                                        }
-                                    } else {
-                                        //user can login
-
-                                        String SignInType = userData.get("SignInType");
-                                        Log.d(TAG, "SignInType:" + SignInType);
-                                        switch (SignInType) {
-                                            case "email":
-                                                signIn(userData.get("email"), userData.get("password"));
-                                                break;
-                                            case "google":
-                                                initializeGoogleFirebaseSignIn();
-                                                googleFirebaseSignIn.firebaseAuthWithGoogle(GoogleSignIn.getLastSignedInAccount(MainActivity.this));
-                                                break;
-                                            default:
-                                                Log.d(TAG, "Invalid SignInType");
-                                                return;
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-
-                    } else {
-                        user = null;
-                        Log.d(TAG,"User is null");
+                    GoogleSignInAccount acc = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+                    if (acc != null)
+                        googleFirebaseSignIn.firebaseAuthWithGoogle(acc);
+                    else {
+                        Toast.makeText(MainActivity.this, "Authentication failed. Try again", Toast.LENGTH_SHORT).show();
+                        pgbarhide();
                     }
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    // Getting User failed, log a message
-                    Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-                    Toast.makeText(MainActivity.this, "Failed to load User Information.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
-
-    private void validateBeforeSignIn() {
-        Log.d(TAG,"Inside validateBeforeSignIn");
-        // Check if registered user sign's in using old device or new device using imei number.
-        if (device != null) {
-            // first get uid from imei
-            final String uid = device.getUID();
-            if (uid.equals("null")) {
-                Log.d(TAG, uid);
-                //setUserForSignIn(uid, userData);
-                //to check if email is registered
-                setUidFromFirebaseForSignIn();
-            } else {
-                // for this, either same user will be already signed in(so this will be the case if data cleared)
-                // or other user may have formatted the mobile without logging out
-                // implemented in checkUserStatus() function
-                pgbarhide();
-                Log.d(TAG,"Current user:"+firebaseHelper.getFirebaseAuth().getCurrentUser()+"this should not be the case");
             }
         } else {
-            Log.d(TAG, "Imei not registered");
-            //to check if email is registered
-            setUidFromFirebaseForSignIn();
+            Log.d(TAG, "User:null");
+            pgbarhide();
         }
     }
+
 
     /**Checks whether service is running or not**/
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -779,30 +818,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     user = dataSnapshot.getValue(User.class);
-                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
-                    SQLiteDBHelper db=new SQLiteDBHelper(MainActivity.this);
+//                    Log.d("Paid12345","schin1"+user.getName()+user.isPaid());
+                    //db=new SQLiteDBHelper(MainActivity.this);
+                    SQLiteDBHelper db=SQLiteDBHelper.getInstance(MainActivity.this);
+                    try {
+                        if (db.addUser(user)) {
+                            if (user.getSosContacts() != null)
+                                db.addsosContacts(user.getSosContacts(),1); //to fetch SOSContacts from Firebase
+                            downloadProfilePic(uid);
+                        }
+                        else {
+                            firebaseHelper.firebaseSignOut(mImeiNumber);
+                            firebaseHelper.googleSignOut(MainActivity.this);
+                            updateUI(null);
+                            Toasty.error(MainActivity.this, "Authentication failed :sqlite error occurred",Toasty.LENGTH_LONG, true).show();
+                            return;
+                        }
 
-                    db.addUser(user);
-                    db.setUser(user);
-                    if (user.getSosContacts() != null)
-                        db.addsosContacts(user.getSosContacts()); //to fetch SOSContacts from Firebase
-
-                    Log.d("Paid12345","schin"+user.getName()+ user.isPaid());
-                    if(dataSnapshot.getValue(User.class).isPaid()){
-                        Log.d("Paid12345","i am here");
-                        home_fragment.setpaid(true);
+                    }catch (Exception e){
+                        Log.d(TAG,e.getMessage());
+                        firebaseHelper.firebaseSignOut(mImeiNumber);
+                        firebaseHelper.googleSignOut(MainActivity.this);
+                        updateUI(null);
+                        Toasty.error(MainActivity.this, "Sqlite error occurred MainAct:"+e.getMessage(),Toasty.LENGTH_LONG, true).show();
+                        return;
                     }
-                    else{
-                        home_fragment.setpaid(false);
-                    }
-                    updateUI(firebaseUser);
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    Log.d(TAG,databaseError.getDetails());
+                    Toasty.error(MainActivity.this, "Inside storeData MainAct:"+databaseError.getMessage(), Toasty.LENGTH_LONG, true).show();
+                    firebaseHelper.firebaseSignOut(mImeiNumber);
+                    firebaseHelper.googleSignOut(MainActivity.this);
+                    pgbarhide();
                 }
             });
+        }
+    }
+
+    private void downloadProfilePic(String uid){
+        // display image from internal storage
+        final InternalStorage internalStorage = InternalStorage.getInstance();
+        internalStorage.initContext(MainActivity.this);
+        File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        try{
+            BitmapFactory.decodeStream(new FileInputStream(imgPath));
+            updateUI(FirebaseAuth.getInstance().getCurrentUser());
+        }catch (IOException e){
+            //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"Profile picture not found");
+            // download from firebase
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+            StorageReference imgRef = storageReference.child(uid).child("images/profile_pic");
+            Log.d(TAG,"imagePath"+imgRef.getPath()+imgRef.getParent());
+
+            final long ONE_MEGABYTE = 1024 * 1024;
+            imgRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    try {
+                        internalStorage.saveImageToInternalStorage(bitmap, user.getEmail());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Unable to store image",Toast.LENGTH_SHORT).show();
+                    }
+                    updateUI(FirebaseAuth.getInstance().getCurrentUser());
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d(TAG,"Profile pic doesn't exists");
+                    updateUI(FirebaseAuth.getInstance().getCurrentUser());
+                }
+            });
+
         }
     }
 }

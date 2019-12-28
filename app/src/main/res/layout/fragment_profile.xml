@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="@color/graylight"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,43 +25,67 @@
                 android:layout_gravity="top"
                 android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/gradientbackground"
-            android:orientation="vertical"
-            >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/gradientbackground"
+                    android:orientation="vertical"
+                    >
 
-            <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_account_circle_cyan_24dp"
-                android:layout_marginTop="15dp"
-                />
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
 
-            <EditText
-                android:id="@+id/text_Name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:alpha="0.6"
-                android:textColor="#000000"
-                android:gravity="center"
-                android:hint="Name"
-                android:paddingStart="20dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="0dp"
-                android:textCursorDrawable="@drawable/cursor_color"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/profile_pic"
+                            android:layout_width="120dp"
+                            android:layout_height="120dp"
+                            android:src="@drawable/ic_account_circle_cyan_24dp"
+                            android:layout_marginTop="15dp"
+                            app:civ_border_width="0dp"
+                            app:civ_border_color="@color/cyan"/>
 
+                        <ImageButton
+                            android:id="@+id/btn_choose_img"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginTop="80dp"
+                            android:layout_marginStart="85dp"
+                            android:layout_marginBottom="10dp"
+
+                            android:background="@drawable/button_bg_round"
+                            android:src="@drawable/ic_camera_icon"
+                            android:visibility="visible" />
+
+                    </RelativeLayout>
+
+                    <EditText
+                        android:id="@+id/text_Name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:alpha="0.6"
+                        android:gravity="center"
+                        android:hint="Name"
+                        android:paddingStart="20dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="0dp"
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+
+                        android:textCursorDrawable="@drawable/cursor_color"
+
+
+                        android:textColorLink="#00EEEEEE"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
-
 
 
                 <LinearLayout
@@ -82,14 +107,18 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:alpha="0.6"
+                        android:background="@android:color/transparent"
                         android:hint="Email"
                         android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:textColor="#000000"
+
+                        android:textColor="@color/cyan"
+                        android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
+                        android:textColorHighlight="#007399"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -113,14 +142,19 @@
                         android:layout_gravity="center_vertical"
                         android:alpha="0.6"
                         android:hint="Phone Number"
-                        android:maxLength="10"
                         android:inputType="number"
+                        android:maxLength="10"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:textColor="#000000"
+                        android:singleLine="true"
+                        android:textColor="@color/cyan"
+                        android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
+                        android:textColorHighlight="#007399"
+                        android:background="@drawable/shapeemail"
+
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -135,7 +169,7 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_home_black_24dp" />
+                        android:src="@drawable/ic_home_cyan_24dp" />
 
                     <AutoCompleteTextView
                         android:id="@+id/text_Address"
@@ -144,13 +178,17 @@
                         android:layout_gravity="center_vertical"
                         android:alpha="0.6"
                         android:hint="Locality"
-                        android:inputType="textCapSentences|textMultiLine"
+                        android:inputType="textCapSentences"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:textColor="#000000"
+                        android:singleLine="true"
+                        android:textColor="@color/cyan"
+                        android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
+                        android:textColorHighlight="#007399"
+                        android:background="@drawable/shapeemail"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -175,22 +213,25 @@
                         android:alpha="0.6"
                         android:paddingStart="15dp"
                         android:spinnerMode="dropdown"
-                        android:textColor="#000000"
-                        android:textSize="22sp"
+                        android:textColor="@color/cyan"
+                        android:textColorHighlight="#007399"
+                        android:background="@drawable/shapeemail"
+
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
-<!--                    <EditText-->
-<!--                        android:id="@+id/text_Gender"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                       -->
-<!--                        android:hint="Gender"-->
-<!--                        android:inputType="textCapSentences|textMultiLine"-->
-<!--                        android:paddingStart="20dp"-->
-<!--                        android:paddingLeft="20dp"-->
-<!--                        android:paddingRight="0dp"-->
-<!--                        android:textCursorDrawable="@drawable/cursor_color"-->
-<!--                        />-->
+                    <!--                    <EditText-->
+                    <!--                        android:id="@+id/text_Gender"-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                       -->
+                    <!--                        android:hint="Gender"-->
+                    <!--                        android:inputType="textCapSentences|textMultiLine"-->
+                    <!--                        android:paddingStart="20dp"-->
+                    <!--                        android:paddingLeft="20dp"-->
+                    <!--                        android:paddingRight="0dp"-->
+                    <!--                        android:textCursorDrawable="@drawable/cursor_color"-->
+                    <!--                        />-->
                 </LinearLayout>
 
                 <LinearLayout
@@ -208,19 +249,25 @@
 
                     <EditText
                         android:id="@+id/text_DOB"
-                        android:focusable="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:alpha="0.6"
+                        android:focusable="false"
                         android:hint="Date of Birth"
                         android:inputType="textCapSentences|textMultiLine"
                         android:paddingStart="20dp"
                         android:paddingLeft="20dp"
                         android:paddingRight="0dp"
-                        android:textColor="#000000"
+                        android:singleLine="true"
+                        android:background="@drawable/shapeemail"
+
+                        android:textColorHighlight="#007399"
+
+                        android:textColor="@color/cyan"
+                        android:textColorLink="#00FFFFFF"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="22sp"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -237,7 +284,7 @@
                         android:layout_width="125dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="30dp"
-                        android:layout_marginBottom="30dp"
+                        android:layout_marginBottom="10dp"
                         android:background="@drawable/buttonstylegradient"
                         android:drawableLeft="@drawable/ic_edit_black_24dp"
                         android:drawablePadding="5dp"
@@ -251,19 +298,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="30dp"
-                        android:layout_marginBottom="30dp"
+                        android:layout_marginBottom="10dp"
                         android:background="@drawable/buttonstylegradient"
                         android:drawablePadding="5dp"
                         android:text="logout"
                         android:textColor="#fff"
                         android:textSize="22sp" />
+
                 </LinearLayout>
+
                 <TextView
                     android:id="@+id/text_changePassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="30dp"
                     android:text="@string/change_password"
                     android:textSize="16sp"
+
                     android:textColor="@color/cyan"
                     android:gravity="center"
                     android:clickable="true"
@@ -273,4 +324,3 @@
         </ScrollView>
     </LinearLayout>
 </LinearLayout>
-

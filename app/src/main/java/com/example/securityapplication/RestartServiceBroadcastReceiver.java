@@ -12,6 +12,8 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
@@ -19,7 +21,9 @@ public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(RestartServiceBroadcastReceiver.class.getSimpleName(), "Restarting service on stopped service");
-        Toast.makeText(context, "Service restarted", Toast.LENGTH_SHORT).show();
+        Toasty.info(context, "Service restarted", Toast.LENGTH_SHORT, true).show();
+
+        //Toast.makeText(context, "Service restarted", Toast.LENGTH_SHORT).show();
         scheduleJob(context);
    }
 

@@ -27,7 +27,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.securityapplication.model.User;
+
 import java.util.Objects;
+
+import es.dmoral.toasty.Toasty;
 
 import static android.content.Intent.getIntent;
 
@@ -38,13 +42,9 @@ public class home_fragment extends Fragment {
     public Button informsafety;
     static public boolean check=false;
     int RC;
-    static Boolean is_paid = false;
+    Boolean is_paid = false;
     public static Boolean test = true;
     //NOTE: Button bt has been removed. Now using Button emergency. Event listeners also moved to emergency
-
-    public static void setpaid(Boolean b){
-        is_paid=b;
-    }
     @Nullable
     @Override
 
@@ -59,7 +59,14 @@ public class home_fragment extends Fragment {
         alert = Objects.requireNonNull(getActivity()).findViewById(R.id.alert);
         emergency = getActivity().findViewById(R.id.emergency);
         informsafety = getActivity().findViewById(R.id.inform);
-
+        Log.d("Paid1234hello2","paid: "+UserObject.user.isPaid());
+        if(UserObject.user.isPaid()){
+            is_paid=true;
+        }
+        else{
+            is_paid=false;
+        }
+        Log.d("Paid1234hello2","ispaid: "+is_paid);
 
         alert.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ShowToast")
@@ -70,7 +77,9 @@ public class home_fragment extends Fragment {
                 }
                 else
                 {
-                    Toast.makeText(getContext(),"sms permisssion noy enabled",Toast.LENGTH_LONG);
+                    Toasty.error(getContext(), "sms permisssion not enabled", Toast.LENGTH_SHORT);
+
+                    //Toast.makeText(getContext(),"sms permisssion not enabled",Toast.LENGTH_LONG);
                 }
 
                 check=true;
@@ -80,11 +89,7 @@ public class home_fragment extends Fragment {
 
 
                 if (!isMyServiceRunning(SendSMSService.class)){
-
                     Objects.requireNonNull(getContext()).startService(mSosPlayerIntent);
-
-
-
 
                 }
             }
@@ -94,7 +99,8 @@ public class home_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (is_paid) {
-                    Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
+                    Toasty.info(getContext(), "You are premier member", Toast.LENGTH_SHORT, true).show();
+                    //Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
 
                     //Code: TO play siren and send emergency message and alert
                     //emergency.setBackgroundColor(getResources().getColor(R.drawable.buttonshape_emer));
@@ -126,7 +132,9 @@ public class home_fragment extends Fragment {
                                         intent.setData(Uri.parse("http://www.w3schools.com"));
                                         startActivity(intent);
                                     } catch (Exception e) {
-                                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                                        Toasty.error(getContext(), "Something went wrong", Toast.LENGTH_SHORT, true).show();
+
+                                      //  Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             }).setNegativeButton("Cancel", null).setCancelable(false).create().show();
@@ -137,7 +145,6 @@ public class home_fragment extends Fragment {
         informsafety.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 try {
 
@@ -198,13 +205,24 @@ public class home_fragment extends Fragment {
             }
         });
 
-        //removed earlier test mode from here
+//        if (navigation.test) {
+//
+//            TextView tv = getActivity().findViewById(R.id.textView3);
+//            tv.setVisibility(View.VISIBLE);
+//        } else {
+//            TextView tv = getActivity().findViewById(R.id.textView3);
+//            tv.setVisibility(View.INVISIBLE);
+//        }
+
+
 
     }
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.info(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+           // Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);

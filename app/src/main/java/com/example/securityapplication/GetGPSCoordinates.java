@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import es.dmoral.toasty.Toasty;
 
 public class GetGPSCoordinates extends Service {
 
@@ -220,7 +221,9 @@ public class GetGPSCoordinates extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
+        Toasty.error(getApplicationContext(), "GPS service destroyed", Toast.LENGTH_SHORT, true).show();
+
+        //Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
         Log.d("GPSService","OnDestroy");
         if (locationCallback!=null)
             mFusedLocationClient.removeLocationUpdates(locationCallback);
@@ -264,10 +267,4 @@ public class GetGPSCoordinates extends Service {
             }
         };
     }
-
-    private void turnGPSOn() {
-
-    }
-
-
 }

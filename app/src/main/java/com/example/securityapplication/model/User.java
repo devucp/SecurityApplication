@@ -9,19 +9,18 @@ import java.util.Map;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 public class User implements Parcelable {
     private String name;
     private String email;
-    //private String password;
     private String gender;
     private String mobile;
     private String location;
     private String imei;
     private String dob;
-    private Boolean paid;
+    private Boolean paid=false;
     private HashMap<String,String> sosContacts;
-    private Boolean googleAccountLinked;
 
     public String getDob() {
         return dob;
@@ -38,10 +37,8 @@ public class User implements Parcelable {
         //id = in.readInt();
         name = in.readString();
         email = in.readString();
-        //password = in.readString();
         gender = in.readString();
         mobile = in.readString();
-//        aadhar = in.readString();
         location = in.readString();
         imei = in.readString();
         dob = in.readString();
@@ -59,8 +56,22 @@ public class User implements Parcelable {
         }
     };
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", gender='" + gender + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", location='" + location + '\'' +
+                ", imei='" + imei + '\'' +
+                ", dob='" + dob + '\'' +
+                ", paid=" + paid +
+                ", sosContacts=" + sosContacts +
+                '}';
+    }
 
-    /*public int getId() {
+/*public int getId() {
         return id;
     }
 
@@ -83,14 +94,6 @@ public class User implements Parcelable {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    /*public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }*/
 
     public String getGender() {
         return gender;
@@ -143,7 +146,7 @@ public class User implements Parcelable {
         dest.writeString(dob);
     }
 
-    public boolean isPaid(){ return paid; }
+    public Boolean isPaid(){ return paid; }
 
     public void setPaid(Boolean paid){ this.paid = paid; }
 
@@ -152,8 +155,4 @@ public class User implements Parcelable {
     public void setSosContacts(HashMap<String,String> sosContacts){
         this.sosContacts = sosContacts;
     }
-
-    public boolean isGoogleAccountLinked(){ return googleAccountLinked; }
-
-    public void setGoogleAccountLinked(Boolean googleAccountLinked){ this.googleAccountLinked = googleAccountLinked; }
 }

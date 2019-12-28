@@ -220,8 +220,6 @@
                 android:id="@+id/sosedit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-                android:layout_marginRight="20dp"
                 android:background="@drawable/btn_cus"
                 android:paddingBottom="9dp"
                 android:paddingTop="9dp"
@@ -232,21 +230,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/sossave"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:alpha="0.6"
-                android:background="@drawable/btn_cus"
-                android:paddingHorizontal="50dp"
-                android:paddingTop="9dp"
-                android:paddingBottom="9dp"
-                android:text="save"
-                android:textColor="#000000"
-                android:textColorHint="#ffffff"
-                android:textSize="18sp"
-                android:textStyle="bold" />
 
         </LinearLayout>
     </LinearLayout>

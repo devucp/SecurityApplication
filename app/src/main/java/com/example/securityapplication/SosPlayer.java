@@ -32,17 +32,16 @@ public class SosPlayer extends Service {
 
     PowerButtonBroadcastReceiver mPowerButtonBroadcastReceiver;
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        startWaitTimer();
-        try {
-            stop = intent.getIntExtra("stop", 0);
-        }catch(Exception e){
-            stop=0; //assigning a default value
-            Toast.makeText(getApplicationContext(),"SOS player Exception"+e.getMessage(),Toast.LENGTH_LONG);
-        }
-        Log.d(TAG,"Inside onStartCOmmand : Stop ="+stop);
-
+    public int onStartCommand(Intent intent, int flags, int startId){
+            super.onStartCommand(intent, flags, startId);
+            startWaitTimer();
+            try {
+                stop = intent.getIntExtra("stop", 0);
+            }catch(Exception e){
+                stop=0; //assigning a default value
+                Toast.makeText(getApplicationContext(),"SOS player Exception"+e.getMessage(),Toast.LENGTH_LONG);
+            }
+            Log.d(TAG,"Inside onStartCOmmand : Stop ="+stop);
 
         if(stop==1){
             stopPlaying();
@@ -50,10 +49,8 @@ public class SosPlayer extends Service {
             Intent stopSirenIntent= new Intent(this,BackgroundSosPlayerService.class);
             boolean stoppedSiren=stopService(stopSirenIntent);
             Log.d(TAG,"Stop=1 stopping BackgroundSOSPlayer service in case it was running :"+stoppedSiren);
-
-            boolean stopped=stopService(new Intent(getApplicationContext(),SosPlayer.class)); //stops the service when calling intent has stop=1
-            Log.d(TAG,"Stop=1 so calling stopService() :"+stopped);
-
+                boolean stopped=stopService(new Intent(getApplicationContext(),SosPlayer.class)); //stops the service when calling intent has stop=1
+                Log.d(TAG,"Stop=1 so calling stopService() :"+stopped);
         }
         else{
             //initialise the VolumeProviderCompact
@@ -77,16 +74,19 @@ public class SosPlayer extends Service {
 
     @Override
     public void onCreate() {
-        super.onCreate();
+        try {
+            super.onCreate();
 
-        //initialising count
-        resetCount();
-        //initialising sosplaying variable
-        sosplay=false;
-        prev_direction=0;
+            //initialising count
+            resetCount();
+            //initialising sosplaying variable
+            sosplay = false;
+            prev_direction = 0;
 
-        timerStarted=false;
-
+            timerStarted = false;
+        }catch (Exception e){
+            Toast.makeText(this, e.getMessage()+"22", Toast.LENGTH_SHORT).show();
+        }
         //code moved to detectSosPattern which is now called from onStartCommand if stop==0
         //Register PowerButtonBroadcastReceiver screen on-off
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -134,7 +134,7 @@ public class SosPlayer extends Service {
             }
 
 
-            public void onFinish() {
+            public void onFinish(){
                 Log.d("SOS Timer" ,"Timeoout reached" );
                 resetCount();
                 timerStarted=false;

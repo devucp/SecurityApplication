@@ -15,6 +15,8 @@ import com.example.securityapplication.model.User;
 
 import org.w3c.dom.Text;
 
+import es.dmoral.toasty.Toasty;
+
 public class EditProfileActivity extends AppCompatActivity {
 
     private EditText edit_Name,edit_Email,edit_Phone,edit_Address;
@@ -31,7 +33,7 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_activity_edit);
 
-        mydb = new SQLiteDBHelper(this);
+        mydb = SQLiteDBHelper.getInstance(this);
         val = new Validation();
         user = getIntent().getParcelableExtra("User");
 
@@ -160,7 +162,9 @@ public class EditProfileActivity extends AppCompatActivity {
                         user.setName(FinName);
                     }
                     else {
-                        Toast.makeText(getApplicationContext(),"Enter a Valid Name",Toast.LENGTH_SHORT).show();
+                        Toasty.error(getApplicationContext(), "Enter a Valid Name", Toast.LENGTH_SHORT, true).show();
+
+                        //Toast.makeText(getApplicationContext(),"Enter a Valid Name",Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }
@@ -169,7 +173,9 @@ public class EditProfileActivity extends AppCompatActivity {
                         user.setMobile(FinPhone);
                     }
                     else {
-                        Toast.makeText(getApplicationContext(),"Enter a Valid Phone Number",Toast.LENGTH_SHORT).show();
+                        Toasty.error(getApplicationContext(), "Enter a Valid Phone Number", Toast.LENGTH_SHORT, true).show();
+
+                //        Toast.makeText(getApplicationContext(),"Enter a Valid Phone Number",Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }

@@ -36,7 +36,6 @@ import android.widget.Toast;
 
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.KeyboardHelper;
-import com.example.securityapplication.model.Device;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -56,6 +55,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Hashtable;
+
+import es.dmoral.toasty.Toasty;
 
 import static java.security.AccessController.getContext;
 
@@ -132,8 +133,17 @@ public class SignUp1Activity extends AppCompatActivity {
                 }
             }
         }
-        else
+        else if (getIntent().getStringExtra("email") != null){
             Log.d("isLoggedinGoogle","Not logged in");
+            textinputEmail.setText(getIntent().getStringExtra("email"));
+        }
+    }
+
+    public void onStart(){
+        super.onStart();
+        // stop spinner user interaction enabled
+        spinner.setVisibility(View.GONE);
+        Enable();
     }
 
     private void ShowMessage(String title,String Message){
@@ -151,7 +161,7 @@ public class SignUp1Activity extends AppCompatActivity {
             return userData;
         }
         else {
-            Toast.makeText(this,"Enter Valid Credentials",Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Enter Valid Credentials", Toast.LENGTH_SHORT, true).show();
             return null;
         }
     }
@@ -163,11 +173,16 @@ public class SignUp1Activity extends AppCompatActivity {
 
         KeyboardHelper.hideSoftKeyboard(SignUp1Activity.this, view);
         Hashtable<String,String> userData = Validater();
+        Toast.makeText(SignUp1Activity.this, "Please stay here..", Toast.LENGTH_LONG).show();
         if (userData != null){
             // disable screen and show spinner
             spinner.setVisibility(View.VISIBLE);
             disable();
             setUidFromFirebase(userData);
+        }else {
+            // stop spinner user interaction enabled
+            spinner.setVisibility(View.GONE);
+            Enable();
         }
     }
 
@@ -185,7 +200,6 @@ public class SignUp1Activity extends AppCompatActivity {
                             FirebaseUser firebaseUser = firebaseHelper.getFirebaseAuth().getCurrentUser();
                             // check is email verified if clicked on signup and send verify email if clicked on verifyBtn
                             checkIsEmailVerified(firebaseUser,userData);
-
                         } else
                             {
                             try
@@ -200,9 +214,10 @@ public class SignUp1Activity extends AppCompatActivity {
                                 // stop spinner user interaction enabled
                                 spinner.setVisibility(View.GONE);
                                 Enable();
+                                Toasty.error(SignUp1Activity.this, "Invalid Password, Use forgot password in case you forgot your password", Toast.LENGTH_LONG, true).show();
 
-                                Toast.makeText(SignUp1Activity.this,
-                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
+                               /* Toast.makeText(SignUp1Activity.this,
+                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();*/
                             }
                             catch (Exception e)
                             {
@@ -212,8 +227,7 @@ public class SignUp1Activity extends AppCompatActivity {
                                 Log.e(TAG,e.getMessage());
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignUp1Activity.this, "Authentication failed.Please check your connection and try again",
-                                        Toast.LENGTH_LONG).show();
+                                Toasty.error(SignUp1Activity.this, "Authentication failed.Please check your connection and try again", Toast.LENGTH_LONG, true).show();
                             }
                         }
                     }
@@ -245,8 +259,10 @@ public class SignUp1Activity extends AppCompatActivity {
                                 textinputCnfPass.setAlpha(1);
                                 verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG,e.getMessage());
-                                Toast.makeText(SignUp1Activity.this,
-                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();
+                                Toasty.error(SignUp1Activity.this, "Invalid Password, Use forgot password in case you forgot your password", Toast.LENGTH_LONG, true).show();
+
+                              /*  Toast.makeText(SignUp1Activity.this,
+                                        "Invalid Password, Use forgot password in case you forgot your password",Toast.LENGTH_LONG).show();*/
                             }catch (Exception e){
                                 // stop spinner
                                 spinner.setVisibility(View.GONE);
@@ -256,7 +272,9 @@ public class SignUp1Activity extends AppCompatActivity {
                                 textinputCnfPass.setAlpha(1);
                                 verifyEmailButton.setAlpha(1);*/
                                 Log.d(TAG, "Exception while signIN:"+e.getMessage());
-                                Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
+                                Toasty.error(SignUp1Activity.this, "Authentication failed. Please check connection and try again", Toast.LENGTH_LONG, true).show();
+
+                                //Toast.makeText(SignUp1Activity.this,"Authentication failed. Please check connection and try again", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -268,9 +286,7 @@ public class SignUp1Activity extends AppCompatActivity {
 
         verifyEmail = new VerifyEmail(firebaseUser, SignUp1Activity.this);
         if (verifyEmail.isEmailIdVerified()) {
-            Toast.makeText(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG).show();
-            String emailId = firebaseUser.getEmail();
-
+            Toasty.success(SignUp1Activity.this, "Email is verified", Toast.LENGTH_LONG, true).show();  
             firebaseHelper.firebaseSignOut();
             spinner.setVisibility(View.GONE);
             Enable();
@@ -301,15 +317,10 @@ public class SignUp1Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==10 && requestCode==1)
-            try {
-                closeNow();
-            }catch (Exception e){
-                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-                finish();
-            }
+            finish();
 
         if (requestCode==2){
-            Toast.makeText(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT).show();
+            Toasty.error(SignUp1Activity.this, "Please fill the required details", Toast.LENGTH_SHORT, true).show();
         }
     }
 
@@ -319,12 +330,7 @@ public class SignUp1Activity extends AppCompatActivity {
         Intent returnIntent = new Intent();
         returnIntent.putExtra("hasBackPressed",true);
         setResult(Activity.RESULT_OK,returnIntent);
-        try {
-            closeNow();
-        }catch (Exception e){
-            Log.d(TAG,"Exception on closing activity:"+e.getMessage());
-            finish();
-        }
+        finish();
     }
 
     private void setUidFromFirebase(final Hashtable<String,String> userData){
@@ -350,7 +356,8 @@ public class SignUp1Activity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.d(TAG,databaseError.getDetails());
+                Toast.makeText(SignUp1Activity.this, "Inside setUidFromFirebase SignUp1:"+databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -365,14 +372,13 @@ public class SignUp1Activity extends AppCompatActivity {
         else{
             spinner.setVisibility(View.GONE);
             Enable();
-            Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
+            Toasty.error(SignUp1Activity.this, "Email is already registered", Toast.LENGTH_LONG, true).show();
+
+           // Toast.makeText(SignUp1Activity.this, "Email is already registered",Toast.LENGTH_LONG).show();
             spinner.setVisibility(View.GONE);
             Enable();
         }
-
     }
-
-
 
    public static void setError(String s,TextView t1)
    {
@@ -386,23 +392,14 @@ public class SignUp1Activity extends AppCompatActivity {
        }
    }
 
-    private void closeNow() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            finishAffinity();
-        } else {
-            finish();
-        }
-
-    }
-
    //screen enable disable
 
     public  void Enable()
     {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         t1.setAlpha(1);
-        t2.setAlpha(1);
-        t3.setAlpha(1);
+        pass_outer.setAlpha(1);
+        cnfpass_outer.setAlpha(1);
         Btn_Submit.setAlpha(1);
         Btn_Submit.setText("PROCEED");
     }
@@ -411,12 +408,9 @@ public class SignUp1Activity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         t1.setAlpha((float) 0.6);
-        t2.setAlpha((float) 0.6);
-        t3.setAlpha((float) 0.6);
+        pass_outer.setAlpha((float) 0.6);
+        cnfpass_outer.setAlpha((float) 0.6);
         Btn_Submit.setAlpha((float) 0.6);
         Btn_Submit.setText("");
     }
 }
-
-
-  

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -95,13 +96,12 @@ public class profile_fragment extends Fragment {
     private ImageView profile_pic;
     private ImageButton chooseImgBtn;
     private Uri filePath, camerafilepath;
-    private  Bitmap bitmappic;
+    private  Bitmap bitmappic,bit_image;
 
     private  Intent CropIntent;
     private final int PICK_IMAGE_REQUEST = 71;
     private final int TAKE_PICTURE = 81;
     private  ProgressDialog progressDialog;
-
     // InternalStorage
     private InternalStorage internalStorage;
 
@@ -433,30 +433,27 @@ public class profile_fragment extends Fragment {
             }*/
 
 
-        if(requestCode == 201 && resultCode == getActivity().RESULT_OK) {
+        getActivity();
+        if(requestCode == 201 && resultCode == Activity.RESULT_OK) {
             checkCameraPermission();
 
 
             filePath = null;
-            Bitmap cameraphoto = (Bitmap) data.getExtras().get("data");
-
-            filePath = getImageUri(getContext(),cameraphoto);
-
-
-/*
-            Log.d("tag", String.valueOf(filePath));
-
-            filePath = (Uri) data.getData();
-
-            Log.d("tag", String.valueOf(filePath));
-
+            assert data != null;
+            Bitmap cameraphoto = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+            bit_image= (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+            assert cameraphoto != null;
+            Log.d("tag123", String.valueOf(filePath));
+            //filePath = (Uri) data.getData();
+            Log.d("tag123", String.valueOf(filePath));
 
             //bitmappic = (Bitmap) data.getExtras().get("data");
 
             if (filePath == null) {
-                Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
-                return;
-            }*/
+                filePath = getImageUri(Objects.requireNonNull(getActivity()).getApplicationContext(),cameraphoto);
+                //Toast.makeText(getContext(), "File not found i am", Toast.LENGTH_SHORT).show();
+                //return;
+            }
 
 
             cropimage();
@@ -478,21 +475,26 @@ public class profile_fragment extends Fragment {
         if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
         {
             try {
-                if (data != null) {
-                    // get the returned data
-                    Bundle extras = data.getExtras();
+                Bundle extras = data.getExtras();
+                if (extras != null) {
                     // get the cropped bitmap
                     Bitmap bitmappic = extras.getParcelable("data");
                     //CropImage.ActivityResult result = CropImage.getActivityResult(data);
-
                     internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
-
+                    profile_pic.setImageBitmap(bitmappic);
+                    deleteExistingProfilePic();
+                }
+                else{
+                    Toasty.error(getContext(), "Your Mobile doesn't support editable cropping automatic cropping is applying", Toast.LENGTH_LONG, true).show();
+                    Log.d("camera123456","else is running ");
+                    Bitmap bitmappic = Bitmap.createBitmap(bit_image, 0, 0, bit_image.getWidth(), bit_image.getWidth());
+                    internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
                     profile_pic.setImageBitmap(bitmappic);
                     deleteExistingProfilePic();
                 }
             }catch (Exception e){
                 e.printStackTrace();
-                Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Unable to store image"+e.getMessage(),Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -500,6 +502,10 @@ public class profile_fragment extends Fragment {
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+//        ContentValues values=new ContentValues();
+//        values.put(MediaStore.Images.Media.TITLE,"Title");
+//        values.put(MediaStore.Images.Media.DESCRIPTION,"from camera");
+//        Uri path2=getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
@@ -818,7 +824,12 @@ public class profile_fragment extends Fragment {
             CropIntent.putExtra("scaleUpIfNeeded", true);
             CropIntent.putExtra("return-data", true);
             CropIntent.putExtra(MediaStore.EXTRA_OUTPUT, filePath);
-            startActivityForResult(CropIntent, 0);
+            if (CropIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivityForResult(CropIntent, 0);
+            } else {
+                Toast.makeText(getContext(), "No Crop App Available", Toast.LENGTH_SHORT).show();
+            }
+
         }catch (ActivityNotFoundException anfe) {
             // display an error message
             String errorMessage = "Whoops - your device doesn't support the crop action!";

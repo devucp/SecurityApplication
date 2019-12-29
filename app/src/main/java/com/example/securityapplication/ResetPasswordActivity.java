@@ -36,17 +36,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
     Validation validate;
     ProgressBar pgsBar;
 
-
-
-
     public void pgbarshow()
     {
         btn_reset.setText("");
         findViewById(R.id.pBar).setVisibility(VISIBLE);
         btn_reset.getBackground().setAlpha(100);
-
-
-
 
     }
 
@@ -60,15 +54,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
 
         btn_reset.setText("RESET PASSWORD");
-
-
-
-
-
-
-
-
-
 
     }
 

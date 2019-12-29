@@ -64,7 +64,8 @@ public class SendSMSService extends Service {
 
     public void initSenderName() {
         try{
-        this.senderName= navigation.newUser.getName();}
+            Log.d("SMS Service","Calling Userobject.print():"+UserObject.print());
+        this.senderName= UserObject.user.getName();} //Was previously navigation.newUser. Changed to Userobject.user
         catch(Exception e){
             Toast.makeText(this,"initialising sender name error"+e.getMessage(),Toast.LENGTH_LONG);
             //initSenderName(); //re-try
@@ -112,7 +113,7 @@ public class SendSMSService extends Service {
                     Map.Entry contactEntry = (Map.Entry) sosContactsIterator.next();
                     String contact = (String) contactEntry.getValue();
                     Log.d("SendSMSService", "contact.get(" + i + "):" + contact);
-                    if (!contact.equals("null") && contact.length() == 10) {
+                    if (contact!=null && !contact.equals("null") && contact.length() == 10) { //added a condition to check if contact is not null
                         contactList[i] = contact;
                         Log.d("SendSMSService", "contactList[" + i + "]:" + contactList[i]);
 
@@ -200,8 +201,9 @@ public class SendSMSService extends Service {
         }
         else{
             initSenderName();
-            messageToSend= getSenderName()+ "uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
-                                            " This is a TEST message."+getSenderName()+" may contact you in emergency.";
+            messageToSend= getSenderName()+ " uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
+                                            " This is a TEST message. "+getSenderName()+" may contact you in emergency.";
+//            Log.d("SMS Service","Tstmode msg: "+messageToSend);
         }
         return messageToSend;
 

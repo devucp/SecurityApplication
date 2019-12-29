@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.example.securityapplication.GoogleFirebaseSignIn;
 import com.example.securityapplication.MainActivity;
-import com.example.securityapplication.ProfileActivity;
 import com.example.securityapplication.R;
 import com.example.securityapplication.SignUp2;
 import com.example.securityapplication.model.User;

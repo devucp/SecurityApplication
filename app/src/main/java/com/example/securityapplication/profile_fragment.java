@@ -444,7 +444,7 @@ public class profile_fragment extends Fragment {
             bit_image= (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
             assert cameraphoto != null;
             Log.d("tag123", String.valueOf(filePath));
-            //filePath = (Uri) data.getData();
+            filePath = (Uri) data.getData();
             Log.d("tag123", String.valueOf(filePath));
 
             //bitmappic = (Bitmap) data.getExtras().get("data");

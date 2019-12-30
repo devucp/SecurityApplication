@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
+
 public class SendSMSService extends Service {
     private static String[] contactList=null; //TODO: stores the number of the emergency contacts
     private String senderName;
@@ -27,7 +30,7 @@ public class SendSMSService extends Service {
     private static Integer emergency;
 
 
-    private String SOS_MESSAGE=" You are my SOS Contact." ;
+    private String SOS_MESSAGE="You are my SOS Contact." ;
 
 
     private sentReceiver sentReceiver;
@@ -59,8 +62,14 @@ public class SendSMSService extends Service {
         return safe;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void initSenderName() {
+        try{
+            Log.d("SMS Service","Calling Userobject.print():"+UserObject.print());
+        this.senderName= UserObject.user.getName();} //Was previously navigation.newUser. Changed to Userobject.user
+        catch(Exception e){
+            Toast.makeText(this,"initialising sender name error"+e.getMessage(),Toast.LENGTH_LONG);
+            //initSenderName(); //re-try
+        }
     }
 
 
@@ -68,10 +77,6 @@ public class SendSMSService extends Service {
         return senderName;
     }
 
-    //TODO: Initiliase the list with contact numbers of the user
-    public void setContactList(){
-
-    }
 
     @Override
     public void onCreate() {
@@ -79,11 +84,18 @@ public class SendSMSService extends Service {
 
         //---when the SMS has been sent---
         sentReceiver= new sentReceiver();
-        registerReceiver(sentReceiver,new IntentFilter(SENT));
+        getApplicationContext().registerReceiver(sentReceiver,new IntentFilter(SENT));
         //---when the SMS has been delivered---
         deliveryReceiver= new deliveryReceiver();
-        registerReceiver(deliveryReceiver,new IntentFilter(DELIVERED));
+        getApplicationContext().registerReceiver(deliveryReceiver,new IntentFilter(DELIVERED));
         Log.d("SOS SMS","onCreate");
+    }
+
+    /**Check if testmode was active when called**/
+    public boolean checkTestMode(){
+        SQLiteDBHelper sqLiteDBHelper=SQLiteDBHelper.getInstance(SendSMSService.this);
+        Log.d("SOS SMS","checktestmode():"+sqLiteDBHelper.getTestmode());
+        return sqLiteDBHelper.getTestmode();
     }
 
     /**Initialise the SOS contacts**/
@@ -101,7 +113,7 @@ public class SendSMSService extends Service {
                     Map.Entry contactEntry = (Map.Entry) sosContactsIterator.next();
                     String contact = (String) contactEntry.getValue();
                     Log.d("SendSMSService", "contact.get(" + i + "):" + contact);
-                    if (!contact.equals("null") && contact.length() == 10) {
+                    if (contact!=null && !contact.equals("null") && contact.length() == 10) { //added a condition to check if contact is not null
                         contactList[i] = contact;
                         Log.d("SendSMSService", "contactList[" + i + "]:" + contactList[i]);
 
@@ -161,7 +173,8 @@ public class SendSMSService extends Service {
             safe=0; //emergency =1 . reset the safe variable
             toastmsg="send emergency sos message";
         }
-        Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
+        Toasty.warning(getApplicationContext(), toastmsg, Toast.LENGTH_SHORT, true).show();
+        //Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
         this.stopSelf();//FINISH the service
     }
 
@@ -169,27 +182,29 @@ public class SendSMSService extends Service {
     public String initSMSText(String location){
         String messageToSend=SOS_MESSAGE;
         //modified message depending on the extra received from calling intent
-        if(alert==1)
-        {
-            messageToSend+="I'm feeling UNSAFE. ";
+    Log.d("SMS Service","checking Testmode:"+checkTestMode());
+        if(!navigation.test) { //to be replaced with checkTestMode() when it is functional
+            if (alert == 1) {
+                messageToSend += "I'm feeling UNSAFE. ";
+            } else if (safe == 1) {
+                messageToSend += "Just wanted to let you know that I'm SAFE. ";
+            } else {
+                messageToSend += "PLEASE HELP ME. ";
+
+            }
+
+            messageToSend += "This is my approximate location ";
+
+            if (location != null && location != "Location unavailable")
+                messageToSend += "\nhttps://www.google.com/maps/place/";
+            messageToSend += location;
         }
-        else if(safe==1)
-        {
-            messageToSend+="Just wanted to let you know that I'm SAFE. ";
+        else{
+            initSenderName();
+            messageToSend= getSenderName()+ " uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
+                                            " This is a TEST message. "+getSenderName()+" may contact you in emergency.";
+//            Log.d("SMS Service","Tstmode msg: "+messageToSend);
         }
-        else
-        {
-
-            messageToSend+="PLEASE HELP ME. ";
-
-        }
-
-        messageToSend+="This is my approximate location ";
-
-        if(location!=null && location!="Location unavailable")
-            messageToSend+="\nhttps://www.google.com/maps/place/";
-        messageToSend+=location;
-
         return messageToSend;
 
     }
@@ -197,21 +212,24 @@ public class SendSMSService extends Service {
 
         String messageToSend= initSMSText(location); //refactored the code into initSMSText()
 
-        PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
-                new Intent(SENT), 0);
+        PendingIntent sentPI = PendingIntent.getBroadcast(getApplicationContext(), 0,
+                new Intent(getApplicationContext(),sentReceiver.class), 0);
 
-        PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
-                new Intent(DELIVERED), 0);
+        PendingIntent deliveredPI = PendingIntent.getBroadcast(getApplicationContext(), 0,
+                new Intent(getApplicationContext(),deliveryReceiver.class), 0);
 
         Log.d("SendSMSServcie", "message to be sent is: "+messageToSend );
 
         ArrayList<String> parts = SmsManager.getDefault().divideMessage(messageToSend);
-
         ArrayList<PendingIntent> sendList = new ArrayList<>();
-        sendList.add(sentPI);
 
         ArrayList<PendingIntent> deliverList = new ArrayList<>();
-        deliverList.add(deliveredPI);
+
+        for(int i=0;i<parts.size();i++){
+            Log.d("SOS SMS","Intents added for part"+(i+1));
+            sendList.add(sentPI);
+            deliverList.add(deliveredPI);
+        }
 
 
         try {
@@ -221,7 +239,9 @@ public class SendSMSService extends Service {
         catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.d("SOS SMS", "sendMessage() exception");
-            Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
+            Toasty.error(getApplicationContext(), "Invalid Mobile No or SOS contacts not initiliased", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(getApplicationContext(),"Invalid Mobile No or SOS contacts not initiliased",Toast.LENGTH_SHORT);
         }
         Log.d("SOS SMS", "sendMessage() end");
     }
@@ -252,8 +272,8 @@ public class SendSMSService extends Service {
 
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(sentReceiver);
-        unregisterReceiver(deliveryReceiver);
+        getApplicationContext().unregisterReceiver(sentReceiver);
+        getApplicationContext().unregisterReceiver(deliveryReceiver);
 
     }
 }

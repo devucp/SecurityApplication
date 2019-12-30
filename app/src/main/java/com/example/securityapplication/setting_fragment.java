@@ -17,7 +17,8 @@ import es.dmoral.toasty.Toasty;
 
 public class setting_fragment extends Fragment {
     Button sos;
-    Button rate_us,scream;
+    Button rate_us,scream,invite,privacy;
+    String str="Check out TRATA, I use it to protect myself and the people I care about. Get it for free at \nhttps://play.google.com/store/apps/details?id=com.android.chrome";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -28,6 +29,16 @@ public class setting_fragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rate_us=getActivity().findViewById(R.id.rate_us);
         scream=getActivity().findViewById(R.id.screem);
+        invite=getActivity().findViewById(R.id.invite);
+        privacy=getActivity().findViewById(R.id.privacy);
+        privacy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = Uri.parse("http://innovatiivecreators.in/Privacy/");
+                Intent priva = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(priva);
+            }
+        });
         scream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,16 +50,27 @@ public class setting_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 try {
-                    Uri uri = Uri.parse("market://details?id="+"com.android.chrome");
+                    Uri uri = Uri.parse("market://details?id="+"com.example.securityapplication");
                     Intent Rate = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(Rate);
                 }
                 catch (ActivityNotFoundException e)
                 {
-                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id="+"com.android.chrome");
+                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id="+"com.example.securityapplication");
                     Intent Rate = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(Rate);
                 }
+            }
+        });
+        invite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent();
+                intent.setAction(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_TEXT,str);
+                intent.putExtra(Intent.EXTRA_SUBJECT,"TRATA : THE SECURITY APPLICATION");
+                intent.setType("text/plain");
+                startActivity(intent);
             }
         });
     }

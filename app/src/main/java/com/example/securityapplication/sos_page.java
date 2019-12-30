@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,6 +34,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+
+import es.dmoral.toasty.Toasty;
 
 public class sos_page extends AppCompatActivity {
 
@@ -72,7 +76,7 @@ public class sos_page extends AppCompatActivity {
 
         values = new ContentValues();
         mydb = SQLiteDBHelper.getInstance(this);
-        user = new User();
+        user = UserObject.user;
         SosContacts = new HashMap<String, String>();
         val = new Validation();
 
@@ -127,9 +131,13 @@ public class sos_page extends AppCompatActivity {
             Cursor res;
             res = mydb.getSosContacts();
             if (res.getCount() == 0){
-                Toast.makeText(getApplicationContext(),
+                Toasty.error(getApplicationContext(),
                         "Please enter atleast 1 contact for emergency",
                         Toast.LENGTH_LONG).show();
+
+               /* Toast.makeText(getApplicationContext(),
+                        "Please enter atleast 1 contact for emergency",
+                        Toast.LENGTH_LONG).show();*/
                 Log.d("SOS Activity","No Contact Data found ");
                 //Removed initvalues as it was not required anymore
                 FillViews();
@@ -185,6 +193,8 @@ public class sos_page extends AppCompatActivity {
         btn_SosEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Animation btn_anim= AnimationUtils.loadAnimation(sos_page.this,R.anim.btn_anim);
+                btn_SosEdit.startAnimation(btn_anim);
                 if(btn_SosEdit.getText().equals("save")){
                     save();
                 }
@@ -416,7 +426,9 @@ try {
 }
 catch (Exception e)
 {
-    Toast.makeText(this, "Permission is not given", Toast.LENGTH_SHORT).show();
+    Toasty.warning(this, "Permission is not given", Toast.LENGTH_SHORT, true).show();
+
+   // Toast.makeText(this, "Permission is not given", Toast.LENGTH_SHORT).show();
 }
     }
 
@@ -443,7 +455,9 @@ catch (Exception e)
 
         }
         else {
-            Toast.makeText(sos_page.this,"Please check your Internet Connectivity",Toast.LENGTH_LONG).show();
+            Toasty.error(sos_page.this, "Please check your Internet Connectivity", Toast.LENGTH_LONG, true).show();
+
+            //Toast.makeText(sos_page.this,"Please check your Internet Connectivity",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -461,7 +475,9 @@ catch (Exception e)
             if (c1.getText().toString().equals("")) {
                 //toast
                 Log.d("SOS Activity", "C1 Empty");
-                Toast.makeText(getApplicationContext(), "1st contact is mandatory", Toast.LENGTH_LONG).show();
+                Toasty.error(getApplicationContext(), "1st contact is mandatory", Toast.LENGTH_LONG, true).show();
+
+                //Toast.makeText(getApplicationContext(), "1st contact is mandatory", Toast.LENGTH_LONG).show();
                 return;
             } else {
                 temp_n1 = c1.getText().toString().trim();
@@ -641,11 +657,15 @@ catch (Exception e)
                 if (mydb.addsosContacts(SosContacts,dec)) {
                     Log.d("SosActivity", "SOS contacts was added in database");
                     updateFireBaseSOS();
-                    Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();
+                    Toasty.success(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT, true).show();
+
+                   // Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();
 
                     startActivity(intent);
                 } else {
-                    Toast.makeText(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT).show();
+                    Toasty.error(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT, true).show();
+
+                    //Toast.makeText(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT).show();
                     Log.d("SosActivity", "Data was not entered");
                 }
             } else {
@@ -656,7 +676,9 @@ catch (Exception e)
             //End
         }
         else {
-            Toast.makeText(sos_page.this,"Please check your Internet Connectivity and try again",Toast.LENGTH_LONG).show();
+            Toasty.error(sos_page.this, "Please check your Internet Connectivity and try again", Toast.LENGTH_LONG, true).show();
+
+           // Toast.makeText(sos_page.this,"Please check your Internet Connectivity and try again",Toast.LENGTH_LONG).show();
         }
     }
 }

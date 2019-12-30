@@ -8,6 +8,8 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 public class sentReceiver extends BroadcastReceiver {
 
     @Override
@@ -16,24 +18,34 @@ public class sentReceiver extends BroadcastReceiver {
         switch (getResultCode())
         {
             case Activity.RESULT_OK:
-                Toast.makeText(context, "SMS sent",
-                        Toast.LENGTH_LONG).show();
+                Toasty.success(context, "SMS sent", Toast.LENGTH_SHORT, true).show();
+
+                /*Toast.makeText(context, "SMS sent",
+                        Toast.LENGTH_LONG).show();*/
                 break;
             case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                Toast.makeText(context, "Generic failure",
-                        Toast.LENGTH_LONG).show();
+                Toasty.error(context, "Generic failure", Toast.LENGTH_LONG, true).show();
+
+               /* Toast.makeText(context, "Generic failure",
+                        Toast.LENGTH_LONG).show();*/
                 break;
             case SmsManager.RESULT_ERROR_NO_SERVICE:
-                Toast.makeText(context, "No service",
-                        Toast.LENGTH_LONG).show();
+                Toasty.error(context,  "No service", Toast.LENGTH_LONG, true).show();
+
+               /* Toast.makeText(context, "No service",
+                        Toast.LENGTH_LONG).show();*/
                 break;
             case SmsManager.RESULT_ERROR_NULL_PDU:
-                Toast.makeText(context, "Null PDU",
-                        Toast.LENGTH_LONG).show();
+                Toasty.error(context,  "Null PDU", Toast.LENGTH_LONG, true).show();
+
+                /*Toast.makeText(context, "Null PDU",
+                        Toast.LENGTH_LONG).show();*/
                 break;
             case SmsManager.RESULT_ERROR_RADIO_OFF:
-                Toast.makeText(context, "Radio off",
-                        Toast.LENGTH_LONG).show();
+                Toasty.warning(context,  "Radio off", Toast.LENGTH_LONG, true).show();
+
+                /*Toast.makeText(context, "Radio off",
+                        Toast.LENGTH_LONG).show();*/
                 break;
         }
 

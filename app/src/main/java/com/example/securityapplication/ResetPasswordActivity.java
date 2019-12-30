@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
+import es.dmoral.toasty.Toasty;
+
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -32,17 +36,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
     Validation validate;
     ProgressBar pgsBar;
 
-
-
-
     public void pgbarshow()
     {
         btn_reset.setText("");
         findViewById(R.id.pBar).setVisibility(VISIBLE);
         btn_reset.getBackground().setAlpha(100);
-
-
-
 
     }
 
@@ -56,15 +54,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
 
         btn_reset.setText("RESET PASSWORD");
-
-
-
-
-
-
-
-
-
 
     }
 
@@ -93,7 +82,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
         btn_reset.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(final View v) {
-
+                Animation reset_anim= AnimationUtils.loadAnimation(ResetPasswordActivity.this,R.anim.btn_anim);
+                btn_reset.startAnimation(reset_anim);
                 if (!IsInternet.checkInternet(ResetPasswordActivity.this))
                     return;
 
@@ -107,7 +97,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
                             inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
                             if(task.isSuccessful()){
-                                Toast.makeText(ResetPasswordActivity.this,"EMAIL SENT. PLEASE CHECK YOUR MAIL",Toast.LENGTH_SHORT).show();
+                                Toasty.success(ResetPasswordActivity.this, "EMAIL SENT. PLEASE CHECK YOUR MAIL", Toast.LENGTH_SHORT, true).show();
+
+                               // Toast.makeText(ResetPasswordActivity.this,"EMAIL SENT. PLEASE CHECK YOUR MAIL",Toast.LENGTH_SHORT).show();
                                 //startActivity(new Intent(ResetPasswordActivity.this,MainActivity.class));
 
 
@@ -116,7 +108,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
                             else
                             {
                                 String error = task.getException().getMessage().split("\\.")[0];
-                                Toast.makeText(ResetPasswordActivity.this,error,Toast.LENGTH_LONG).show();
+                                Toasty.error(ResetPasswordActivity.this, error, Toast.LENGTH_LONG, true).show();
+
+                                //Toast.makeText(ResetPasswordActivity.this,error,Toast.LENGTH_LONG).show();
 
                             }
                             pgbarhide();
@@ -130,4 +124,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
         });
 
     }
+
+
 }

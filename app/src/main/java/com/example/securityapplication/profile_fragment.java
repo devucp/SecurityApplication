@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,6 +35,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -67,13 +71,13 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
 import de.hdodenhof.circleimageview.CircleImageView;
-
+import es.dmoral.toasty.Toasty;
 import static com.example.securityapplication.R.layout.spinner_layout;
 import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
 
@@ -98,7 +102,7 @@ public class profile_fragment extends Fragment {
     private ImageButton chooseImgBtn;
     private Uri filePath = null;
     private  Bitmap bitmappic =null;
-
+    File f;
     private  Intent CropIntent;
     private final int PICK_IMAGE_REQUEST = 71;
     private final int TAKE_PICTURE = 81;
@@ -132,17 +136,17 @@ public class profile_fragment extends Fragment {
         return v;
     }
 
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         initObjects();
         initviews();
 //        FetchAllData();
         DisplayData();
         initListeners();
         deviceId();
+
+
+
 
     }
 
@@ -249,6 +253,8 @@ public class profile_fragment extends Fragment {
 
         btn_edit.setOnClickListener(new View.OnClickListener() {
                                         @Override public void onClick(View view) {
+                                            Animation edit_anim= AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
+                                            btn_edit.startAnimation(edit_anim);
 
                                             if (IsInternet.isNetworkAvaliable(getContext())) {
 
@@ -257,11 +263,14 @@ public class profile_fragment extends Fragment {
                                                 if(btn_edit.getText().equals("edit"))
                                                 {btn_edit.setText("Save");
                                                     enable();
-                                                    alphaa(1.0f);}
+                                                    btn_edit.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                                                alphaa(1.0f);}
                                                 else {
                                                     if(!validate())
                                                     {
-                                                        Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
+                                                        Toasty.error(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT, true).show();
+
+                                                        //Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
                                                     }
                                                     else {
                                                         // start progress bar
@@ -283,15 +292,15 @@ public class profile_fragment extends Fragment {
                                                             user.setGender("female");
                                                         else
                                                             user.setGender("others");
-
-
-                                                        // check mobile number in firebase
-                                                        checkMobileInFirebase(textPhone.getText().toString());
+                                                        user.setMobile(textPhone.getText().toString());
+                                                        updateUser();
                                                     }
                                                 }
                                             }//Sending Data to EditProfileActivity
                                             else {
-                                                Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
+                                                Toasty.error(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG, true).show();
+
+                                                //Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
                                             }
                                         }
 
@@ -301,7 +310,12 @@ public class profile_fragment extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
+
+                Animation log_anim=AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
+                btn_logout.startAnimation(log_anim);
+                Toasty.info(getContext(), "clicked", Toast.LENGTH_SHORT, true).show();
+
                 Log.d("signout","signout happen");
                 signOut();
             }
@@ -376,14 +390,18 @@ public class profile_fragment extends Fragment {
         textPhone.setText(user.getMobile());
 
         // display image from internal storage
-        File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        //File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Trata/"+user.getEmail()+"/");
+        File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
+       // File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
         try{
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(imgPath));
             profile_pic = getActivity().findViewById(R.id.profile_pic);
             //ImageButton imageButton = (ImageButton) profile_pic;
             profile_pic.setImageBitmap(b);
         }catch (IOException e){
-            Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"Profile picture not found");
         }
 
         Log.d("Profile","DATA displayed on profile Successfully");
@@ -395,7 +413,11 @@ public class profile_fragment extends Fragment {
         textPhone.setEnabled(false);
         textAddress.setEnabled(false);
         textDob.setEnabled(false);
-        //chooseImgBtn.setVisibility(View.GONE);
+        textName.setBackgroundColor(Color.TRANSPARENT);
+        textEmail.setBackgroundColor(Color.TRANSPARENT);
+        textPhone.setBackgroundColor(Color.TRANSPARENT);
+        textAddress.setBackgroundColor(Color.TRANSPARENT);
+        textDob.setBackgroundColor(Color.TRANSPARENT);
     }
     private void alphaa(float k){
         spinner.setAlpha(k);
@@ -412,6 +434,12 @@ public class profile_fragment extends Fragment {
         textPhone.setEnabled(true);
         textAddress.setEnabled(true);
         textDob.setEnabled(true);
+
+
+        textEmail.setBackgroundResource(R.drawable.blackborder);
+        textPhone.setBackgroundResource(R.drawable.blackborder);
+        textAddress.setBackgroundResource(R.drawable.blackborder);
+        textDob.setBackgroundResource(R.drawable.blackborder);
     }
 
     private void initviews() {
@@ -432,15 +460,12 @@ public class profile_fragment extends Fragment {
         chooseImgBtn = getActivity().findViewById(R.id.btn_choose_img);
 
         disable();
-
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
-
+        Log.d(TAG,"resultcode:"+resultCode+"requestcode:"+requestCode);
         if (requestCode == 1){
             if (resultCode == 110){
                 user = Objects.requireNonNull(data).getParcelableExtra("ResultUser");
@@ -454,18 +479,12 @@ public class profile_fragment extends Fragment {
                 && data != null && data.getData() != null ) {
             filePath = data.getData();
 
-
             if (filePath == null) {
                 Toast.makeText(getContext(), "File not found", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-
             cropimage();
         }
-
-
-
 
 
 
@@ -527,11 +546,10 @@ public class profile_fragment extends Fragment {
                 Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
             }*/
 
-
-
-
+           
         if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
         {
+
             Bundle bundle = Objects.requireNonNull(data).getExtras();
             bitmappic = Objects.requireNonNull(bundle).getParcelable("data");
 
@@ -539,20 +557,40 @@ public class profile_fragment extends Fragment {
                 //CropImage.ActivityResult result = CropImage.getActivityResult(data);
                // Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), bitmappic);
 
+                if (!f.exists()) {
+                    Log.d(TAG, "Folder doesn't exist, creating it...");
+                    boolean rv = f.mkdir();
+                    Log.d(TAG, "Folder creation " + ( rv ? "success" : "failed"));
+                } else {
+                    Log.d(TAG, "Folder already exists.");
+                }
 
-                internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+                    //internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+                File mypath=new File(f.getAbsolutePath(),"profile.jpeg");
+
+
+
+
+                FileOutputStream fos1 = new FileOutputStream(mypath);
+                // Use the compress method on the BitMap object to write image to the OutputStream
+                bitmappic.compress(Bitmap.CompressFormat.JPEG, 100, fos1);
+
 
                 profile_pic.setImageBitmap(bitmappic);
-                deleteExistingProfilePic();
+
+
+
+                    deleteExistingProfilePic();
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        inImage.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
@@ -574,8 +612,6 @@ public class profile_fragment extends Fragment {
             }
         }
 
-
-
         //Log.d("MAinActivity","SMS intent");
         //check permissions
         checkCameraPermission();
@@ -584,12 +620,12 @@ public class profile_fragment extends Fragment {
 
     public  boolean checkSMSPermission(){
         if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
+            Toasty.error(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_SHORT, true).show();
+
+            //Toast.makeText(getContext(), "Permission Required for sending SMS in case of SOS", Toast.LENGTH_LONG).show();
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);
-
-
         }
 
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS)== PackageManager.PERMISSION_GRANTED;
@@ -612,8 +648,6 @@ public class profile_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, RC);
-
-
         }
 
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
@@ -627,24 +661,10 @@ public class profile_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, RC);
-
-
         }
 
         return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED;
 
-    }
-
-
-
-
-    private void closeNow(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            //finishAffinity();
-        }
-        else{
-            //finish();
-        }
     }
 
     @Override
@@ -654,7 +674,7 @@ public class profile_fragment extends Fragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     deviceId();
                 } else {
-                    closeNow();
+                    getActivity().finish();
                     Toast.makeText(getContext(), "Without permission we check", Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -690,8 +710,15 @@ public class profile_fragment extends Fragment {
             Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);
             mStopSosPlayer.putExtra("stop",1);
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
-            Log.d("Profile Fr","Service sosplayer new startIntent...");
-            Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
+            Log.d("Profile Fragment","Service sosplayer new startIntent...");
+
+            //to stop GetGPS Service upon logout
+            Intent MStopGPSService = new Intent(getContext(),GetGPSCoordinates.class);
+            getActivity().stopService(MStopGPSService);
+            Log.d("Profile Fragment","GPS Service Stopped");
+            Toasty.warning(getContext(), "Services Stopped", Toast.LENGTH_SHORT, true).show();
+
+           // Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
         }
         catch(Exception e) {
             Log.d("Profile Fr","Service SOSplayer is not running");
@@ -704,47 +731,9 @@ public class profile_fragment extends Fragment {
         startActivity(mLogOutAndRedirect);
     }
 
-    private void checkMobileInFirebase(final String newMobile){
-        firebaseHelper.getUsersDatabaseReference().child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot userDataSnapshot) {
-                final User oldUser = userDataSnapshot.getValue(User.class);
-                if (oldUser.getMobile().equals(newMobile)){
-                    // update user in sqlite and firebase
-                    updateUser();
-                }else {
-                    firebaseHelper.getMobileDatabaseReference().child(newMobile).setValue(FirebaseAuth.getInstance().getUid()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            // delete previous mobile number and add new number
-                            firebaseHelper.getMobileDatabaseReference().child(oldUser.getMobile()).setValue(null);
-                            updateUser();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            // stop progress bar
-                            progressDialog.dismiss();
-                            // prompt user to enter different mobile number
-                            Toast.makeText(getActivity(), "Mobile number is registered to another account",Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG,databaseError.getDetails());
-                Toast.makeText(getActivity(),databaseError.getMessage(),Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void updateUser(){
 
         Log.d(TAG,"Updating user...");
-
-        user.setMobile(textPhone.getText().toString());
         mydb.updateUser(user);
         firebaseHelper.updateuser_infirebase(FirebaseAuth.getInstance().getUid(),user);
 
@@ -753,6 +742,7 @@ public class profile_fragment extends Fragment {
 
         btn_edit.setText("edit");
         alphaa(0.6f);
+        btn_edit.setCompoundDrawablesWithIntrinsicBounds( R.drawable.ic_edit_black_24dp, 0, 0, 0);
         disable();
     }
 
@@ -770,7 +760,8 @@ public class profile_fragment extends Fragment {
                 public void onComplete(@NonNull Task<Void> task) {
                     progressDialog.dismiss();
                     if(task.isSuccessful()){
-                        Toast.makeText(getActivity(),"EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD",Toast.LENGTH_SHORT).show();
+                        try{Toasty.success(getActivity(), "EMAIL SENT. PLEASE CHECK YOUR MAIL TO CHANGE PASSWORD", Toast.LENGTH_SHORT, true).show();}
+                        catch(Exception e){Log.d(TAG,"toast exception:"+e.getMessage());}
                     }
                     else
                     {
@@ -778,7 +769,8 @@ public class profile_fragment extends Fragment {
                             throw task.getException();
                         }catch (Exception e){
                             Log.d(TAG,e.getMessage());
-                            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
+                            try{Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();}
+                            catch(Exception e1){Log.d(TAG, "toast exception:"+e1.getMessage());}
                         }
                     }
                 }
@@ -786,7 +778,9 @@ public class profile_fragment extends Fragment {
         }catch (Exception e){
             progressDialog.dismiss();
             Log.d(TAG, e.getMessage());
-            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
+            Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();
+
+//            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -835,12 +829,8 @@ public class profile_fragment extends Fragment {
 
                 Intent cameraintent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraintent,201);
-
         }
     }
-
-
-
 
     private void uploadProfilePicToFirebase(){
 
@@ -912,25 +902,32 @@ public class profile_fragment extends Fragment {
                     uploadProfilePicToFirebase();
                 }
                 else
-                    Toast.makeText(getContext(), "Failed to upload image"+exception.getMessage(),Toast.LENGTH_LONG).show();
+                    Toasty.error(getContext(), "Failed to upload image"+exception.getMessage(), Toast.LENGTH_LONG, true).show();
+                //Toast.makeText(getContext(), "Failed to upload image"+exception.getMessage(),Toast.LENGTH_LONG).show();
             }
         });
     }
 
     public void cropimage()
     {
-        CropIntent = new Intent("com.android.camera.action.CROP");
-        CropIntent.setDataAndType(filePath,"image/*");
-        CropIntent.putExtra("crop","true");
-        CropIntent.putExtra("outputX",180);
-        CropIntent.putExtra("outputY",180);
-        CropIntent.putExtra("aspectX",3);
-        CropIntent.putExtra("aspectY",3);
-        CropIntent.putExtra("scaleUpIfNeeded",true);
-        CropIntent.putExtra("return-data",true);
-        startActivityForResult(CropIntent,0);
-
+        try {
+            CropIntent = new Intent("com.android.camera.action.CROP");
+            CropIntent.setDataAndType(filePath, "image/*");
+            CropIntent.putExtra("crop", "true");
+            CropIntent.putExtra("outputX", 180);
+            CropIntent.putExtra("outputY", 180);
+            CropIntent.putExtra("aspectX", 3);
+            CropIntent.putExtra("aspectY", 3);
+            CropIntent.putExtra("scaleUpIfNeeded", true);
+            CropIntent.putExtra("return-data", true);
+            CropIntent.putExtra(MediaStore.EXTRA_OUTPUT, filePath);
+            startActivityForResult(CropIntent, 0);
+        }catch (ActivityNotFoundException anfe) {
+            // display an error message
+            String errorMessage = "Whoops - your device doesn't support the crop action!";
+            try {
+                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+            }catch (Exception e){Log.d(TAG,e.getMessage());}
+        }
     }
-
-
 }

@@ -5,180 +5,186 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/graylight"
-    android:layout_margin="5dp"
+    android:layout_marginLeft="8dp"
     android:orientation="vertical"
     tools:context=".MainActivity">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_margin="10dp">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        >
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/graylight"
-            android:paddingLeft="42dp"
-            android:text="general"
-            android:textAlignment="textStart"
-            android:textColor="@color/cyan"
-            android:textSize="18sp" />
-
-    </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            >
-
-            <Button
-                android:id="@+id/settingsos"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_margin="0dp">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="sos"
-                android:drawableRight="@drawable/ic_keyboard_arrow_right_black_24dp"
-                android:background="@color/graylight"
-                android:paddingLeft="42dp"
-                android:text="EMERGENCY CONTACT"
-                android:textAlignment="textStart"
-                android:textColor="@color/cyan"
-                android:textSize="18sp" />
+                android:layout_marginTop="8dp"
+                >
 
+                <Button
+                    android:id="@+id/settingsos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="sos"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:drawablePadding="20dp"
+                    android:background="@drawable/ribble_button"
+                    android:drawableLeft="@drawable/ic_person_add_black_24dp"
+                    android:text="EMERGENCY CONTACT"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:paddingRight="24dp"
+                    android:layout_marginLeft="30dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <Button
+                    android:id="@+id/screem"
+                    android:alpha="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="20dp"
+                    android:paddingVertical="20dp"
+                    android:textAlignment="textStart"
+                    android:background="@drawable/ribble_button"
+                    android:drawableLeft="@drawable/ic_mic_black_24dp"
+                    android:text="scream test"
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:paddingRight="24dp"
+                    android:layout_marginLeft="30dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_book_black_24dp"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="20dp"
+                    android:textAlignment="textStart"
+                    android:background="@drawable/ribble_button"
+                    android:drawablePadding="20dp"
+                    android:text="about us"
+
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:id="@+id/rate_us"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ribble_button"
+                    android:drawablePadding="20dp"
+                    android:drawableLeft="@drawable/ic_rate_review_black_24dp"
+                    android:text="Rate us"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:textAlignment="textStart"
+
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ribble_button"
+                    android:drawablePadding="20dp"
+                    android:drawableLeft="@drawable/ic_people_black_24dp"
+                    android:text="community"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="20dp"
+                    android:textAlignment="textStart"
+
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <View
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimaryDark"
+                    android:paddingRight="24dp"
+                    android:layout_marginLeft="30dp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/privacy"
+                    android:layout_marginBottom="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:drawableLeft="@drawable/ic_content_paste_black_24dp"
+                    android:background="@drawable/ribble_button"
+                    android:drawablePadding="20dp"
+                    android:text="privacy policy"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/invite"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_security_black_24dp"
+                    android:background="@drawable/ribble_button"
+                    android:drawablePadding="20dp"
+                    android:text="Protect A Firend"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/cyan"
+                    android:textSize="20sp" />
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            />
-
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        >
-
-        <View
-
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimaryDark"
-            android:paddingRight="4dp"
-            android:layout_marginLeft="10dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:paddingLeft="0dp"
-        >
-
-        <Button
-            android:id="@+id/screem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="42dp"
-            android:textAlignment="textStart"
-            android:background="@color/graylight"
-            android:drawableRight="@drawable/ic_volume_up_black_24dp"
-            android:text="scream test"
-
-
-            android:textColor="@color/cyan"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-        <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
-
-        <View
-
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorPrimaryDark"
-            android:paddingRight="24dp"
-            android:layout_marginLeft="10dp"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="42dp"
-            android:textAlignment="textStart"
-            android:background="@color/graylight"
-            android:drawablePadding="130dp"
-            android:text="about us"
-
-
-            android:textColor="@color/cyan"
-            android:textSize="18sp" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_width="match_parent"
-            android:id="@+id/rate_us"
-            android:layout_height="wrap_content"
-            android:background="@color/graylight"
-            android:drawablePadding="150dp"
-            android:paddingLeft="42dp"
-            android:text="Rate us"
-            android:textAlignment="textStart"
-
-            android:textColor="@color/cyan"
-            android:textSize="18sp" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/graylight"
-            android:drawablePadding="150dp"
-            android:paddingLeft="42dp"
-            android:text="community"
-            android:textAlignment="textStart"
-
-            android:textColor="@color/cyan"
-            android:textSize="18sp" />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_marginBottom="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="42dp"
-            android:background="@color/graylight"
-            android:drawablePadding="150dp"
-            android:text="privacy policy"
-            android:textAlignment="textStart"
-            android:textColor="@color/cyan"
-            android:textSize="18sp" />
-    </LinearLayout>
-    </LinearLayout>
 
 
     </ScrollView>

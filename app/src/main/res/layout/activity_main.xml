@@ -31,7 +31,7 @@
         android:drawablePadding="10dp"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:textCursorDrawable="@color/white"
+        android:textCursorDrawable="@drawable/maincursor"
         android:padding="15dp"
         android:textColor="@color/white"
         android:textColorHighlight="#007399"
@@ -64,7 +64,7 @@
             android:textColor="@color/white"
             android:textColorHighlight="#007399"
             android:textColorHint="@color/white"
-            android:textCursorDrawable="@color/white"
+            android:textCursorDrawable="@drawable/maincursor"
             />
     </android.support.design.widget.TextInputLayout>
 
@@ -91,7 +91,7 @@
             android:id="@+id/ForgetPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Forget Password"
+            android:text="Forgot Password"
             android:drawableRight="@drawable/ic_lock_open_black_24dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"

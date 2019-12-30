@@ -9,9 +9,12 @@ import android.os.Bundle;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -56,6 +59,18 @@ public class saviour_fragment extends Fragment {
         builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                try {
+                    FragmentManager fragmentManager2 = getFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    home_fragment fragment2 = new home_fragment();
+                    ;
+                    fragmentTransaction2.replace(R.id.savior, fragment2);
+                    fragmentTransaction2.commit();
+                    BottomNavigationView mBottomNavigationView = (BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation);
+                    mBottomNavigationView.getMenu().findItem(R.id.home).setChecked(true);
+                }catch (Exception e){
+                    Log.d("Error","Some Error Occures");
+                }
 
             }
         });

@@ -14,10 +14,13 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.DrawableWrapper;
 import android.net.Uri;
 import android.os.Build;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,6 +31,7 @@ import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -45,6 +49,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ceylonlabs.imageviewpopup.ImagePopup;
 import com.example.securityapplication.Helper.FirebaseHelper;
 import com.example.securityapplication.Helper.InternalStorage;
 import com.example.securityapplication.model.User;
@@ -66,10 +71,12 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import static com.example.securityapplication.R.layout.spinner_layout;
 import static com.google.firebase.storage.StorageException.ERROR_OBJECT_NOT_FOUND;
@@ -89,14 +96,13 @@ public class profile_fragment extends Fragment {
     private String TAG = "ProfileActivity";
     Spinner spinner;
     DatePickerDialog datePickerDialog;
-    private  Uri file;
     private FirebaseHelper firebaseHelper;
 
-    private ImageView profile_pic;
+    private CircleImageView profile_pic;
     private ImageButton chooseImgBtn;
-    private Uri filePath, camerafilepath;
-    private  Bitmap bitmappic;
-
+    private Uri filePath = null;
+    private  Bitmap bitmappic =null;
+    File f;
     private  Intent CropIntent;
     private final int PICK_IMAGE_REQUEST = 71;
     private final int TAKE_PICTURE = 81;
@@ -138,6 +144,10 @@ public class profile_fragment extends Fragment {
         DisplayData();
         initListeners();
         deviceId();
+
+
+
+
     }
 
     private void initObjects() {
@@ -157,6 +167,65 @@ public class profile_fragment extends Fragment {
     }
 
     private void initListeners() {
+
+
+        profile_pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                    /*Dialog builder = new Dialog(this);
+                    builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    builder.getWindow().setBackgroundDrawable(
+                            new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            //nothing;
+                        }
+                    });
+
+                    ImageView imageView = new ImageView(this);
+                    imageView.setImageURI(imageUri);
+                    builder.addContentView(imageView, new RelativeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    builder.show();*/
+                final ImagePopup imagePopup = new ImagePopup(getContext());
+                imagePopup.setWindowHeight(800); // Optional
+                imagePopup.setWindowWidth(800); // Optional
+                imagePopup.setBackgroundColor(Color.BLACK);  // Optional
+                imagePopup.setFullScreen(true); // Optional
+                imagePopup.setHideCloseIcon(true);  // Optional
+                imagePopup.setImageOnClickClose(true);  // Optional
+                imagePopup.setFadingEdgeLength(1000);
+                imagePopup.setClickable(true);
+                imagePopup.setKeepScreenOn(true);
+                imagePopup.setPressed(true);
+                imagePopup.setTop(100);
+                imagePopup.setBottom(100);
+                imagePopup.setEnabled(true);
+
+
+                imagePopup.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pictureChoice();                    }
+                });
+
+
+
+
+                imagePopup.initiatePopup(profile_pic.getDrawable()); // Load Image from Drawable
+                imagePopup.viewPopup();
+
+
+            }
+        });
+
+
+
+
         textDob.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,7 +274,7 @@ public class profile_fragment extends Fragment {
                                                     }
                                                     else {
                                                         // start progress bar
-                                                        progressDialog = new ProgressDialog(getContext());
+                                                        progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
                                                         progressDialog.setTitle("Saving data...");
                                                         progressDialog.show();
                                                         progressDialog.setMessage("validating....");
@@ -320,10 +389,14 @@ public class profile_fragment extends Fragment {
         textPhone.setText(user.getMobile());
 
         // display image from internal storage
-        File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        //File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Trata/"+user.getEmail()+"/");
+        File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
+       // File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
         try{
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(imgPath));
             profile_pic = getActivity().findViewById(R.id.profile_pic);
+            //ImageButton imageButton = (ImageButton) profile_pic;
             profile_pic.setImageBitmap(b);
         }catch (IOException e){
             //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
@@ -339,7 +412,6 @@ public class profile_fragment extends Fragment {
         textPhone.setEnabled(false);
         textAddress.setEnabled(false);
         textDob.setEnabled(false);
-        chooseImgBtn.setVisibility(View.GONE);
         textName.setBackgroundColor(Color.TRANSPARENT);
         textEmail.setBackgroundColor(Color.TRANSPARENT);
         textPhone.setBackgroundColor(Color.TRANSPARENT);
@@ -437,9 +509,9 @@ public class profile_fragment extends Fragment {
 
 
             filePath = null;
-            Bitmap cameraphoto = (Bitmap) data.getExtras().get("data");
+            Bitmap cameraphoto = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
 
-            filePath = getImageUri(getContext(),cameraphoto);
+            filePath = getImageUri(Objects.requireNonNull(getContext()), Objects.requireNonNull(cameraphoto));
 
 
 /*
@@ -476,19 +548,38 @@ public class profile_fragment extends Fragment {
            
         if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
         {
-            try {
-                if (data != null) {
-                    // get the returned data
-                    Bundle extras = data.getExtras();
-                    // get the cropped bitmap
-                    Bitmap bitmappic = extras.getParcelable("data");
-                    //CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
-                    internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+            Bundle bundle = Objects.requireNonNull(data).getExtras();
+            bitmappic = Objects.requireNonNull(bundle).getParcelable("data");
 
-                    profile_pic.setImageBitmap(bitmappic);
-                    deleteExistingProfilePic();
+            try { 
+                //CropImage.ActivityResult result = CropImage.getActivityResult(data);
+               // Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), bitmappic);
+
+                if (!f.exists()) {
+                    Log.d(TAG, "Folder doesn't exist, creating it...");
+                    boolean rv = f.mkdir();
+                    Log.d(TAG, "Folder creation " + ( rv ? "success" : "failed"));
+                } else {
+                    Log.d(TAG, "Folder already exists.");
                 }
+
+                    //internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
+                File mypath=new File(f.getAbsolutePath(),"profile.jpeg");
+
+
+
+
+                FileOutputStream fos1 = new FileOutputStream(mypath);
+                // Use the compress method on the BitMap object to write image to the OutputStream
+                bitmappic.compress(Bitmap.CompressFormat.JPEG, 100, fos1);
+
+
+                profile_pic.setImageBitmap(bitmappic);
+
+
+
+                    deleteExistingProfilePic();
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
@@ -708,7 +799,14 @@ public class profile_fragment extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         chooseImg("gallery");
                     }
-                });
+                })
+                .setNegativeButton("Crop", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        cropimage();
+                    }
+                })
+        ;
         AlertDialog alert = a_builder.create();
         alert.show();
     }
@@ -735,7 +833,7 @@ public class profile_fragment extends Fragment {
 
     private void uploadProfilePicToFirebase(){
 
-        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        final ProgressDialog progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
         progressDialog.setTitle("Uploading...");
         progressDialog.show();
         progressDialog.setCancelable(false);
@@ -776,7 +874,7 @@ public class profile_fragment extends Fragment {
     }
 
     private void deleteExistingProfilePic(){
-        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        final ProgressDialog progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
         progressDialog.setTitle("Processing...");
         progressDialog.show();
         progressDialog.setCancelable(false);

@@ -17,7 +17,7 @@ import es.dmoral.toasty.Toasty;
 
 public class setting_fragment extends Fragment {
     Button sos;
-    Button rate_us,scream,invite,privacy;
+    Button rate_us,scream,invite,privacy,community; //added community
     String str="Check out TRATA, I use it to protect myself and the people I care about. Get it for free at \nhttps://play.google.com/store/apps/details?id=com.android.chrome";
     @Nullable
     @Override
@@ -31,6 +31,7 @@ public class setting_fragment extends Fragment {
         scream=getActivity().findViewById(R.id.screem);
         invite=getActivity().findViewById(R.id.invite);
         privacy=getActivity().findViewById(R.id.privacy);
+        community=getActivity().findViewById(R.id.community);
         privacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,11 +43,17 @@ public class setting_fragment extends Fragment {
         scream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toasty.info(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT, true).show();
-
-                //Toast.makeText(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT).show();
+                Toasty.info(getContext(), "This feature is coming soon...", Toast.LENGTH_SHORT, true).show();
             }
         });
+        //added coming soon message for Community
+        community.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toasty.info(getContext(), "This feature is coming soon...", Toast.LENGTH_SHORT, true).show();
+            }
+        });
+
         rate_us.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

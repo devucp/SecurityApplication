@@ -34,7 +34,7 @@ public class SosPlayer extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
             super.onStartCommand(intent, flags, startId);
-            startWaitTimer();
+           // startWaitTimer(); //Commented out as no longer used
             try {
                 stop = intent.getIntExtra("stop", 0);
             }catch(Exception e){
@@ -85,7 +85,8 @@ public class SosPlayer extends Service {
 
             timerStarted = false;
         }catch (Exception e){
-            Toast.makeText(this, e.getMessage()+"22", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,e.getMessage());
+            //Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         //code moved to detectSosPattern which is now called from onStartCommand if stop==0
         //Register PowerButtonBroadcastReceiver screen on-off
@@ -127,7 +128,7 @@ public class SosPlayer extends Service {
     public void startWaitTimer(){
         timerStarted=true;
         Log.d("SOS Timer","Timer started");
-        Toast.makeText(getApplicationContext(), "SOS timer started", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "SOS timer started", Toast.LENGTH_LONG).show();
         wtimer=new CountDownTimer(10*1000, 1000) {
 
             public void onTick(long millisUntilFinished) {
@@ -139,7 +140,7 @@ public class SosPlayer extends Service {
                 Log.d("SOS Timer" ,"Timeoout reached" );
                 resetCount();
                 timerStarted=false;
-                Toast.makeText(getApplicationContext(), "SOS timer reset", Toast.LENGTH_LONG).show();
+          //      Toast.makeText(getApplicationContext(), "SOS timer reset", Toast.LENGTH_LONG).show();
 
             }
         }.start();

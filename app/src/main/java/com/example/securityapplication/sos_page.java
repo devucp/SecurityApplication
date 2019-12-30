@@ -656,15 +656,11 @@ catch (Exception e)
                 if (mydb.addsosContacts(SosContacts,dec)) {
                     Log.d("SosActivity", "SOS contacts was added in database");
                     updateFireBaseSOS();
-                    Toasty.success(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT, true).show();
-
-                   // Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();
-
+                    Toasty.success(sos_page.this, "Contacts saved successfully ", Toast.LENGTH_SHORT, true).show(); //fixed message
                     startActivity(intent);
                 } else {
-                    Toasty.error(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT, true).show();
+                    Toasty.error(sos_page.this, "Contacts could not be added", Toast.LENGTH_SHORT, true).show(); //fixed message
 
-                    //Toast.makeText(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT).show();
                     Log.d("SosActivity", "Data was not entered");
                 }
             } else {

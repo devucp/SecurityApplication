@@ -241,11 +241,10 @@ public class profile_fragment extends Fragment {
         btn_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(getContext(), "clicked", Toast.LENGTH_SHORT).show();
 
                 Animation log_anim=AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
                 btn_logout.startAnimation(log_anim);
-                Toasty.info(getContext(), "clicked", Toast.LENGTH_SHORT, true).show();
+                //Toasty.info(getContext(), "clicked", Toast.LENGTH_SHORT, true).show(); //REMOVED
 
                 Log.d("signout","signout happen");
                 signOut();
@@ -619,12 +618,13 @@ public class profile_fragment extends Fragment {
             Intent mStopSosPlayer=new Intent(getContext(),SosPlayer.class);
             mStopSosPlayer.putExtra("stop",1);
             getActivity().startService(mStopSosPlayer); //previously was stopService(). Now using startService() to use the stop extra in onStartCommand()
-            Log.d("Profile Fr","Service sosplayer new startIntent...");
+            Log.d("Profile Fragment","Service sosplayer new startIntent...");
 
             //to stop GetGPS Service upon logout
             Intent MStopGPSService = new Intent(getContext(),GetGPSCoordinates.class);
             getActivity().stopService(MStopGPSService);
-            Toasty.warning(getContext(), "Service sosplayer stopping...", Toast.LENGTH_SHORT, true).show();
+            Log.d("Profile Fragment","GPS Service Stopped");
+            Toasty.warning(getContext(), "Services Stopped", Toast.LENGTH_SHORT, true).show(); //TODO:Remove toasty
 
            // Toast.makeText(getContext(),"Service sosplayer stopping...",Toast.LENGTH_SHORT).show();
         }
@@ -827,7 +827,7 @@ public class profile_fragment extends Fragment {
             // display an error message
             String errorMessage = "Whoops - your device doesn't support the crop action!";
             try {
-                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                Toasty.normal(getContext(), errorMessage, Toast.LENGTH_SHORT).show(); //changed to a normal toasty
             }catch (Exception e){Log.d(TAG,e.getMessage());}
         }
     }

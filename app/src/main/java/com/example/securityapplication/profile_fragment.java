@@ -92,13 +92,12 @@ public class profile_fragment extends Fragment {
     private String TAG = "ProfileActivity";
     Spinner spinner;
     DatePickerDialog datePickerDialog;
-    private  Uri file;
     private FirebaseHelper firebaseHelper;
 
     private CircleImageView profile_pic;
     private ImageButton chooseImgBtn;
-    private Uri filePath, camerafilepath;
-    private  Bitmap bitmappic;
+    private Uri filePath = null;
+    private  Bitmap bitmappic =null;
 
     private  Intent CropIntent;
     private final int PICK_IMAGE_REQUEST = 71;
@@ -492,9 +491,9 @@ public class profile_fragment extends Fragment {
 
 
             filePath = null;
-            Bitmap cameraphoto = (Bitmap) data.getExtras().get("data");
+            Bitmap cameraphoto = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
 
-            filePath = getImageUri(getContext(),cameraphoto);
+            filePath = getImageUri(Objects.requireNonNull(getContext()), Objects.requireNonNull(cameraphoto));
 
 
 /*
@@ -533,11 +532,13 @@ public class profile_fragment extends Fragment {
 
         if(requestCode == 0 && resultCode == getActivity().RESULT_OK)
         {
-            Bundle bundle = data.getExtras();
-            Bitmap bitmappic = bundle.getParcelable("data");
+            Bundle bundle = Objects.requireNonNull(data).getExtras();
+            bitmappic = Objects.requireNonNull(bundle).getParcelable("data");
 
-            try {
+            try { 
                 //CropImage.ActivityResult result = CropImage.getActivityResult(data);
+               // Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), bitmappic);
+
 
                 internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
 

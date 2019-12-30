@@ -61,7 +61,6 @@ public class GetGPSCoordinates extends Service {
     @Override
     public void onCreate() {
 
-
         Log.d("GPSService", "Oncreate");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = LocationRequest.create();

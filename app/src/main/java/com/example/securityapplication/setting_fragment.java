@@ -34,7 +34,7 @@ public class setting_fragment extends Fragment {
         privacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = Uri.parse("https://www.google.com");
+                Uri uri = Uri.parse("http://innovatiivecreators.in/Privacy/");
                 Intent priva = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(priva);
             }
@@ -51,13 +51,13 @@ public class setting_fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 try {
-                    Uri uri = Uri.parse("market://details?id="+"com.android.chrome");
+                    Uri uri = Uri.parse("market://details?id="+"com.example.securityapplication");
                     Intent Rate = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(Rate);
                 }
                 catch (ActivityNotFoundException e)
                 {
-                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id="+"com.android.chrome");
+                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id="+"com.example.securityapplication");
                     Intent Rate = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(Rate);
                 }

@@ -116,6 +116,7 @@ public class SosPlayer extends Service {
                  *//*
                         Log.v("Player","Direction is:"+direction);
                         updateCount(direction);
+                        setCurrentVolume(getCurrentVolume()+direction);
                     }
                 };
 

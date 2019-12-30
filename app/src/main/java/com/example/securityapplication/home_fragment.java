@@ -23,6 +23,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,6 +74,8 @@ public class home_fragment extends Fragment {
             @SuppressLint("ShowToast")
             @Override
             public void onClick(View v) {
+                Animation alert_anim=AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
+                alert.startAnimation(alert_anim);
                 if(!checkSMSPermission()) {
 
                 }
@@ -98,6 +102,8 @@ public class home_fragment extends Fragment {
         emergency.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final Animation myAnim = AnimationUtils.loadAnimation(getContext(), R.anim.btn_anim);
+                emergency.startAnimation(myAnim);
                 if (is_paid) {
                     Toasty.info(getContext(), "You are premier member", Toast.LENGTH_SHORT, true).show();
                     //Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
@@ -145,17 +151,13 @@ public class home_fragment extends Fragment {
         informsafety.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Animation inf_anim=AnimationUtils.loadAnimation(getContext(),R.anim.btn_anim);
+                informsafety.startAnimation(inf_anim);
                 try {
 
-
                     if (SendSMSService.getAlert() == 0 && SendSMSService.getEmergency() == 0) {
-
                         Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
-
-
                     }
-
 
 
 

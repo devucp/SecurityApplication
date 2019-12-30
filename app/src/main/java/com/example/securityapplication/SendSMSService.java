@@ -201,8 +201,8 @@ public class SendSMSService extends Service {
         }
         else{
             initSenderName();
-            messageToSend= getSenderName()+ "uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
-                                            " This is a TEST message."+getSenderName()+" may contact you in emergency.";
+            messageToSend= getSenderName()+ " uses Trata app for their safety. You're "+getSenderName()+"'s SOS contact."+
+                                            " This is a TEST message. "+getSenderName()+" may contact you in emergency.";
 //            Log.d("SMS Service","Tstmode msg: "+messageToSend);
         }
         return messageToSend;

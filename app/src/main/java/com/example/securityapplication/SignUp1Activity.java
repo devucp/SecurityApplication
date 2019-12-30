@@ -25,6 +25,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -167,7 +169,8 @@ public class SignUp1Activity extends AppCompatActivity {
     }
 
     public void signUp(View view){
-
+        Animation signup_anim= AnimationUtils.loadAnimation(this,R.anim.btn_anim);
+        Btn_Submit.startAnimation(signup_anim);
         if (!IsInternet.checkInternet(SignUp1Activity.this))
             return;
 

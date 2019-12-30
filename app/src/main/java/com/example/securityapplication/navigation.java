@@ -111,7 +111,7 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
             public void onClick(View view) {
                 if (flag==0){
                     flag=1;
-                    tmode1.setText("TEST MODE : ON");
+                    tmode1.setText("TEST MODE : ON ");
                     db.updatetestmode(true);
                     tmode1.setTextColor(Color.GREEN);
                     Log.d("checking11", "oncreate onc "+db.getTestmode());
@@ -339,6 +339,7 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
 
 }
 

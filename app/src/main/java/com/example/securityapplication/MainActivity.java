@@ -585,20 +585,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             /**Location Service intent**/
             if (checkGPSPermission()) {
                 ContextCompat.startForegroundService(this, new Intent(MainActivity.this, GetGPSCoordinates.class));
-            } else {
-                Toast.makeText(this, "Location Permissions required", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
-            startActivity(mHomeIntent);
-            //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
-
-            try {
-                finish();
+                Intent mHomeIntent = new Intent(MainActivity.this,navigation.class);
+                startActivity(mHomeIntent);
                 //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
 
-            }catch (Exception e){
-                Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                try {
+                    finish();
+                    //Toasty.success(MainActivity.this, "Success!", Toast.LENGTH_SHORT, true).show();
+
+                }catch (Exception e){
+                    Log.d(TAG,"Exception on closing activity:"+e.getMessage());
+                    finish();
+                }
+            } else {
+                Toast.makeText(this, "Location Permissions required", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -876,32 +876,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
             Log.d(TAG,"Profile picture not found");
             // download from firebase
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-            StorageReference imgRef = storageReference.child(uid).child("images/profile_pic");
-            Log.d(TAG,"imagePath"+imgRef.getPath()+imgRef.getParent());
+            try {
+                StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+                StorageReference imgRef = storageReference.child(uid).child("images/profile_pic");
+                Log.d(TAG,"imagePath"+imgRef.getPath()+imgRef.getParent());
 
-            final long ONE_MEGABYTE = 1024 * 1024;
-            imgRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    try {
-                        internalStorage.saveImageToInternalStorage(bitmap, user.getEmail());
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        Toast.makeText(MainActivity.this, "Unable to store image",Toast.LENGTH_SHORT).show();
+                final long ONE_MEGABYTE = 1024 * 1024;
+                imgRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        try {
+                            internalStorage.saveImageToInternalStorage(bitmap, user.getEmail());
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "Unable to store image",Toast.LENGTH_SHORT).show();
+                        }
+                        updateUI(FirebaseAuth.getInstance().getCurrentUser());
                     }
-                    updateUI(FirebaseAuth.getInstance().getCurrentUser());
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                    Log.d(TAG,"Profile pic doesn't exists");
-                    updateUI(FirebaseAuth.getInstance().getCurrentUser());
-                }
-            });
-
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Log.d(TAG,"Profile pic doesn't exists");
+                        updateUI(FirebaseAuth.getInstance().getCurrentUser());
+                    }
+                });
+            }catch (Exception ec){
+                Log.d(TAG, "error while downloading image:"+ec.getMessage());
+            }
         }
     }
 }

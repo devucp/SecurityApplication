@@ -220,7 +220,7 @@ public class GetGPSCoordinates extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toasty.error(getApplicationContext(), "GPS service destroyed", Toast.LENGTH_SHORT, true).show();
+        //Toasty.error(getApplicationContext(), "GPS service destroyed", Toast.LENGTH_SHORT, true).show();
 
         //Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
         Log.d("GPSService","OnDestroy");

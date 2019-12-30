@@ -226,6 +226,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         /** DATABASE FORCEFUL CREATION**/
         db=SQLiteDBHelper.getInstance(MainActivity.this);
+        //uncomment to force delete database NOTE:Recomment after uncommenting oncce
+        //db.deleteDatabase(this);
     }
 
     public void onStart(){

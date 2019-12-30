@@ -122,16 +122,17 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:id="@+id/community"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/ribble_button"
-            android:drawablePadding="20dp"
             android:drawableLeft="@drawable/ic_people_black_24dp"
-            android:text="community"
-            android:paddingBottom="20dp"
+            android:drawablePadding="20dp"
             android:paddingTop="20dp"
-            android:textAlignment="textStart"
+            android:paddingBottom="20dp"
+            android:text="community"
 
+            android:textAlignment="textStart"
             android:textColor="@color/cyan"
             android:textSize="20sp" />
     </LinearLayout>
@@ -179,7 +180,7 @@
                 android:drawableLeft="@drawable/ic_security_black_24dp"
                 android:background="@drawable/ribble_button"
                 android:drawablePadding="20dp"
-                android:text="Protect A Firend"
+                android:text="Protect A Friend"
                 android:textAlignment="textStart"
                 android:textColor="@color/cyan"
                 android:textSize="20sp" />

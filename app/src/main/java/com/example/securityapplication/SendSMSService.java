@@ -161,19 +161,22 @@ public class SendSMSService extends Service {
         if(alert==1)
         {
             safe=0; //reset the safe variable
-            toastmsg="send alert sos message";
+            toastmsg="Sending Alert sos message...";
         }
         else if(safe==1)
         {
             alert=0; //reset the alert variable
-            toastmsg="send safe sos message";
+            toastmsg="Sending safety sos message...";
         }
         else
         {   emergency=1;
             safe=0; //emergency =1 . reset the safe variable
-            toastmsg="send emergency sos message";
+            toastmsg="Sending Emergency sos message...";
         }
-        Toasty.warning(getApplicationContext(), toastmsg, Toast.LENGTH_SHORT, true).show();
+        if(safe==0)
+            Toasty.info(getApplicationContext(), toastmsg, Toast.LENGTH_SHORT, true).show();
+        else
+            Toasty.success(getApplicationContext(), toastmsg, Toast.LENGTH_SHORT, true).show(); //Added success toasty for inform safety
         //Toast.makeText(getApplicationContext(), toastmsg, Toast.LENGTH_LONG).show();
         this.stopSelf();//FINISH the service
     }

@@ -141,7 +141,8 @@ public class FirebaseHelper {
         if (mAuth.getCurrentUser() != null) {
             makeDeviceImeiNull(imei);
             makeUserImeiNull();
-            Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            Log.d(TAG,"Logged Out from Firebase"); //Removed Toasty and added log
+            //Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
     }
 

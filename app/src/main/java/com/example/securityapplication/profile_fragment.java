@@ -331,10 +331,19 @@ public class profile_fragment extends Fragment {
         chooseImgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            if(checkCameraPermission() && checkReadExterPermission() && checkWriteExterPermission() ) {
+                checkCameraPermission();
+                checkWriteExterPermission();
+                checkReadExterPermission();
 
                 pictureChoice();
                 // choose img from gallery
                 chooseImg("storage");
+
+            }
+            else {
+                Toasty.info(getContext(),"Please give Camera and File access Permissions");
+            }
             }
         });
     }
@@ -390,9 +399,9 @@ public class profile_fragment extends Fragment {
         textPhone.setText(user.getMobile());
 
         // display image from internal storage
-        //File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
-        f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Trata/"+user.getEmail()+"/");
-        File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
+        File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
+        //f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Trata/"+user.getEmail()+"/");
+        //File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
        // File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
         try{
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(imgPath));
@@ -464,6 +473,8 @@ public class profile_fragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG,"resultcode:"+resultCode+"requestcode:"+requestCode);
         if (requestCode == 1){
@@ -511,8 +522,13 @@ public class profile_fragment extends Fragment {
 
             filePath = null;
             Bitmap cameraphoto = (Bitmap) Objects.requireNonNull(Objects.requireNonNull(data).getExtras()).get("data");
+            Long image_size2 = imagesizecheck(cameraphoto);
+            Log.d("tag", String.valueOf(image_size2));
+
 
             filePath = getImageUri(Objects.requireNonNull(getContext()), Objects.requireNonNull(cameraphoto));
+
+
 
 
 /*
@@ -553,34 +569,45 @@ public class profile_fragment extends Fragment {
             Bundle bundle = Objects.requireNonNull(data).getExtras();
             bitmappic = Objects.requireNonNull(bundle).getParcelable("data");
 
-            try { 
+            Long image_size = imagesizecheck(bitmappic);
+
+
+
+
+
+            Log.d("tag", String.valueOf(image_size));
+            try {
                 //CropImage.ActivityResult result = CropImage.getActivityResult(data);
                // Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(getActivity()).getContentResolver(), bitmappic);
 
-                if (!f.exists()) {
+                /*if (!f.exists()) {
                     Log.d(TAG, "Folder doesn't exist, creating it...");
                     boolean rv = f.mkdir();
                     Log.d(TAG, "Folder creation " + ( rv ? "success" : "failed"));
                 } else {
                     Log.d(TAG, "Folder already exists.");
-                }
+                }*/
 
                     //internalStorage.saveImageToInternalStorage(bitmappic, user.getEmail());
-                File mypath=new File(f.getAbsolutePath(),"profile.jpeg");
+                //File mypath=new File(f.getAbsolutePath(),"profile.jpeg");
 
 
 
 
-                FileOutputStream fos1 = new FileOutputStream(mypath);
+                //FileOutputStream fos1 = new FileOutputStream(mypath);
                 // Use the compress method on the BitMap object to write image to the OutputStream
-                bitmappic.compress(Bitmap.CompressFormat.JPEG, 100, fos1);
+               // bitmappic.compress(Bitmap.CompressFormat.JPEG, 100, bitmappic);
 
 
                 profile_pic.setImageBitmap(bitmappic);
+                Log.d("tag", String.valueOf(image_size));
 
 
 
-                    deleteExistingProfilePic();
+
+                deleteExistingProfilePic();
+                Log.d("tag", String.valueOf(image_size));
+
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Unable to store image",Toast.LENGTH_SHORT).show();
@@ -590,9 +617,25 @@ public class profile_fragment extends Fragment {
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
         inImage.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
+    }
+
+    public long  imagesizecheck(Bitmap bitmapOrg)
+    {
+        Bitmap bitmap2 = bitmapOrg;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+        long lengthbmp = imageInByte.length;
+        //Toasty.info(getContext(), (int) lengthbmp);
+
+
+        Log.d("tag", String.valueOf(lengthbmp));
+
+        return  lengthbmp;
     }
 
 
@@ -616,6 +659,8 @@ public class profile_fragment extends Fragment {
         //check permissions
         checkCameraPermission();
         checkSMSPermission();
+        checkWriteExterPermission();
+        checkReadExterPermission();
     }
 
     public  boolean checkSMSPermission(){
@@ -750,7 +795,7 @@ public class profile_fragment extends Fragment {
         if (!IsInternet.checkInternet(getContext()))
             return;
 
-        progressDialog = new ProgressDialog(getContext());
+        progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
         progressDialog.setTitle("Sending Email...");
         progressDialog.show();
         progressDialog.setCancelable(false);

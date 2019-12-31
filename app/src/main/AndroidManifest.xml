@@ -53,29 +53,18 @@
             android:name=".navigation"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".EditProfileActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ResetPasswordActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".SignUp2"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
         <activity
             android:name=".SignUp1Activity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden">
-
-            <!-- <intent-filter> -->
-
-
-            <!-- <action android:name="android.intent.action.MAIN"/> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-
-
-            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".MainActivity"
@@ -133,6 +122,15 @@
             android:name=".GetGPSCoordinates"
             android:enabled="true"
             android:exported="true" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

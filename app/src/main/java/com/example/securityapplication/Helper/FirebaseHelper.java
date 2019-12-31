@@ -118,6 +118,8 @@ public class FirebaseHelper {
                     if (databaseError != null){
                         Log.d(TAG, databaseError.getMessage());
                     }
+                    else
+                        mAuth.signOut();
                 }
             });
     }
@@ -127,8 +129,9 @@ public class FirebaseHelper {
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
-            AsyncTaskRunner signOutRunner = new AsyncTaskRunner();
-            signOutRunner.execute(imei);
+            makeDeviceImeiNull(imei);
+            makeUserImeiNull();
+            Log.d(TAG,"Logged Out from Firebase"); //Removed Toasty and added log
         }
     }
 
@@ -142,7 +145,13 @@ public class FirebaseHelper {
     public void googleSignOut(Activity activity){
         Log.d(TAG,"Google SignOut called");
         if(GoogleSignIn.getLastSignedInAccount(context) != null) {
-            mGoogleSignInClient.signOut();
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(activity, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            //updateUI(null);
+                        }
+                    });
         }
     }
 
@@ -196,22 +205,5 @@ public class FirebaseHelper {
         dr4.setValue(user.getMobile());
         dr5.setValue(user.getName());
 
-    }
-
-    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            makeDeviceImeiNull(params[0]);
-            makeUserImeiNull();
-            Log.d(TAG,"Deleting imei from firebase");
-            return "Logging Out";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d(TAG,result);
-            firebaseSignOut();
-        }
     }
 }

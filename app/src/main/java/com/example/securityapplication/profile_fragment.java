@@ -317,8 +317,6 @@ public class profile_fragment extends Fragment {
                                                     if(!validate())
                                                     {
                                                         Toasty.error(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT, true).show();
-
-                                                        //Toast.makeText(getContext(), "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
                                                     }
                                                     else {
                                                         // start progress bar
@@ -347,8 +345,6 @@ public class profile_fragment extends Fragment {
                                             }//Sending Data to EditProfileActivity
                                             else {
                                                 Toasty.error(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG, true).show();
-
-                                                //Toast.makeText(getContext(), "Please check your Internet Connectivity", Toast.LENGTH_LONG).show();
                                             }
                                         }
 
@@ -538,7 +534,6 @@ public class profile_fragment extends Fragment {
         textEmail.setEnabled(false);
         textPhone.setEnabled(false);
         textAddress.setEnabled(false);
-        chooseImgBtn.setVisibility(View.INVISIBLE);
         textDob.setEnabled(false);
         textName.setBackgroundColor(Color.TRANSPARENT);
         textEmail.setBackgroundColor(Color.TRANSPARENT);
@@ -557,12 +552,9 @@ public class profile_fragment extends Fragment {
     private void enable(){
         spinner.setEnabled(true);
         textName.setEnabled(true);
-        //chooseImgBtn.setVisibility(View.VISIBLE);
         textPhone.setEnabled(true);
         textAddress.setEnabled(true);
         textDob.setEnabled(true);
-
-        chooseImgBtn.setVisibility(View.VISIBLE);
         textEmail.setBackgroundResource(R.drawable.blackborder);
         textPhone.setBackgroundResource(R.drawable.blackborder);
         textAddress.setBackgroundResource(R.drawable.blackborder);
@@ -622,13 +614,13 @@ public class profile_fragment extends Fragment {
                         int nh = (int) (output.getHeight() * (512.0 / output.getWidth()));
                         bit2 = Bitmap.createScaledBitmap(bit2, 512, nh, true);
                         profile_pic.setImageBitmap(bit2);
+                        //save to internal storage code come here
+                        internalStorage.createDirectoryAndSaveFile(bit2,getCaptureImageOutputUri().getPath());
+                        //upload to firebase
+                        deleteExistingProfilePic();
                     }catch (Exception e){
                         Toast.makeText(getContext(), "Please  upload image of less size", Toast.LENGTH_SHORT).show();
                     }
-                    //save to internal storage code come here
-                    internalStorage.createDirectoryAndSaveFile(bit2,getCaptureImageOutputUri().getPath());
-                    //upload to firebase
-                    deleteExistingProfilePic();
                 }
             }
         }
@@ -864,7 +856,9 @@ public class profile_fragment extends Fragment {
         }catch (Exception e){
             progressDialog.dismiss();
             Log.d(TAG, e.getMessage());
-            Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();
+            try {
+                Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();
+            }catch (Exception ec){Log.d(TAG,ec.getMessage());}
         }
     }
 
@@ -898,7 +892,7 @@ public class profile_fragment extends Fragment {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             progressDialog.dismiss();
-                            Toast.makeText(getContext(), "Failed to upload image"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Failed to upload image", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -944,7 +938,7 @@ public class profile_fragment extends Fragment {
                         uploadProfilePicToFirebase();
                     }
                     else
-                        Toasty.error(getContext(), "Failed to upload image"+exception.getMessage(), Toast.LENGTH_LONG, true).show();
+                        Toasty.error(getContext(), "Failed to upload image", Toast.LENGTH_LONG, true).show();
                 }
             });
         }catch (Exception e){

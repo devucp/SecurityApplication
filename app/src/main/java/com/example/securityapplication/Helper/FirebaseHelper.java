@@ -3,16 +3,11 @@ package com.example.securityapplication.Helper;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.example.securityapplication.GoogleFirebaseSignIn;
-import com.example.securityapplication.MainActivity;
-import com.example.securityapplication.R;
-import com.example.securityapplication.SignUp2;
 import com.example.securityapplication.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,12 +15,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -36,10 +28,8 @@ public class FirebaseHelper {
     private DatabaseReference mDevicesDatabaseReference;
     private DatabaseReference mUsersDatabaseReference;
     private DatabaseReference mEmailDatabaseReference;
-    private DatabaseReference mMobileDatabaseReference;
     private static final String TAG = "FirebaseHelper";
     private Context context;
-    private User user;
     private GoogleSignInClient mGoogleSignInClient;
     private static volatile FirebaseHelper firebaseHelperInstance;
     private FirebaseStorage firebaseStorage;
@@ -128,8 +118,6 @@ public class FirebaseHelper {
                     if (databaseError != null){
                         Log.d(TAG, databaseError.getMessage());
                     }
-                    else
-                        mAuth.signOut();
                 }
             });
     }
@@ -139,10 +127,8 @@ public class FirebaseHelper {
 
         //Firebase signOut
         if (mAuth.getCurrentUser() != null) {
-            makeDeviceImeiNull(imei);
-            makeUserImeiNull();
-            Log.d(TAG,"Logged Out from Firebase"); //Removed Toasty and added log
-            //Toast.makeText(context, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
+            AsyncTaskRunner signOutRunner = new AsyncTaskRunner();
+            signOutRunner.execute(imei);
         }
     }
 
@@ -150,21 +136,13 @@ public class FirebaseHelper {
         Log.d(TAG,"Firebase SignOut() called");
         if (mAuth.getCurrentUser() != null) {
             mAuth.signOut();
-            //Toast.makeText(this, "Logged Out from Firebase", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void googleSignOut(Activity activity){
         Log.d(TAG,"Google SignOut called");
         if(GoogleSignIn.getLastSignedInAccount(context) != null) {
-            mGoogleSignInClient.signOut()
-                    .addOnCompleteListener(activity, new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            //updateUI(null);
-                            //Toast.makeText(MainActivity.this,"Logged Out from Google",Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            mGoogleSignInClient.signOut();
         }
     }
 
@@ -218,5 +196,22 @@ public class FirebaseHelper {
         dr4.setValue(user.getMobile());
         dr5.setValue(user.getName());
 
+    }
+
+    private class AsyncTaskRunner extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            makeDeviceImeiNull(params[0]);
+            makeUserImeiNull();
+            Log.d(TAG,"Deleting imei from firebase");
+            return "Logging Out";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG,result);
+            firebaseSignOut();
+        }
     }
 }

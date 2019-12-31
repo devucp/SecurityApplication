@@ -218,7 +218,6 @@ public class profile_fragment extends Fragment {
 
     private void initListeners() {
 
-
         profile_pic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -444,7 +443,7 @@ public class profile_fragment extends Fragment {
         Uri outputFileUri = null;
         File getImage = getActivity().getExternalFilesDir("");
         if (getImage != null) {
-            outputFileUri = Uri.fromFile(new File(getImage.getPath(), "profile.png"));
+            outputFileUri = Uri.fromFile(new File(getImage.getPath(), user.getEmail()+"/profile.jpeg"));
         }
         return outputFileUri;
     }
@@ -501,18 +500,13 @@ public class profile_fragment extends Fragment {
         textPhone.setText(user.getMobile());
 
         // display image from internal storage
-        //File imgPath = internalStorage.getImagePathFromStorage(user.getEmail());
-        f = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Trata/"+user.getEmail()+"/");
-        File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
-       // File imgPath = new File(f.getAbsolutePath(), "profile.jpeg");
+        File imgPath = new File(getCaptureImageOutputUri().getPath());
         try{
             Bitmap b = BitmapFactory.decodeStream(new FileInputStream(imgPath));
             profile_pic = getActivity().findViewById(R.id.profile_pic);
-            //ImageButton imageButton = (ImageButton) profile_pic;
             profile_pic.setImageBitmap(b);
 
         }catch (IOException e){
-            //Toast.makeText(getContext(), "Profile picture not found", Toast.LENGTH_SHORT).show();
             Log.d(TAG,"Profile picture not found");
         }
 
@@ -600,16 +594,14 @@ public class profile_fragment extends Fragment {
                     bit2 = Bitmap.createScaledBitmap(bit2, 512, nh, true);
                     profile_pic.setImageBitmap(bit2);
                     //save to internal storage code come here
-
-
-
-                    uploadProfilePicToFirebase();
+                    internalStorage.createDirectoryAndSaveFile(bit2,getCaptureImageOutputUri().getPath());
+                    //upload to firebase
+                    deleteExistingProfilePic();
                 }
             }
-
         }
-
     }
+
     private String getImageFromFilePath(Intent data) {
         boolean isCamera = data == null || data.getData() == null;
 
@@ -841,8 +833,6 @@ public class profile_fragment extends Fragment {
             progressDialog.dismiss();
             Log.d(TAG, e.getMessage());
             Toasty.info(getActivity(), "You need to sign in again to change password", Toast.LENGTH_LONG, true).show();
-
-//            Toast.makeText(getActivity(),"You need to sign in again to change password",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -853,39 +843,44 @@ public class profile_fragment extends Fragment {
         progressDialog.show();
         progressDialog.setCancelable(false);
 
-        // Get the data from an ImageView as bytes
-        profile_pic.setDrawingCacheEnabled(true);
-        profile_pic.buildDrawingCache();
-        Bitmap bitmap = ((BitmapDrawable) profile_pic.getDrawable()).getBitmap();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,40, baos);
-        byte[] data = baos.toByteArray();
+        try {
+            // Get the data from an ImageView as bytes
+            profile_pic.setDrawingCacheEnabled(true);
+            profile_pic.buildDrawingCache();
+            Bitmap bitmap = ((BitmapDrawable) profile_pic.getDrawable()).getBitmap();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG,40, baos);
+            byte[] data = baos.toByteArray();
 
-        StorageReference ref = firebaseHelper.getStorageReference().child("images/profile_pic");
-        UploadTask uploadTask = ref.putBytes(data);
-        uploadTask
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        progressDialog.dismiss();
-                        Toast.makeText(getContext(),"Image uploaded successfully", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
-                        Toast.makeText(getContext(), "Failed to upload image"+e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        double progress = (100f*taskSnapshot.getBytesTransferred()/taskSnapshot
-                                .getTotalByteCount());
-                        progressDialog.setMessage("Uploaded "+(int)progress+"%");
-                    }
-                });
+            StorageReference ref = firebaseHelper.getStorageReference().child("images/profile_pic");
+            UploadTask uploadTask = ref.putBytes(data);
+            uploadTask
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss();
+                            Toast.makeText(getContext(),"Image uploaded successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
+                            Toast.makeText(getContext(), "Failed to upload image"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100f*taskSnapshot.getBytesTransferred()/taskSnapshot
+                                    .getTotalByteCount());
+                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
+                        }
+                    });
+        }catch (Exception e){
+            Log.d(TAG,e.getMessage());
+            progressDialog.dismiss();
+        }
     }
 
     private void deleteExistingProfilePic(){
@@ -894,33 +889,37 @@ public class profile_fragment extends Fragment {
         progressDialog.show();
         progressDialog.setCancelable(false);
         // Create a storage reference from our app
-        StorageReference storageRef = firebaseHelper.getStorageReference();
+        try {
+            StorageReference storageRef = firebaseHelper.getStorageReference();
 
-        // Create a reference to the file to delete
-        StorageReference imgRef = storageRef.child("images/profile_pic");
+            // Create a reference to the file to delete
+            StorageReference imgRef = storageRef.child("images/profile_pic");
 
-        // Delete the file
-        imgRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // File deleted successfully
-                progressDialog.dismiss();
-                uploadProfilePicToFirebase();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                if (((StorageException) exception).getErrorCode() == ERROR_OBJECT_NOT_FOUND){
+            // Delete the file
+            imgRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
                     progressDialog.dismiss();
                     uploadProfilePicToFirebase();
                 }
-                else
-                    Toasty.error(getContext(), "Failed to upload image"+exception.getMessage(), Toast.LENGTH_LONG, true).show();
-                //Toast.makeText(getContext(), "Failed to upload image"+exception.getMessage(),Toast.LENGTH_LONG).show();
-            }
-        });
-    }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    if (((StorageException) exception).getErrorCode() == ERROR_OBJECT_NOT_FOUND){
+                        progressDialog.dismiss();
+                        uploadProfilePicToFirebase();
+                    }
+                    else
+                        Toasty.error(getContext(), "Failed to upload image"+exception.getMessage(), Toast.LENGTH_LONG, true).show();
+                }
+            });
+        }catch (Exception e){
+            Log.d(TAG,e.getMessage());
+            progressDialog.dismiss();
+        }
 
+    }
 
 }

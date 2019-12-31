@@ -176,9 +176,9 @@ public class SignUp1Activity extends AppCompatActivity {
 
         KeyboardHelper.hideSoftKeyboard(SignUp1Activity.this, view);
         Hashtable<String,String> userData = Validater();
-        Toasty.info(SignUp1Activity.this, "Please stay here..", Toast.LENGTH_LONG).show();
         if (userData != null){
             // disable screen and show spinner
+            Toasty.info(SignUp1Activity.this, "Please stay here..", Toast.LENGTH_LONG).show();
             spinner.setVisibility(View.VISIBLE);
             disable();
             setUidFromFirebase(userData);

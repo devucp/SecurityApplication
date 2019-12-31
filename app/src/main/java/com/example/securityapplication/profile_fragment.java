@@ -523,6 +523,21 @@ public class profile_fragment extends Fragment {
 
         Log.d("Profile","DATA displayed on profile Successfully");
     }
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
     private void disable(){
         textName.setEnabled(false);
         spinner.setEnabled(false);
@@ -603,14 +618,19 @@ public class profile_fragment extends Fragment {
 //
 //                    d=Bitmap.createBitmap(d,0,0,d.getWidth(),m);
                     Bitmap output;
-                    if (d.getWidth() >= d.getHeight())
-                        output = Bitmap.createBitmap(d, d.getWidth() / 2 - d.getHeight() / 2, 0, d.getHeight(), d.getHeight());
-                    else
-                        output = Bitmap.createBitmap(d, 0, d.getHeight() / 2 - d.getWidth() / 2, d.getWidth(), d.getWidth());
-                    Bitmap bit2=ExifUtils.rotateBitmap(filePath, output);
-                    int nh = (int) ( output.getHeight() * (512.0 / output.getWidth()) );
-                    bit2 = Bitmap.createScaledBitmap(bit2, 512, nh, true);
-                    profile_pic.setImageBitmap(bit2);
+                    try {
+                        if (d.getWidth() >= d.getHeight())
+                            output = Bitmap.createBitmap(d, d.getWidth() / 2 - d.getHeight() / 2, 0, d.getHeight(), d.getHeight());
+                        else
+                            output = Bitmap.createBitmap(d, 0, d.getHeight() / 2 - d.getWidth() / 2, d.getWidth(), d.getWidth());
+                        //Bitmap output=getResizedBitmap(d,100);
+                        Bitmap bit2 = ExifUtils.rotateBitmap(filePath, output);
+                        int nh = (int) (output.getHeight() * (512.0 / output.getWidth()));
+                        bit2 = Bitmap.createScaledBitmap(bit2, 512, nh, true);
+                        profile_pic.setImageBitmap(bit2);
+                    }catch (Exception e){
+                        Toast.makeText(getContext(), "Please  upload image of less size", Toast.LENGTH_SHORT).show();
+                    }
                     //save to internal storage code come here
 
 

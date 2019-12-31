@@ -17,7 +17,7 @@ import es.dmoral.toasty.Toasty;
 
 public class setting_fragment extends Fragment {
     Button sos;
-    Button rate_us,scream,invite,privacy,community; //added community
+    Button rate_us,scream,invite,privacy,community,aboutus; //added community //Added aboutus
     String str="Check out TRATA, I use it to protect myself and the people I care about. Get it for free at \nhttps://play.google.com/store/apps/details?id=com.android.chrome";
     @Nullable
     @Override
@@ -32,6 +32,7 @@ public class setting_fragment extends Fragment {
         invite=getActivity().findViewById(R.id.invite);
         privacy=getActivity().findViewById(R.id.privacy);
         community=getActivity().findViewById(R.id.community);
+        aboutus=getActivity().findViewById(R.id.aboutus);
         privacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,11 +47,21 @@ public class setting_fragment extends Fragment {
                 Toasty.info(getContext(), "This feature is coming soon...", Toast.LENGTH_SHORT, true).show();
             }
         });
-        //added coming soon message for Community
+        //Added about us activity intent
+        aboutus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent aboutus= new Intent(getActivity(),AboutUs.class);
+                startActivity(aboutus);
+            }
+        });
+        //NOTE:changed to blog Community
         community.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toasty.info(getContext(), "This feature is coming soon...", Toast.LENGTH_SHORT, true).show();
+                Uri uri = Uri.parse("http://trataindia.blogspot.com"); //TODO:replace uri with blog url
+                Intent priva = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(priva);
             }
         });
 

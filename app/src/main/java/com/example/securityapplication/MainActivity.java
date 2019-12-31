@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (databaseError != null) {
                             firebaseHelper.makeDeviceImeiNull(mImeiNumber);
                             if (databaseError.getCode() == -3) {
-                                Toasty.error(MainActivity.this, "Last logout was unsuccessful. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
+                                Toasty.error(MainActivity.this, "Last logout was unsuccessful on this device. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
                             }
                             else {
                                 Log.d(TAG,databaseError.getMessage());
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     if (databaseError != null) {
                                         firebaseHelper.makeDeviceImeiNull(mImeiNumber);
                                         if (databaseError.getCode() == -3){
-                                            Toasty.error(MainActivity.this, "Last logout was unsuccessful. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
+                                            Toasty.error(MainActivity.this, "Last logout was unsuccessful on this device. Try to login using the previous Account.", Toast.LENGTH_LONG).show();
                                         }
                                         else
                                             Toasty.error(MainActivity.this, "Sign in failed.",Toast.LENGTH_SHORT).show();

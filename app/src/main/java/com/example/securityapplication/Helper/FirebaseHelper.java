@@ -144,7 +144,7 @@ public class FirebaseHelper {
 
     public void googleSignOut(Activity activity){
         Log.d(TAG,"Google SignOut called");
-        if(GoogleSignIn.getLastSignedInAccount(context) != null) {
+        if(GoogleSignIn.getLastSignedInAccount(context) != null && mGoogleSignInClient != null) {
             mGoogleSignInClient.signOut()
                     .addOnCompleteListener(activity, new OnCompleteListener<Void>() {
                         @Override

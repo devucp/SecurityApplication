@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.DrawableWrapper;
@@ -50,6 +51,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -188,6 +190,11 @@ public class profile_fragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         //builder = new StrictMode.VmPolicy.Builder();
         //StrictMode.setVmPolicy(builder.build());
+        LinearLayout linearLayout = getActivity().findViewById(R.id.anim_back);
+        AnimationDrawable animationDrawable = (AnimationDrawable) linearLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(4000);
+        animationDrawable.start();
         initObjects();
         initviews();
 //        FetchAllData();
@@ -301,8 +308,6 @@ public class profile_fragment extends Fragment {
                                             btn_edit.startAnimation(edit_anim);
 
                                             if (IsInternet.isNetworkAvaliable(getContext())) {
-
-                                                chooseImgBtn.setVisibility(View.VISIBLE);
 
                                                 if(btn_edit.getText().equals("edit"))
                                                 {btn_edit.setText("Save");
@@ -518,12 +523,28 @@ public class profile_fragment extends Fragment {
 
         Log.d("Profile","DATA displayed on profile Successfully");
     }
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
     private void disable(){
         textName.setEnabled(false);
         spinner.setEnabled(false);
         textEmail.setEnabled(false);
         textPhone.setEnabled(false);
         textAddress.setEnabled(false);
+        chooseImgBtn.setVisibility(View.INVISIBLE);
         textDob.setEnabled(false);
         textName.setBackgroundColor(Color.TRANSPARENT);
         textEmail.setBackgroundColor(Color.TRANSPARENT);
@@ -547,7 +568,7 @@ public class profile_fragment extends Fragment {
         textAddress.setEnabled(true);
         textDob.setEnabled(true);
 
-
+        chooseImgBtn.setVisibility(View.VISIBLE);
         textEmail.setBackgroundResource(R.drawable.blackborder);
         textPhone.setBackgroundResource(R.drawable.blackborder);
         textAddress.setBackgroundResource(R.drawable.blackborder);
@@ -587,18 +608,29 @@ public class profile_fragment extends Fragment {
                 String filePath = getImageFilePath(data);
                 if (filePath != null) {
                     Bitmap d = BitmapFactory.decodeFile(filePath);
-
-                    int k=d.getWidth();
-                    int l=d.getHeight();
-                    int min=k<l?k:l;
-                    if(k<l){
-
+//                    int m=d.getWidth();
+//                    int k=d.getWidth();
+//                    int l=d.getHeight();
+//                    if(k<l)
+//                        m=k;
+//                    else
+//                        m=l;
+//
+//                    d=Bitmap.createBitmap(d,0,0,d.getWidth(),m);
+                    Bitmap output;
+                    try {
+                        if (d.getWidth() >= d.getHeight())
+                            output = Bitmap.createBitmap(d, d.getWidth() / 2 - d.getHeight() / 2, 0, d.getHeight(), d.getHeight());
+                        else
+                            output = Bitmap.createBitmap(d, 0, d.getHeight() / 2 - d.getWidth() / 2, d.getWidth(), d.getWidth());
+                        //Bitmap output=getResizedBitmap(d,100);
+                        Bitmap bit2 = ExifUtils.rotateBitmap(filePath, output);
+                        int nh = (int) (output.getHeight() * (512.0 / output.getWidth()));
+                        bit2 = Bitmap.createScaledBitmap(bit2, 512, nh, true);
+                        profile_pic.setImageBitmap(bit2);
+                    }catch (Exception e){
+                        Toast.makeText(getContext(), "Please  upload image of less size", Toast.LENGTH_SHORT).show();
                     }
-                    d=Bitmap.createBitmap(d,0,0,min,min);
-                    Bitmap bit2=ExifUtils.rotateBitmap(filePath, d);
-                    int nh = (int) ( d.getHeight() * (512.0 / d.getWidth()) );
-                    bit2 = Bitmap.createScaledBitmap(bit2, 512, nh, true);
-                    profile_pic.setImageBitmap(bit2);
                     //save to internal storage code come here
 
 

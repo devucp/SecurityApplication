@@ -17,8 +17,8 @@ import es.dmoral.toasty.Toasty;
 
 public class setting_fragment extends Fragment {
     Button sos;
-    Button rate_us,scream,invite,privacy;
-    String str="Check out TRATA, I use it to protect myself and the people I care about. Get it for free at \nhttps://play.google.com/store/apps/details?id=com.android.chrome";
+    Button rate_us,scream,invite,privacy,community,aboutus,feedback; //added community
+    String str="Check out TRATA, I use it to protect myself and the people I care about. Get it for free at \nhttp://innovatiivecreators.in/download/";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -31,6 +31,18 @@ public class setting_fragment extends Fragment {
         scream=getActivity().findViewById(R.id.screem);
         invite=getActivity().findViewById(R.id.invite);
         privacy=getActivity().findViewById(R.id.privacy);
+        community=getActivity().findViewById(R.id.community);
+        feedback=getActivity().findViewById(R.id.feedback);
+        feedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri data = Uri.parse("mailto:sachin.saw.13@gmail.com?subject=" + "Feedback" + "&body=" + "");
+                intent.setData(data);
+                startActivity(intent);
+            }
+        });
+        aboutus=getActivity().findViewById(R.id.aboutus);
         privacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -42,10 +54,27 @@ public class setting_fragment extends Fragment {
         scream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Toast.makeText(getContext(), "This feature are Comming Soon...", Toast.LENGTH_SHORT).show();
-                Toasty.info(getContext(),"This feature is Comming Soon...").show();
+                Toasty.info(getContext(), "This feature is coming soon...", Toast.LENGTH_SHORT, true).show();
             }
         });
+        //Added about us activity intent
+        aboutus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent aboutus= new Intent(getActivity(),AboutUs.class);
+                startActivity(aboutus);
+            }
+        });
+        //NOTE:changed to blog Community
+        community.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = Uri.parse("http://trataindia.blogspot.com"); //TODO:replace uri with blog url
+                Intent priva = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(priva);
+            }
+        });
+
         rate_us.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

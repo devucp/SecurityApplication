@@ -112,9 +112,9 @@ public class home_fragment extends Fragment {
             public void onClick(View view) {
                 final Animation myAnim = AnimationUtils.loadAnimation(getContext(), R.anim.btn_anim);
                 emergency.startAnimation(myAnim);
-                if (is_paid) {
-                    Toasty.info(getContext(), "You are premier member", Toast.LENGTH_SHORT, true).show();
-                    //Toast.makeText(getContext(), "You are premier member", Toast.LENGTH_SHORT).show();
+                if (is_paid || true) { //temporarily made ALWAYS TRUE
+
+                    //Toasty.info(getContext(), "You are Premium member", Toast.LENGTH_SHORT, true).show(); //Commented-out
 
                     //Code: TO play siren and send emergency message and alert
                     //emergency.setBackgroundColor(getResources().getColor(R.drawable.buttonshape_emer));
@@ -135,7 +135,7 @@ public class home_fragment extends Fragment {
 
                 } else {
                     //if user using free services only
-                    new AlertDialog.Builder(getContext()).setMessage("Upgrade to Premier to Use this function")
+                    new AlertDialog.Builder(getContext()).setMessage("Upgrade to Premium to Use this function")
                             .setPositiveButton("Purchased", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -164,7 +164,7 @@ public class home_fragment extends Fragment {
                 try {
 
                     if (SendSMSService.getAlert() == 0 && SendSMSService.getEmergency() == 0) {
-                        Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
+                        Toasty.warning(getContext(), "Emergency/Alert Not Raised", Toast.LENGTH_SHORT,true).show();  //changed to warning-toasty from toast
                     }
 
 
@@ -204,7 +204,7 @@ public class home_fragment extends Fragment {
                 }
                 catch (Exception e)
                 {
-                    Toast.makeText(getContext(), "emergency not raised", Toast.LENGTH_SHORT).show();
+                    Toasty.warning(getContext(), "Emergency/Alert Not Raised", Toast.LENGTH_SHORT,true).show();  //changed to warning-toasty from toast
 
                     Log.d("home_fragment", "catch raised");
                 }
@@ -236,6 +236,7 @@ public class home_fragment extends Fragment {
             Log.d("MainActivity", "PERMISSION FOR SEND SMS NOT GRANTED, REQUESTING PERMSISSION...");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.SEND_SMS}, RC);
+            return false;// added return false
         }
         final boolean b = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
         return b;

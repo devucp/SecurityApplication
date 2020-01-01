@@ -24,7 +24,7 @@ public class sentReceiver extends BroadcastReceiver {
                         Toast.LENGTH_LONG).show();*/
                 break;
             case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                Toasty.error(context, "Generic failure", Toast.LENGTH_LONG, true).show();
+                Toasty.error(context, "Error: Message not sent", Toast.LENGTH_LONG, true).show(); //changed from generic failure
 
                /* Toast.makeText(context, "Generic failure",
                         Toast.LENGTH_LONG).show();*/

@@ -64,11 +64,11 @@ public class GetGPSCoordinates extends Service {
         Log.d("GPSService", "Oncreate");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(4*1000);
-        locationRequest.setFastestInterval(2*1000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(5*60*1000); //NOTE:changed to 5 mins
+        locationRequest.setFastestInterval(3*60*1000); //NOTE:changed to 2 mins
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
-        initListener();
+
 
         /*if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED)
             && (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) ==PackageManager.PERMISSION_GRANTED))
@@ -139,11 +139,11 @@ public class GetGPSCoordinates extends Service {
                         Log.d("onLocationAvailabilty","Location Available will show updates");
                         //Location Available resume service
                     }else {
-                        Log.d("onLocationAvailabilty","Location Unavailable deploying prompt");
+                        Log.d("onLocationAvailabilty","Location Unavailable deploying intent");
+                        Toasty.warning(getApplicationContext(),"Please turn on location to help us serve you better",Toasty.LENGTH_LONG).show();
                         Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(i);
-                        Toast.makeText(getApplicationContext(),"Please turn on location to help us serve you better",Toast.LENGTH_LONG).show();
                     }
                 }
             };
@@ -158,9 +158,10 @@ public class GetGPSCoordinates extends Service {
                     0, notificationIntent, 0);
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                    .setSmallIcon(R.drawable.ic_notify)
+                    .setColor(getResources().getColor(R.color.cyan))
                     .setContentIntent(pendingIntent)
-                    .setContentTitle(" Security Application ")
+                    .setContentTitle("TRATA")
                     .setContentText(input)
                     .build();
 
@@ -220,7 +221,7 @@ public class GetGPSCoordinates extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toasty.error(getApplicationContext(), "GPS service destroyed", Toast.LENGTH_SHORT, true).show();
+        //Toasty.error(getApplicationContext(), "GPS service destroyed", Toast.LENGTH_SHORT, true).show();
 
         //Toast.makeText(getApplicationContext(),"GPS service destroyed",Toast.LENGTH_SHORT);
         Log.d("GPSService","OnDestroy");

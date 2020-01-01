@@ -131,7 +131,7 @@ public class sos_page extends AppCompatActivity {
             Cursor res;
             res = mydb.getSosContacts();
             if (res.getCount() == 0){
-                Toasty.error(getApplicationContext(),
+                Toasty.info(getApplicationContext(),
                         "Please enter atleast 1 contact for emergency",
                         Toast.LENGTH_LONG).show();
 
@@ -435,8 +435,7 @@ catch (Exception e)
     @Override
     public void onBackPressed(){
         ReturnIntent.putExtra("ResultIntent",user);
-        //Log.d("SignUp2 ","Returned Completed User Object"+user.getMobile()+user.getLocation());
-        setResult(10,ReturnIntent);//to finish sing up 1 activity
+        setResult(10,ReturnIntent);//to finish navigation activity
         finish();
     }
     public void edit() {
@@ -657,15 +656,11 @@ catch (Exception e)
                 if (mydb.addsosContacts(SosContacts,dec)) {
                     Log.d("SosActivity", "SOS contacts was added in database");
                     updateFireBaseSOS();
-                    Toasty.success(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT, true).show();
-
-                   // Toast.makeText(sos_page.this, "DATA saved successfully ", Toast.LENGTH_SHORT).show();
-
+                    Toasty.success(sos_page.this, "Contacts saved successfully ", Toast.LENGTH_SHORT, true).show(); //fixed message
                     startActivity(intent);
                 } else {
-                    Toasty.error(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT, true).show();
+                    Toasty.error(sos_page.this, "Contacts could not be added", Toast.LENGTH_SHORT, true).show(); //fixed message
 
-                    //Toast.makeText(sos_page.this, "SOS Contact could not be added", Toast.LENGTH_SHORT).show();
                     Log.d("SosActivity", "Data was not entered");
                 }
             } else {

@@ -97,6 +97,16 @@ public class navigation extends AppCompatActivity implements ForceUpdateChecker.
 
         logo.startAnimation(animRotate);
 
+        logo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent aboutus= new Intent(getApplicationContext(),AboutUs.class);
+                startActivity(aboutus);
+
+            }
+        });
+
 
         async();
         //sqlite db code here

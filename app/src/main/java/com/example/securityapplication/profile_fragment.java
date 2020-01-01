@@ -822,7 +822,7 @@ public class profile_fragment extends Fragment {
         if (!IsInternet.checkInternet(getContext()))
             return;
 
-        progressDialog = new ProgressDialog(getContext());
+        progressDialog = new ProgressDialog(getContext(),R.style.MyAlertDialogStyle);
         progressDialog.setTitle("Sending Email...");
         progressDialog.show();
         progressDialog.setCancelable(false);

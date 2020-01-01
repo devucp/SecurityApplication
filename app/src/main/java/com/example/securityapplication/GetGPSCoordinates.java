@@ -160,6 +160,7 @@ public class GetGPSCoordinates extends Service {
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notify)
                     .setColor(getResources().getColor(R.color.cyan))
+                    .setPriority(Notification.PRIORITY_HIGH)
                     .setContentIntent(pendingIntent)
                     .setContentTitle("Trata")
                     .setContentText(input)

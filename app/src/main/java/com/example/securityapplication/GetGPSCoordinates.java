@@ -161,7 +161,7 @@ public class GetGPSCoordinates extends Service {
                     .setSmallIcon(R.drawable.ic_notify)
                     .setColor(getResources().getColor(R.color.cyan))
                     .setContentIntent(pendingIntent)
-                    .setContentTitle("TRATA")
+                    .setContentTitle("Trata")
                     .setContentText(input)
                     .build();
 

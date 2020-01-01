@@ -15,6 +15,38 @@
       },
       "oauth_client": [
         {
+          "client_id": "534786616869-8klolugqqr8mn1canrfjut2ru5at17dg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.securityapplication",
+            "certificate_hash": "ea408956bf5a0b70210960df63e29f1f755d9708"
+          }
+        },
+        {
+          "client_id": "534786616869-rieukiebaget8v0vmspbevtb6f3ch02l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.securityapplication",
+            "certificate_hash": "c133cb0f12756d4ba1d8427ea546831a6dc5bb7a"
+          }
+        },
+        {
+          "client_id": "534786616869-ndb46cnf5qfrjifh2o59llmq97f704pk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.securityapplication",
+            "certificate_hash": "01d6865bc785e15c48b6dd3c993d789c35f4237a"
+          }
+        },
+        {
+          "client_id": "534786616869-41nq9t5m26rra7fnirj9sm7cukn94vst.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.securityapplication",
+            "certificate_hash": "80045fe2a778a3d1ffc2848df034b66c1ab84b73"
+          }
+        },
+        {
           "client_id": "534786616869-dj480jqoqd5ien1897od9ire090ustcm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

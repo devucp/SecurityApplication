@@ -80,7 +80,7 @@
                         android:textColor="@color/white"
                         android:textColorLink="#00EEEEEE"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="25sp"
+                        android:textSize="30sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
@@ -90,6 +90,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_marginLeft="8dp"
+    android:padding="10dp"
     >
                 <LinearLayout
                     android:layout_width="match_parent"
